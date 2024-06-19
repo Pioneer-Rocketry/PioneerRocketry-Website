@@ -17,19 +17,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- calendar script -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
-    <script>
+    <script lang="javascript" type="text/javascript">
 
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar')
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth'
+                initialView: 'dayGridMonth',
+                timeZone: 'local',
+                events: [
+                    {
+                        id: 'vc-meeting',
+                        title: 'Discord Club Meeting',
+                        start: new Date(2024, 6, 18),
+                        end: new Date(2024, 9, 1),
+                        daysOfWeek: [2],
+                        startTime: "18:33",
+                        endTime: "19:00",
+                        url: "https://discord.com/",
+                        backgroundColor: '#5865F2',
+
+                    }
+                ]
             })
-            calendar.render(1000)
+            calendar.render()
+
         })
 
-        $(window).resize(function () {
-            calendar.updateSize();
-        });
+
 
     </script>
     <style>
