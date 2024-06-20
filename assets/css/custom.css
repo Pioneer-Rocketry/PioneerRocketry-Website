@@ -1,0 +1,11 @@
+.cimg{
+    position: inherit;
+    height: 50vh;
+    object-fit: cover;
+    max-width: 100%;
+    
+}
+#autoplay{
+    margin-bottom: 100px;
+    margin-top: 100px;
+}
