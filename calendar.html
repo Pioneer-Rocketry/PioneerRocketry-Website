@@ -20,26 +20,25 @@
     <script lang="javascript" type="text/javascript">
 
         document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar')
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                timeZone: 'local',
-                events: [
-                    {
-                        id: 'vc-meeting',
-                        title: 'Discord Club Meeting',
-                        start: new Date(2024, 6, 18),
-                        end: new Date(2024, 9, 1),
-                        daysOfWeek: [2],
-                        startTime: "18:33",
-                        endTime: "19:00",
-                        url: "https://discord.com/",
-                        backgroundColor: '#5865F2',
-
-                    }
-                ]
+            fetch('https://puller2.kris-adams3000.workers.dev/', {
+                method: 'GET',
+                headers: {
+                    'Pull-All-Data': 'true' // Add this header to pull all data
+                }
             })
-            calendar.render()
+                .then(response => response.json())
+                .then(data => {
+                    const calendarEl = document.getElementById('calendar')
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        timeZone: 'local',
+                        events: data,
+                    })
+                    calendar.render()
+                })
+                .catch(error => console.error('Error:', error));
+                
+
 
         })
 
