@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/main.css" />
-    
+
     <!-- calendar script -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
     <script lang="javascript" type="text/javascript">
@@ -42,89 +42,95 @@
           })
           .catch((error) => console.error("Error:", error));
       });
-      
-      $('#createEventForm').on('submit', async function(event) {
+
+      $("#createEventForm").on("submit", async function (event) {
         event.preventDefault(); // Prevent default form submission
-        
+
         // Gather basic event data
         const formData = new FormData(this);
         const basicEventData = {
-          securityKey: formData.get('securityKey'),
-          title: formData.get('eventTitle'),
-          start: formData.get('eventStartDate'),
-          end: formData.get('eventEndDate'),
-          description: formData.get('eventDescription')
+          securityKey: formData.get("securityKey"),
+          title: formData.get("eventTitle"),
+          start: formData.get("eventStartDate"),
+          end: formData.get("eventEndDate"),
+          description: formData.get("eventDescription"),
           // Add more basic fields as needed based on your form
         };
-        
+
         // Gather advanced event data
         const advancedEventData = {
-          id: formData.get('eventId'),
-          groupId: formData.get('eventGroupId'),
-          allDay: formData.get('eventAllDay') === 'true',
-          start: formData.get('eventStart'),
-          end: formData.get('eventEnd'),
-          daysOfWeek: formData.get('eventDaysOfWeek') ? JSON.parse(formData.get('eventDaysOfWeek')) : null,
-          startTime: formData.get('eventStartTime'),
-          endTime: formData.get('eventEndTime'),
-          startRecur: formData.get('eventStartRecur'),
-          endRecur: formData.get('eventEndRecur'),
-          title: formData.get('eventTitle'),
-          url: formData.get('eventUrl'),
-          interactive: formData.get('eventInteractive') === 'true',
-          className: formData.get('eventClassName'),
-          classNames: formData.get('eventClassNames') ? JSON.parse(formData.get('eventClassNames')) : null,
-          editable: formData.get('eventEditable') === 'true',
-          startEditable: formData.get('eventStartEditable') === 'true',
-          durationEditable: formData.get('eventDurationEditable') === 'true',
-          resourceEditable: formData.get('eventResourceEditable') === 'true',
-          resourceId: formData.get('eventResourceId'),
-          resourceIds: formData.get('eventResourceIds') ? JSON.parse(formData.get('eventResourceIds')) : null,
-          display: formData.get('eventDisplay'),
-          overlap: formData.get('eventOverlap') === 'true',
-          constraint: formData.get('eventConstraint'),
-          color: formData.get('eventColor'),
-          backgroundColor: formData.get('eventBackgroundColor'),
-          borderColor: formData.get('eventBorderColor'),
-          textColor: formData.get('eventTextColor'),
-          rrule: formData.get('eventRrule'),
-          duration: formData.get('eventDuration')
+          id: formData.get("eventId"),
+          groupId: formData.get("eventGroupId"),
+          allDay: formData.get("eventAllDay") === "true",
+          start: formData.get("eventStart"),
+          end: formData.get("eventEnd"),
+          daysOfWeek: formData.get("eventDaysOfWeek")
+            ? JSON.parse(formData.get("eventDaysOfWeek"))
+            : null,
+          startTime: formData.get("eventStartTime"),
+          endTime: formData.get("eventEndTime"),
+          startRecur: formData.get("eventStartRecur"),
+          endRecur: formData.get("eventEndRecur"),
+          title: formData.get("eventTitle"),
+          url: formData.get("eventUrl"),
+          interactive: formData.get("eventInteractive") === "true",
+          className: formData.get("eventClassName"),
+          classNames: formData.get("eventClassNames")
+            ? JSON.parse(formData.get("eventClassNames"))
+            : null,
+          editable: formData.get("eventEditable") === "true",
+          startEditable: formData.get("eventStartEditable") === "true",
+          durationEditable: formData.get("eventDurationEditable") === "true",
+          resourceEditable: formData.get("eventResourceEditable") === "true",
+          resourceId: formData.get("eventResourceId"),
+          resourceIds: formData.get("eventResourceIds")
+            ? JSON.parse(formData.get("eventResourceIds"))
+            : null,
+          display: formData.get("eventDisplay"),
+          overlap: formData.get("eventOverlap") === "true",
+          constraint: formData.get("eventConstraint"),
+          color: formData.get("eventColor"),
+          backgroundColor: formData.get("eventBackgroundColor"),
+          borderColor: formData.get("eventBorderColor"),
+          textColor: formData.get("eventTextColor"),
+          rrule: formData.get("eventRrule"),
+          duration: formData.get("eventDuration"),
           // Add more advanced fields as needed based on your form
         };
-        
+
         // Combine basic and advanced data into a single object
         const eventData = { ...basicEventData, ...advancedEventData };
-        
+
         try {
           // Send data to the backend for insertion into the database
-          const response = await fetch('https://puller2.kris-adams3000.workers.dev/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              "New-Event":JSON.stringify(eventData),
-              "Security-Key":event.securityKey,
-            },
-            
-          });
-          
+          const response = await fetch(
+            "https://puller2.kris-adams3000.workers.dev/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "New-Event": JSON.stringify(eventData),
+                "Security-Key": event.securityKey,
+              },
+            }
+          );
+
           if (!response.ok) {
-            throw new Error('Failed to insert event');
+            throw new Error("Failed to insert event");
           }
-          
+
           // Handle success response
-          console.log('New Event Inserted Successfully');
-          
+          console.log("New Event Inserted Successfully");
+
           // Optionally, close the modal or reset the form
-          $('#createEventModal').modal('hide');
+          $("#createEventModal").modal("hide");
           this.reset(); // Reset the form fields
-          
         } catch (error) {
           // Handle error
-          console.error('Error inserting event:', error.message);
+          console.error("Error inserting event:", error.message);
           // Optionally, display an error message to the user
         }
       });
-      
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
@@ -277,30 +283,33 @@
         class="modal fade"
         id="createEventModal"
         tabindex="-1"
-        role="dialog"
         aria-labelledby="createEventModalLabel"
         aria-hidden="true"
+        data-bs-theme="dark"
       >
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-              <h5 class="modal-title" id="createEventModalLabel">
-                Create New Event
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Create New Event</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- Modal Body -->
             <div class="modal-body">
               <form id="createEventForm">
+                <!-- Event Title -->
+                <div class="form-group">
+                    <label for="securityKey">Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="securityKey"
+                      name="securityKey"
+                      required
+                    />
+                  </div>
+
                 <!-- Event Title -->
                 <div class="form-group">
                   <label for="eventTitle">Title</label>
@@ -715,7 +724,7 @@
     </div>
 
     <!-- Scripts -->
-    
+
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/jquery.dropotron.min.js"></script>
     <script src="assets/js/browser.min.js"></script>
