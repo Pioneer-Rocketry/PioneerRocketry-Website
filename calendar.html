@@ -47,7 +47,7 @@
             event.preventDefault(); // Prevent default form submission
     
             // Gather basic event data
-            const formData = new FormData(this);
+            const formData = new FormData($("#createEventForm")[0]);
             const basicEventData = {
               securityKey: formData.get("securityKey"),
               title: formData.get("eventTitle"),
@@ -432,7 +432,7 @@
 
                     <div class="form-group">
                       <label for="eventDaysOfWeek"
-                        >Days of Week (JSON Array)</label
+                        >Days of Week ([0,1,2,3,4,5,6])</label
                       >
                       <input
                         type="text"
@@ -507,7 +507,7 @@
                     </div>
 
                     <div class="form-group">
-                      <label for="eventClassName">Class Name</label>
+                      <label for="eventClassName">Class Name (Or Class Names)</label>
                       <input
                         type="text"
                         class="form-control"
@@ -518,7 +518,7 @@
 
                     <div class="form-group">
                       <label for="eventClassNames"
-                        >Class Names (JSON Array)</label
+                        >Class Names ([ 'myclass1', myclass2' ])</label
                       >
                       <input
                         type="text"
