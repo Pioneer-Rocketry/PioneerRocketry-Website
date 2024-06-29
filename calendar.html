@@ -23,8 +23,9 @@
     <!-- calendar script -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
     <script lang="javascript" type="text/javascript">
+      let calendar;
       document.addEventListener("DOMContentLoaded", function () {
-        fetch("https://puller2.kris-adams3000.workers.dev/", {
+        fetch("https://api.pioneerrocketry.com", {
           method: "GET",
           headers: {
             "Pull-All-Data": "true", // Add this header to pull all data
@@ -32,14 +33,22 @@
         })
           .then((response) => response.json())
           .then((data) => {
+
+            const parsedObject = [];
+            
+            for (const key in data) {
+              parsedObject[key] = data[key];
+            }
+
+
             const calendarEl = document.getElementById("calendar");
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+             calendar = new FullCalendar.Calendar(calendarEl, {
               initialView: "dayGridMonth",
               timeZone: "local",
-              events: data,
+              events: parsedObject,
               themeSystem: 'bootstrap5'
             });
-            console.log(data);
+            console.log(parsedObject);
             console.log("rendering calendar");
             calendar.render();
           })
@@ -107,7 +116,7 @@
           try {
             // Send data to the backend for insertion into the database
             const response = await fetch(
-              "https://puller2.kris-adams3000.workers.dev/",
+              "https://api.pioneerrocketry.com",
               {
                 method: "POST",
                 headers: {
