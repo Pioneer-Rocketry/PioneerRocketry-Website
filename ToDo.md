@@ -7,5 +7,5 @@
 - [ ] Resize Images Further to reduce from 100mb to around 10mb
 - [X] Remove Extra Images
 - [ ] Implement the Image Upload Tool.
-- [ ] Possibly move the entire wobsite over to a different cloudflare account specifically for Rocketry. 
+- [ ] Possibly move the entire website over to a different cloudflare account specifically for Rocketry. 
 
