@@ -1,10 +1,11 @@
 - [ ] Add a database connection to the webpage.
-- [ ] add event creation and deleteion for calendar to database.
+- [X] add event creation and deleteion for calendar to database.
+- [ ] add security to the worker calls.
 - [ ] Add a social media Embed page.
 - [X] Resize images to reduce size from 1000mb to 100mb.
 - [ ] Link Wiki page to main page.
 - [ ] Resize Images Further to reduce from 100mb to around 10mb
-- [ ] Remove Extra Images
-- [ ] 
-- [ ] 
+- [X] Remove Extra Images
+- [ ] Implement the Image Upload Tool.
+- [ ] Possibly move the entire wobsite over to a different cloudflare account specifically for Rocketry. 
 
