@@ -128,7 +128,8 @@
             return response.json();
           })
           .then((data) => {
-            const repairedEvents = repairEvents(data);
+            let object = JSON.parse(data);
+            const repairedEvents = repairEvents(object.result.events);
 
             const calendarEl = document.getElementById("calendar");
             calendar = new FullCalendar.Calendar(calendarEl, {
