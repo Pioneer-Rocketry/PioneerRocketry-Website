@@ -1,4 +1,6 @@
-
+function attemptLogin(){
+    
+}
 function repairEvent(event) {
     // Default values for missing fields
     const defaults = {
@@ -87,8 +89,13 @@ function repairEvent(event) {
   }
 
 
+
   let calendar;
   document.addEventListener("DOMContentLoaded", function () {
+    
+
+
+
     fetch("https://api.pioneerrocketry.com", {
       method: "GET",
       headers: {
