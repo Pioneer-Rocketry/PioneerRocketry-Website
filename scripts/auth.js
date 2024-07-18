@@ -27,6 +27,9 @@ function onSignIn(googleUser) {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: "663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com",
     callback: "onTokenResponse",
+    scope: 'https://www.googleapis.com/auth/userinfo.email\
+    https://www.googleapis.com/auth/userinfo.profile\
+    openid'
   });
   console.log(client);
   handleCredentialResponse(googleUser);
