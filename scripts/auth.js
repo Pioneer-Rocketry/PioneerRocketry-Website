@@ -1,14 +1,8 @@
 //decode JWT
 function decodeJWT(token) {
     try {
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        throw new Error('Invalid JWT format');
-      }
 
-      // Decode payload (base64url encoded)
-      const payload = parts[1];
-      const decodedPayload = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(payload));
+      const decodedPayload = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(token));
 
       return decodedPayload;
     } catch (error) {
