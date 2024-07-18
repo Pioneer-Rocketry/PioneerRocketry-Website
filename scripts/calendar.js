@@ -1,6 +1,4 @@
-function attemptLogin(){
-    
-}
+
 function repairEvent(event) {
     // Default values for missing fields
     const defaults = {
@@ -110,7 +108,7 @@ function repairEvent(event) {
         return response.json();
       })
       .then((data) => {
-        const repairedEvents = repairEvents(data);
+        const repairedEvents = repairEvents(data.result.events);
 
         const calendarEl = document.getElementById("calendar");
         calendar = new FullCalendar.Calendar(calendarEl, {

@@ -21,7 +21,7 @@ function decodeJwtResponse(token) {
 function onSignIn(googleUser) {
   console.log("Signed in: ", googleUser);
 
-  let responsePayload = decodeJwtResponse(response.credential);
+  let responsePayload = decodeJwtResponse(googleUser.credential);
   
   fetch("https://google-auth.kris-adams3000.workers.dev/googleRedirect", {
     method: "POST",
