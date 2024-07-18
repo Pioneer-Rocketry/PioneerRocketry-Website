@@ -1,3 +1,5 @@
+// Google Auth
+
 //decode JWT
 function decodeJwtResponse(token) {
   try {
@@ -21,33 +23,28 @@ function decodeJwtResponse(token) {
 function onSignIn(googleUser) {
   console.log("Signed in: ", googleUser);
 
-  let responsePayload = decodeJwtResponse(googleUser.credential).payload;
-  
-  fetch("https://google-auth.kris-adams3000.workers.dev/googleRedirect", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id_token: responsePayload.sub }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      // Handle authenticated user
-    })
-    .catch((error) => console.error("Error:", error));
-    handleCredentialResponse(googleUser)
+
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: "663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com",
+    callback: "onTokenResponse",
+  });
+  console.log(client);
+  handleCredentialResponse(googleUser);
+}
+
+function onTokenResponse(tokenResponse) {
+  console.log("Token Response: ", tokenResponse);
 }
 
 function handleCredentialResponse(response) {
-    // decodeJwtResponse() is a custom function defined by you
-    // to decode the credential response.
-    const responsePayload = decodeJwtResponse(response.credential).payload;
+  // decodeJwtResponse() is a custom function defined by you
+  // to decode the credential response.
+  const responsePayload = decodeJwtResponse(response.credential).payload;
 
-    console.log("ID: " + responsePayload.sub);
-    console.log('Full Name: ' + responsePayload.name);
-    console.log('Given Name: ' + responsePayload.given_name);
-    console.log('Family Name: ' + responsePayload.family_name);
-    console.log("Image URL: " + responsePayload.picture);
-    console.log("Email: " + responsePayload.email);
- }
+  console.log("ID: " + responsePayload.sub);
+  console.log("Full Name: " + responsePayload.name);
+  console.log("Given Name: " + responsePayload.given_name);
+  console.log("Family Name: " + responsePayload.family_name);
+  console.log("Image URL: " + responsePayload.picture);
+  console.log("Email: " + responsePayload.email);
+}
