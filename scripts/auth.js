@@ -19,32 +19,6 @@ function decodeJwtResponse(token) {
   }
 }
 
-// Google Sign In
-function onSignIn(googleUser) {
-  console.log("Signed in: ", googleUser);
-
-
-  const client = google.accounts.oauth2.initCodeClient({
-    client_id: '663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com',
-    scope: 'https://www.googleapis.com/auth/calendar.readonly',
-    ux_mode: 'popup',
-    callback: (response) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', code_receiver_uri, true);
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      // Set custom header for CRSF
-      xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest');
-      xhr.onload = function() {
-        console.log('Auth code response: ' + xhr.responseText);
-      };
-      xhr.send('code=' + response.code);
-    },
-  });
-  console.log(client);
-  client.requestCode();
-  handleCredentialResponse(googleUser);
-}
-
 function onTokenResponse(googleUser) {
     handleCredentialResponse(googleUser);
 }
