@@ -16,9 +16,9 @@
   <link rel="stylesheet" href="assets/css/main.css" />
 
   <!-- calendar script -->
-  <script src="
-  https://cdn.jsdelivr.net/npm/jose@5.6.3/dist/browser/index.min.js
-  "></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jose/5.6.3/index.bundle.min.js"
+    integrity="sha512-/FgCHzK1jDJuzuip0hDgg6mwJuSScDheJgD4+kMme+sxSh7zfSIeZ78Ke91GMiitxdV2cx9pNkD/9hyX2c/NcA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://accounts.google.com/gsi/client" onload=""></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
   <script lang="javascript" type="text/javascript" src="./scripts/calendar.js"></script>
@@ -27,15 +27,16 @@
   <script lang="javascript" type="text/javascript" src="./scripts/auth.js"></script>
 
   <style>
-    .g_id_signin{
+    .g_id_signin {
       position: relative;
-    top: 0px;
-    right: 0px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    align-content: center;
+      top: 0px;
+      right: 0px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      align-content: center;
     }
+
     #calendar tbody tr[role="row"] {
       height: 150px;
     }
@@ -100,22 +101,23 @@
 
     <section>
       <div id="g_id_onload" data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
-          data-context="signin" data-ux_mode="popup" data-callback="onSignIn" data-auto_prompt="false" data-native_callback="onSignIn">
-        </div>
-         <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with"
-          data-size="large" data-logo_alignment="left">
-        </div>
+        data-context="signin" data-ux_mode="popup" data-callback="onSignIn" data-auto_prompt="false"
+        data-native_callback="onSignIn">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with"
+        data-size="large" data-logo_alignment="left">
+      </div>
       <div id="calendar-container">
-       
-        
 
-       
+
+
+
         <div id="calendar"></div>
       </div>
       <button id="createEventBtn" type="button" class="btn btn-primary" data-bs-toggle="modal"
-          data-bs-target="#createEventModal">
-          Create New Event
-        </button>
+        data-bs-target="#createEventModal">
+        Create New Event
+      </button>
     </section>
 
     <!-- Footer -->
