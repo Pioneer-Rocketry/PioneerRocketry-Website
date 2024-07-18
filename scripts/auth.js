@@ -45,8 +45,8 @@ function onSignIn(googleUser) {
   handleCredentialResponse(googleUser);
 }
 
-function onTokenResponse(tokenResponse) {
-  console.log("Token Response: ", tokenResponse);
+function onTokenResponse(googleUser) {
+    handleCredentialResponse(googleUser);
 }
 
 function onErrorCallback(error) {
