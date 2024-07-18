@@ -1,11 +1,11 @@
 //decode JWT
-function decodeJWT(token) {
+function decodeJwtResponse(token) {
   try {
-    sJWT = token;
-    var headerObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[0]));
-    var payloadObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[1]));
+    let sJWT = token;
+    let headerObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[0]));
+    let payloadObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[1]));
 
-    var decodedPayload = {
+    let decodedPayload = {
       header: headerObj,
       payload: payloadObj,
     };
@@ -21,14 +21,14 @@ function decodeJWT(token) {
 function onSignIn(googleUser) {
   console.log("Signed in: ", googleUser);
 
-  let id_token = decodeJWT(googleUser.credentials);
-  console.log(id_token);
+  let responsePayload = decodeJwtResponse(response.credential);
+  
   fetch("https://google-auth.kris-adams3000.workers.dev/googleRedirect", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id_token: id_token }),
+    body: JSON.stringify({ id_token: responsePayload.sub }),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -36,4 +36,18 @@ function onSignIn(googleUser) {
       // Handle authenticated user
     })
     .catch((error) => console.error("Error:", error));
+    handleCredentialResponse(googleUser)
 }
+
+function handleCredentialResponse(response) {
+    // decodeJwtResponse() is a custom function defined by you
+    // to decode the credential response.
+    const responsePayload = decodeJwtResponse(response.credential);
+
+    console.log("ID: " + responsePayload.sub);
+    console.log('Full Name: ' + responsePayload.name);
+    console.log('Given Name: ' + responsePayload.given_name);
+    console.log('Family Name: ' + responsePayload.family_name);
+    console.log("Image URL: " + responsePayload.picture);
+    console.log("Email: " + responsePayload.email);
+ }
