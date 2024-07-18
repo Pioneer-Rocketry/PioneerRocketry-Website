@@ -21,7 +21,7 @@ function decodeJwtResponse(token) {
 function onSignIn(googleUser) {
   console.log("Signed in: ", googleUser);
 
-  let responsePayload = decodeJwtResponse(googleUser.credential);
+  let responsePayload = decodeJwtResponse(googleUser.credential).payload;
   
   fetch("https://google-auth.kris-adams3000.workers.dev/googleRedirect", {
     method: "POST",
@@ -42,7 +42,7 @@ function onSignIn(googleUser) {
 function handleCredentialResponse(response) {
     // decodeJwtResponse() is a custom function defined by you
     // to decode the credential response.
-    const responsePayload = decodeJwtResponse(response.credential);
+    const responsePayload = decodeJwtResponse(response.credential).payload;
 
     console.log("ID: " + responsePayload.sub);
     console.log('Full Name: ' + responsePayload.name);
