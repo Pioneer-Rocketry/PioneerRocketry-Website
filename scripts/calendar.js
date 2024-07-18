@@ -96,10 +96,9 @@ function repairEvent(event) {
 
 
 
-    fetch("https://api.pioneerrocketry.com", {
+    fetch("https://api.pioneerrocketry.com/calendar/get_events", {
       method: "GET",
-      headers: {
-        "Pull-All-Data": "true", // Add this header to pull all data
+      headers: { // Add this header to pull all data
       },
     })
       .then((response) => {
