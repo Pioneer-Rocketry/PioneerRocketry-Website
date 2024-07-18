@@ -24,19 +24,33 @@ function onSignIn(googleUser) {
   console.log("Signed in: ", googleUser);
 
 
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: "663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com",
-    callback: "onTokenResponse",
-    scope: 'https://www.googleapis.com/auth/userinfo.email\
-    https://www.googleapis.com/auth/userinfo.profile\
-    openid'
+  const client = google.accounts.oauth2.initCodeClient({
+    client_id: '663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com',
+    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    ux_mode: 'popup',
+    callback: (response) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', code_receiver_uri, true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      // Set custom header for CRSF
+      xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest');
+      xhr.onload = function() {
+        console.log('Auth code response: ' + xhr.responseText);
+      };
+      xhr.send('code=' + response.code);
+    },
   });
   console.log(client);
+  client.requestCode();
   handleCredentialResponse(googleUser);
 }
 
 function onTokenResponse(tokenResponse) {
   console.log("Token Response: ", tokenResponse);
+}
+
+function onErrorCallback(error) {
+  console.log("Error: ", error);
 }
 
 function handleCredentialResponse(response) {
@@ -50,4 +64,7 @@ function handleCredentialResponse(response) {
   console.log("Family Name: " + responsePayload.family_name);
   console.log("Image URL: " + responsePayload.picture);
   console.log("Email: " + responsePayload.email);
+
+  //send a post to the worker with the user data to go against the database
+  //the worker will then check the db for the user email full name and ID
 }
