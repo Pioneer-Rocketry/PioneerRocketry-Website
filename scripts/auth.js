@@ -1,5 +1,30 @@
 // Google Auth
+class User {
+  constructor(data) {
+    this.name = data.name;
+    this.email = data.email;
+    this.picture = data.picture;
+    this.id=data.sub;
 
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getEmail() {
+    return this.email;
+  }
+
+  getPicture() {  
+    return this.picture;
+  }
+
+}
 //decode JWT
 function decodeJwtResponse(token) {
   try {
@@ -30,15 +55,39 @@ function onErrorCallback(error) {
 function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
-  const responsePayload = decodeJwtResponse(response.credential).payload;
-    console.log(responsePayload);
-  console.log("ID: " + responsePayload.sub);
-  console.log("Full Name: " + responsePayload.name);
-  console.log("Given Name: " + responsePayload.given_name);
-  console.log("Family Name: " + responsePayload.family_name);
-  console.log("Image URL: " + responsePayload.picture);
-  console.log("Email: " + responsePayload.email);
+  const responsePayload = decodeJwtResponse(response.credential);
+    console.log(responsePayload.payload);
+    window.user = new User(responsePayload.payload);
+  $.ajax({
+    type: "POST",
+    url: "https://api.pioneerrocketry.com/googleAuth",
+    data: JSON.stringify(user),
+    contentType: "application/json",
+   
+  }).done(function (data) {
+    console.log("Success: " + data);
+    //create popper toast for success
+    let toastDiv = document.createElement("div");
+    toastDiv.setAttribute("id", "liveToast");
+    toastDiv.setAttribute("class", "toast");
+    let toastBody = document.createElement("div");
+    toastBody.setAttribute("class", "toast-body");
+    toastBody.setAttribute("id", "liveToastBody");
+    toastDiv.appendChild(toastBody);
+    toastBody.textContent = "Successful Login: ";
+    let toast = new bootstrap.Toast(toastDiv);
+    toast.show();
+  }).fail(function (data) {
+    console.log("Error: " + data);
+  })
+  console.log("ID: " + responsePayload.payload.sub);
+  console.log("Full Name: " + responsePayload.payload.name);
+  console.log("Given Name: " + responsePayload.payload.given_name);
+  console.log("Family Name: " + responsePayload.payload.family_name);
+  console.log("Image URL: " + responsePayload.payload.picture);
+  console.log("Email: " + responsePayload.payload.email);
 
   //send a post to the worker with the user data to go against the database
   //the worker will then check the db for the user email full name and ID
+
 }
