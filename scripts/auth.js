@@ -4,7 +4,7 @@ class User {
     this.name = data.name;
     this.email = data.email;
     this.picture = data.picture;
-    this.id=data.sub;
+    this.id = data.sub;
 
   }
 
@@ -45,7 +45,7 @@ function decodeJwtResponse(token) {
 }
 
 function onTokenResponse(googleUser) {
-    handleCredentialResponse(googleUser);
+  handleCredentialResponse(googleUser);
 }
 
 function onErrorCallback(error) {
@@ -55,9 +55,12 @@ function onErrorCallback(error) {
 function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
+  console.log(response);
+
   const responsePayload = decodeJwtResponse(response.credential);
-    console.log(responsePayload.payload);
-    window.user = new User(responsePayload.payload);
+  console.log(responsePayload.payload);
+  window.user = new User(responsePayload.payload);
+
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
