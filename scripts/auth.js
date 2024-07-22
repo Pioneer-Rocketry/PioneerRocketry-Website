@@ -1,12 +1,10 @@
 // Google Auth
 class User {
-  constructor(data, token) {
+  constructor(data) {
     this.name = data.name;
     this.email = data.email;
     this.picture = data.picture;
     this.id = data.sub;
-    this.token = token
-
   }
 
   getId() {
