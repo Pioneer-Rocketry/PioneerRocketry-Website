@@ -58,6 +58,7 @@ function handleCredentialResponse(response) {
   console.log(response);
 
   const responsePayload = decodeJwtResponse(response.credential);
+  console.log(responsePayload.header);
   console.log(responsePayload.payload);
   window.user = new User(responsePayload.payload);
 
