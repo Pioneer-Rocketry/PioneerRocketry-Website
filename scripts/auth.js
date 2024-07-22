@@ -25,10 +25,6 @@ class User {
     return this.picture;
   }
 
-  getToken() {  
-    return this.token;
-  }
-
 }
 //decode JWT
 function decodeJwtResponse(token) {
@@ -64,7 +60,7 @@ function handleCredentialResponse(response) {
 
   const responsePayload = decodeJwtResponse(response.credential);
   console.log(responsePayload.header);
-  window.user = new User(responsePayload.payload, response.credential);
+  window.user = new User(responsePayload.payload);
 
   $.ajax({
     type: "POST",
