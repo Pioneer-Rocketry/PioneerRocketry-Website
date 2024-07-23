@@ -209,7 +209,14 @@ function repairEvent(event) {
         }
 
         // Combine basic and advanced data into a single object
-        const eventData = { ...basicEventData, ...advancedEventData, ...user };
+        const eventData = {
+          "CalanderEvent" : {
+            ...basicEventData,
+            ...advancedEventData
+          },
+          "User": {
+            ...user
+        }};
         console.log(eventData);
         try {
           // Send data to the backend for insertion into the database
