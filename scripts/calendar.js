@@ -152,7 +152,6 @@ function repairEvent(event) {
           document.getElementById("createEventForm")
         );
         const basicEventData = {
-          securityKey: formData.get("securityKey"),
           title: formData.get("eventTitle"),
           start: formData.get("eventStartDate"),
           end: formData.get("eventEndDate"),
@@ -203,8 +202,14 @@ function repairEvent(event) {
           // Add more advanced fields as needed based on your form
         };
 
+        const user = {
+          name: window.user.name,
+          email: window.user.email,
+          id: window.user.id
+        }
+
         // Combine basic and advanced data into a single object
-        const eventData = { ...basicEventData, ...advancedEventData };
+        const eventData = { ...basicEventData, ...advancedEventData, ...user };
         console.log(eventData);
         try {
           // Send data to the backend for insertion into the database
