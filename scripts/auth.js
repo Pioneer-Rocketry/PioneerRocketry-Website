@@ -1,10 +1,11 @@
 // Google Auth
 class User {
-  constructor(data) {
+  constructor(data, token) {
     this.name = data.name;
     this.email = data.email;
     this.picture = data.picture;
     this.id = data.sub;
+    this.token = token;
   }
 
   getId() {
@@ -21,6 +22,10 @@ class User {
 
   getPicture() {  
     return this.picture;
+  }
+
+  getToken() {  
+    return this.token;
   }
 
 }
@@ -58,7 +63,7 @@ function handleCredentialResponse(response) {
 
   const responsePayload = decodeJwtResponse(response.credential);
   console.log(responsePayload.header);
-  window.user = new User(responsePayload.payload);
+  window.user = new User(responsePayload.payload, response.credential);
 
   $.ajax({
     type: "POST",
