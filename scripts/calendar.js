@@ -164,6 +164,11 @@ function repairEvent(event) {
           // Add more basic fields as needed based on your form
         };
 
+        console.log(formData.get("eventStartDate"));
+        console.log(dateTimeToUTC(formData.get("eventStartDate")));
+        console.log(formData.get("eventEndDate"));
+        console.log(dateTimeToUTC(formData.get("eventEndDate")));
+
         // Gather advanced event data
         const advancedEventData = {
           id: formData.get("eventId"),
@@ -198,10 +203,18 @@ function repairEvent(event) {
           display: formData.get("eventDisplay"),
           overlap: formData.get("eventOverlap") === "true",
           constraint: formData.get("eventConstraint"),
-          color: formData.get("eventColor") !== "#000000" ? formData.get("eventColor")  : "",
-          backgroundColor: formData.get("eventBackgroundColor") !== "#000000" ? formData.get("eventBackgroundColor")  : "", // eventBorderColor
-          borderColor: formData.get("eventBorderColor") !== "#000000" ? formData.get("eventBorderColorz")  : "",
-          textColor: formData.get("eventTextColor") !== "#000000" ? formData.get("eventTextColor")  : "",
+          color: formData.get("eventColor") !== "#000000"
+            ? formData.get("eventColor")
+            : "",
+          backgroundColor: formData.get("eventBackgroundColor") != "#000000"
+            ? formData.get("eventBackgroundColor")
+            : "", // eventBorderColor
+          borderColor: formData.get("eventBorderColor") != "#000000"
+            ? formData.get("eventBorderColor")
+            : "",
+          textColor: formData.get("eventTextColor") != "#000000"
+            ? formData.get("eventTextColor")
+            : "",
           rrule: formData.get("eventRrule"),
           duration: formData.get("eventDuration"),
           // Add more advanced fields as needed based on your form
