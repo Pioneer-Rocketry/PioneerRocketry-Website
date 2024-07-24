@@ -65,6 +65,8 @@ function handleCredentialResponse(response) {
   console.log(responsePayload.header);
   window.user = new User(responsePayload.payload, response.credential);
 
+  console.log(JSON.stringify(window.user))
+
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
