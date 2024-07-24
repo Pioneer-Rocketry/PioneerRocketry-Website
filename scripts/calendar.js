@@ -141,6 +141,11 @@ function repairEvent(event) {
         calendar.render();
       });
 
+    function dateTimeToUTC(localDatetime) {
+      const time = new Date(localDatetime);
+      return time.toISOString();
+    }
+
     document
       .getElementById("createEventSubmit")
       .addEventListener("click", async function (event) {
@@ -153,8 +158,8 @@ function repairEvent(event) {
         );
         const basicEventData = {
           title: formData.get("eventTitle"),
-          start: formData.get("eventStartDate"),
-          end: formData.get("eventEndDate"),
+          start: dateTimeToUTC(formData.get("eventStartDate")),
+          end: dateTimeToUTC(formData.get("eventEndDate")),
           description: formData.get("eventDescription"),
           // Add more basic fields as needed based on your form
         };
@@ -164,8 +169,8 @@ function repairEvent(event) {
           id: formData.get("eventId"),
           groupId: formData.get("eventGroupId"),
           allDay: formData.get("eventAllDay") === "true",
-          start: formData.get("eventStart"),
-          end: formData.get("eventEnd"),
+          // start: formData.get("eventStart"),
+          // end: formData.get("eventEnd"),
           daysOfWeek: formData.get("eventDaysOfWeek")
             ? JSON.parse(formData.get("eventDaysOfWeek"))
             : "",
