@@ -168,7 +168,7 @@ function repairEvent(event) {
           end: formData.get("eventEnd"),
           daysOfWeek: formData.get("eventDaysOfWeek")
             ? JSON.parse(formData.get("eventDaysOfWeek"))
-            : null,
+            : "",
           startTime: formData.get("eventStartTime"),
           endTime: formData.get("eventEndTime"),
           startRecur: formData.get("eventStartRecur"),
@@ -179,7 +179,7 @@ function repairEvent(event) {
           className: formData.get("eventClassName"),
           classNames: formData.get("eventClassNames")
             ? JSON.parse(formData.get("eventClassNames"))
-            : null,
+            : "",
           editable: formData.get("eventEditable") === "true",
           startEditable: formData.get("eventStartEditable") === "true",
           durationEditable:
@@ -189,7 +189,7 @@ function repairEvent(event) {
           resourceId: formData.get("eventResourceId"),
           resourceIds: formData.get("eventResourceIds")
             ? JSON.parse(formData.get("eventResourceIds"))
-            : null,
+            : "",
           display: formData.get("eventDisplay"),
           overlap: formData.get("eventOverlap") === "true",
           constraint: formData.get("eventConstraint"),
