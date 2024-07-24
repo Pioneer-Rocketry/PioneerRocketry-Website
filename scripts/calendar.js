@@ -198,20 +198,20 @@ function repairEvent(event) {
           display: formData.get("eventDisplay"),
           overlap: formData.get("eventOverlap") === "true",
           constraint: formData.get("eventConstraint"),
-          color: formData.get("eventColor"),
-          backgroundColor: formData.get("eventBackgroundColor"),
-          borderColor: formData.get("eventBorderColor"),
-          textColor: formData.get("eventTextColor"),
+          color: formData.get("eventColor") !== "#000000" ? formData.get("eventColor")  : "",
+          backgroundColor: formData.get("eventBackgroundColor") !== "#000000" ? formData.get("eventBackgroundColor")  : "", // eventBorderColor
+          borderColor: formData.get("eventBorderColor") !== "#000000" ? formData.get("eventBorderColorz")  : "",
+          textColor: formData.get("eventTextColor") !== "#000000" ? formData.get("eventTextColor")  : "",
           rrule: formData.get("eventRrule"),
           duration: formData.get("eventDuration"),
           // Add more advanced fields as needed based on your form
         };
 
-        const user = {
-          name: window.user.name,
-          email: window.user.email,
-          id: window.user.id
-        }
+        // const user = {
+        //   name: window.user.name,
+        //   email: window.user.email,
+        //   id: window.user.id
+        // }
 
         // Combine basic and advanced data into a single object
         const eventData = {
@@ -220,7 +220,7 @@ function repairEvent(event) {
             ...advancedEventData
           },
           "User": {
-            ...user
+            // ...user
         }};
         console.log(eventData);
         try {
