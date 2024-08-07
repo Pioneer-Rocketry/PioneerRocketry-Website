@@ -124,7 +124,7 @@ function repairEvent(event) {
         console.log("rendering calendar");
         calendar.render();
       }).then(() => {
-        $("#calendar .fc-header-toolbar.fc-toolbar").find("fc-toolbar-chunk:eq(1)").append($("<button>").attr({id:"createEventBtn",
+        $("#calendar > div.fc-header-toolbar.fc-toolbar > div:nth-child(2)").append($("<button>").attr({id:"createEventBtn",
           type:"button",
           class:"btn btn-primary",
           "data-bs-toggle":"modal",
