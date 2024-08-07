@@ -230,7 +230,8 @@ function repairEvent(event) {
         const user = {
           name: window.user.name,
           email: window.user.email,
-          id: window.user.id
+          id: window.user.id,
+          token: window.user.token
         }
 
         // Combine basic and advanced data into a single object
