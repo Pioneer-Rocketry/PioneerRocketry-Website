@@ -263,7 +263,9 @@ function repairEvent(event) {
 
           // Optionally, close the modal or reset the form
           $("#createEventModal").modal("hide");
-          this.reset(); // Reset the form fields
+           // Reset the form fields
+           $('#eventData .toast-body').html(response)
+           $('#eventData').toast('show');
         } catch (error) {
           // Handle error
           console.error("Error inserting event:", error.message);
