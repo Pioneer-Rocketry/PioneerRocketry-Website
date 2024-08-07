@@ -91,7 +91,7 @@ function repairEvent(event) {
   let calendar;
   document.addEventListener("DOMContentLoaded", function () {
     
-
+    
 
 
     fetch("https://api.pioneerrocketry.com/calendar/get_all", {
@@ -123,6 +123,13 @@ function repairEvent(event) {
         console.log(repairedEvents);
         console.log("rendering calendar");
         calendar.render();
+      }).then(() => {
+        $("#calendar .fc-header-toolbar.fc-toolbar").find("fc-toolbar-chunk:eq(1)").append($("<button>").attr({id:"createEventBtn",
+          type:"button",
+          class:"btn btn-primary",
+          "data-bs-toggle":"modal",
+          "data-bs-target":"#createEventModal"
+        }).text("Create New Event"));
       })
       .catch((error) => {
         
