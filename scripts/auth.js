@@ -1,4 +1,52 @@
+// Google Auth
+class User {
+  constructor(data, token) {
+    this.name = data.name;
+    this.email = data.email;
+    this.picture = data.picture;
+    this.id = data.sub;
+    this.token = token;
+  }
 
+  getId() {
+    return this.id;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  getEmail() {
+    return this.email;
+  }
+
+  getPicture() {  
+    return this.picture;
+  }
+
+  getToken() {  
+    return this.token;
+  }
+
+}
+//decode JWT
+function decodeJwtResponse(token) {
+  try {
+    let sJWT = token;
+    let headerObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[0]));
+    let payloadObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[1]));
+
+    let decodedPayload = {
+      header: headerObj,
+      payload: payloadObj,
+    };
+
+    return decodedPayload;
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
+}
 
 function onTokenResponse(googleUser) {
   handleCredentialResponse(googleUser);
@@ -12,13 +60,17 @@ function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
   console.log(response);
-  window.userToken = response.credential;
+
+  const responsePayload = decodeJwtResponse(response.credential);
+  console.log(responsePayload.header);
+  window.user = new User(responsePayload.payload, response.credential);
+
+  console.log(JSON.stringify(window.user))
+
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
-    data: JSON.stringify({ 
-      id: response.clientId,
-      token: response.credential }),
+    data: JSON.stringify(window.user),
     contentType: "application/json",
    
   }).done(function (data) {
@@ -35,8 +87,14 @@ function handleCredentialResponse(response) {
     let toast = new bootstrap.Toast(toastDiv);
     toast.show();
   }).fail(function (data) {
-    console.log("Error:", data);
+    console.log("Error: " + data);
   })
+  console.log("ID: " + responsePayload.payload.sub);
+  console.log("Full Name: " + responsePayload.payload.name);
+  console.log("Given Name: " + responsePayload.payload.given_name);
+  console.log("Family Name: " + responsePayload.payload.family_name);
+  console.log("Image URL: " + responsePayload.payload.picture);
+  console.log("Email: " + responsePayload.payload.email);
 
   //send a post to the worker with the user data to go against the database
   //the worker will then check the db for the user email full name and ID
