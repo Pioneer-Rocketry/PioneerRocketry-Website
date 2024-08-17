@@ -1,52 +1,4 @@
-// Google Auth
-class User {
-  constructor(data, token) {
-    this.name = data.name;
-    this.email = data.email;
-    this.picture = data.picture;
-    this.id = data.sub;
-    this.token = token;
-  }
 
-  getId() {
-    return this.id;
-  }
-
-  getName() {
-    return this.name;
-  }
-
-  getEmail() {
-    return this.email;
-  }
-
-  getPicture() {  
-    return this.picture;
-  }
-
-  getToken() {  
-    return this.token;
-  }
-
-}
-//decode JWT
-function decodeJwtResponse(token) {
-  try {
-    let sJWT = token;
-    let headerObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[0]));
-    let payloadObj = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(sJWT.split(".")[1]));
-
-    let decodedPayload = {
-      header: headerObj,
-      payload: payloadObj,
-    };
-
-    return decodedPayload;
-  } catch (error) {
-    console.error("Error decoding JWT:", error);
-    return null;
-  }
-}
 
 function onTokenResponse(googleUser) {
   handleCredentialResponse(googleUser);
@@ -61,16 +13,10 @@ function handleCredentialResponse(response) {
   // to decode the credential response.
   console.log(response);
 
-  const responsePayload = decodeJwtResponse(response.credential);
-  console.log(responsePayload.header);
-  window.user = new User(responsePayload.payload, response.credential);
-
-  console.log(JSON.stringify(window.user))
-
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
-    data: JSON.stringify(window.user),
+    data: response.credential,
     contentType: "application/json",
    
   }).done(function (data) {
