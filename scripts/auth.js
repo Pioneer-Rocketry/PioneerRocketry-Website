@@ -74,7 +74,7 @@ function handleCredentialResponse(response) {
     contentType: "application/json",
    
   }).done(function (data) {
-    console.log("Success: " + data);
+    console.log("Success: ", data);
     if(data.flags >=2){
       $("#createEventBtn").show();
     }
