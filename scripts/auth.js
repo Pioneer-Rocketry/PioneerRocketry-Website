@@ -16,7 +16,7 @@ function handleCredentialResponse(response) {
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
-    data: response.credential,
+    data: JSON.stringify({ token: response.credential }),
     contentType: "application/json",
    
   }).done(function (data) {
