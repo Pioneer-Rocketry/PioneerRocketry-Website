@@ -227,12 +227,7 @@ function repairEvent(event) {
           // Add more advanced fields as needed based on your form
         };
 
-        const user = {
-          name: window.user.name,
-          email: window.user.email,
-          id: window.user.id,
-          token: window.user.token
-        }
+        
 
         // Combine basic and advanced data into a single object
         const eventData = {
@@ -241,7 +236,7 @@ function repairEvent(event) {
             ...advancedEventData
           },
           "User": {
-            ...user
+            ...window.userToken
         }};
         console.log(eventData);
         try {

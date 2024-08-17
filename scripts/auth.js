@@ -12,7 +12,7 @@ function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
   console.log(response);
-
+  window.userToken = response.credential;
   $.ajax({
     type: "POST",
     url: "https://api.pioneerrocketry.com/googleAuth",
@@ -33,14 +33,8 @@ function handleCredentialResponse(response) {
     let toast = new bootstrap.Toast(toastDiv);
     toast.show();
   }).fail(function (data) {
-    console.log("Error: " + data);
+    console.log("Error:", data);
   })
-  console.log("ID: " + responsePayload.payload.sub);
-  console.log("Full Name: " + responsePayload.payload.name);
-  console.log("Given Name: " + responsePayload.payload.given_name);
-  console.log("Family Name: " + responsePayload.payload.family_name);
-  console.log("Image URL: " + responsePayload.payload.picture);
-  console.log("Email: " + responsePayload.payload.email);
 
   //send a post to the worker with the user data to go against the database
   //the worker will then check the db for the user email full name and ID
