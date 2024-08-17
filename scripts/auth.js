@@ -75,6 +75,9 @@ function handleCredentialResponse(response) {
    
   }).done(function (data) {
     console.log("Success: " + data);
+    if(data.flags >=2){
+      $("#createEventBtn").show();
+    }
     //create popper toast for success
     let toastDiv = document.createElement("div");
     toastDiv.setAttribute("id", "liveToast");
