@@ -59,13 +59,13 @@ function onErrorCallback(error) {
 function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
-  console.log(response);
+  //console.log(response);
 
   const responsePayload = decodeJwtResponse(response.credential);
-  console.log(responsePayload.header);
+  //console.log(responsePayload.header);
   window.user = new User(responsePayload.payload, response.credential);
 
-  console.log(JSON.stringify(window.user))
+  //console.log(JSON.stringify(window.user))
 
   $.ajax({
     type: "POST",
