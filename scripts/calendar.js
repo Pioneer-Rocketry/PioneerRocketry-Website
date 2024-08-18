@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
             calendar.render();
         })
         .then(() => {
-            $('#calendar > div.fc-header-toolbar.fc-toolbar > div:nth-child(2)').append($('<button>').attr({ id: 'createEventBtn', type: 'button', class: 'btn btn-primary', 'data-bs-toggle': 'modal', 'data-bs-target': '#createEventModal' }).text('Create New Event')).hide();
+            $('#calendar > div.fc-header-toolbar.fc-toolbar > div:nth-child(2)').append($('<button>').attr({ id: 'createEventBtn', type: 'button', class: 'btn btn-primary', 'data-bs-toggle': 'modal', 'data-bs-target': '#createEventModal' }).text('Create New Event').hide());
         })
         .catch((error) => {
             console.error('Error:', error);
