@@ -76,7 +76,8 @@ function handleCredentialResponse(response) {
   }).done(function (data) {
     console.log(JSON.parse(data));
     let flags = JSON.parse(data).flags;
-    if(parseFloat(flags) >=2){
+    console.log(parseFloat(flags));
+    if(parseFloat(flags) >=2.0){
       $("#createEventBtn").show();
     }
     //create popper toast for success
