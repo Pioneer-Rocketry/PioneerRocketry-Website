@@ -4,753 +4,415 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
-  <head>
-    <title>Pioneer Rocketry</title>
-    <link rel="icon" type="image/png" href="images/favicon.png" />
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, user-scalable=no"
-    />
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="assets/css/main.css" />
+<html lang="en">
 
-    <!-- calendar script -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
-    <script lang="javascript" type="text/javascript">
-      let calendar;
-      document.addEventListener("DOMContentLoaded", function () {
-        fetch("https://api.pioneerrocketry.com", {
-          method: "GET",
-          headers: {
-            "Pull-All-Data": "true", // Add this header to pull all data
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
+<head>
+  <title>Pioneer Rocketry</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
 
-            const parsedObject = [];
-            
-            for (const key in data) {
-              parsedObject[key] = data[key];
-            }
+  <!-- calendar script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
+  <script lang="javascript" type="text/javascript" src="./scripts/calendar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <script lang="javascript" type="text/javascript" src="./scripts/auth.js"></script>
 
+  <style>
+    .g_id_signin {
+      position: relative;
+      top: 0px;
+      right: 0px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      align-content: center;
+    }
 
-            const calendarEl = document.getElementById("calendar");
-             calendar = new FullCalendar.Calendar(calendarEl, {
-              initialView: "dayGridMonth",
-              timeZone: "local",
-              events: parsedObject,
-              themeSystem: 'bootstrap5'
-            });
-            console.log(parsedObject);
-            console.log("rendering calendar");
-            calendar.render();
-          })
-          .catch((error) => console.error("Error:", error));
+    #calendar tbody tr[role="row"] {
+      height: 150px;
+    }
 
-        $("#createEventSubmit").on("click", async function (event) {
-          console.log("form submitted");
-          event.preventDefault(); // Prevent default form submission
+    #calendar h2 {
+      color: black !important;
+    }
 
-          // Gather basic event data
-          const formData = new FormData($("#createEventForm")[0]);
-          const basicEventData = {
-            securityKey: formData.get("securityKey"),
-            title: formData.get("eventTitle"),
-            start: formData.get("eventStartDate"),
-            end: formData.get("eventEndDate"),
-            description: formData.get("eventDescription"),
-            // Add more basic fields as needed based on your form
-          };
+    #calendar-container {
+      margin-left: 5vw;
+      margin-right: 5vw;
+      margin-top: 5vh;
+      margin-bottom: 10vh;
+    }
 
-          // Gather advanced event data
-          const advancedEventData = {
-            id: formData.get("eventId"),
-            groupId: formData.get("eventGroupId"),
-            allDay: formData.get("eventAllDay") === "true",
-            start: formData.get("eventStart"),
-            end: formData.get("eventEnd"),
-            daysOfWeek: formData.get("eventDaysOfWeek")
-              ? JSON.parse(formData.get("eventDaysOfWeek"))
-              : null,
-            startTime: formData.get("eventStartTime"),
-            endTime: formData.get("eventEndTime"),
-            startRecur: formData.get("eventStartRecur"),
-            endRecur: formData.get("eventEndRecur"),
-            title: formData.get("eventTitle"),
-            url: formData.get("eventUrl"),
-            interactive: formData.get("eventInteractive") === "true",
-            className: formData.get("eventClassName"),
-            classNames: formData.get("eventClassNames")
-              ? JSON.parse(formData.get("eventClassNames"))
-              : null,
-            editable: formData.get("eventEditable") === "true",
-            startEditable: formData.get("eventStartEditable") === "true",
-            durationEditable: formData.get("eventDurationEditable") === "true",
-            resourceEditable: formData.get("eventResourceEditable") === "true",
-            resourceId: formData.get("eventResourceId"),
-            resourceIds: formData.get("eventResourceIds")
-              ? JSON.parse(formData.get("eventResourceIds"))
-              : null,
-            display: formData.get("eventDisplay"),
-            overlap: formData.get("eventOverlap") === "true",
-            constraint: formData.get("eventConstraint"),
-            color: formData.get("eventColor"),
-            backgroundColor: formData.get("eventBackgroundColor"),
-            borderColor: formData.get("eventBorderColor"),
-            textColor: formData.get("eventTextColor"),
-            rrule: formData.get("eventRrule"),
-            duration: formData.get("eventDuration"),
-            // Add more advanced fields as needed based on your form
-          };
+    /* Day numbers on the left side */
+    .fc .fc-daygrid-day-number {
+      float: left;
+      margin-left: 5px;
+      font-weight: bold;
+    }
 
-          // Combine basic and advanced data into a single object
-          const eventData = { ...basicEventData, ...advancedEventData };
-          console.log(eventData);
-          try {
-            // Send data to the backend for insertion into the database
-            const response = await fetch(
-              "https://api.pioneerrocketry.com",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "New-Event": JSON.stringify(eventData),
-                  "Security-Key": event.securityKey,
-                },
-              }
-            );
+    .fc .fc-daygrid-day-top {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end !important;
+    }
+  </style>
+</head>
 
-            if (!response.ok) {
-              throw new Error("Failed to insert event");
-            }
+<body class="homepage is-preload">
+  <div id="page-wrapper">
+    <!-- Header -->
+    <section id="header" style="height: 15em" class="wrapper">
+      <!-- Logo -->
+      <div id="logo">
+        <h1><a href="index.html">Schedule</a></h1>
+        <p>Join us for our weekly meetings! See Below!</p>
+        
+      </div>
 
-            // Handle success response
-            console.log("New Event Inserted Successfully");
+      <!-- Nav -->
+      <nav id="nav">
+        <ul>
+          <li class="current"><a href="index.html">Home</a></li>
+          <!-- <li><a href="documentation-home.html">Documentation</a></li> -->
+          <!-- <li><a href="about.html">About</a></li> -->
+          <li><a href="calendar.html">Schedule</a></li>
+        </ul>
+      </nav>
+    </section>
 
-            // Optionally, close the modal or reset the form
-            $("#createEventModal").modal("hide");
-            this.reset(); // Reset the form fields
-          } catch (error) {
-            // Handle error
-            console.error("Error inserting event:", error.message);
-            // Optionally, display an error message to the user
-          }
-        });
-      });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-    <style>
-      #calendar-container {
-        margin-left: 5vw;
-        margin-right: 5vw;
-        margin-top: 5vh;
-        margin-bottom: 10vh;
-      }
+    <section>
+      <div id="g_id_onload" data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
+        data-context="signin" data-ux_mode="popup" data-callback="onTokenResponse" data-auto_select="true"
+        data-itp_support="true"></div>
 
-      #calendar {
-        overflow: hidden;
-      }
-    </style>
-  </head>
+      <div id="calendar-container">
+        <div id="calendar"></div>
+      </div>
+    </section>
 
-  <body class="homepage is-preload">
-    <div id="page-wrapper">
-      <!-- Header -->
-      <section id="header" style="height: 15em" class="wrapper">
-        <!-- Logo -->
-        <div id="logo">
-          <h1><a href="index.html">Schedule</a></h1>
-          <p>Some profound thing about schedules</p>
-        </div>
-
-        <!-- Nav -->
-        <nav id="nav">
-          <ul>
-            <li class="current"><a href="index.html">Home</a></li>
-            <li>
-              <a href="documentation-home.html">Documentation</a>
-              <!-- <ul>
-                        <li><a href="#">Rocket Building</a></li>
-                        <li><a href="#">Rocket Launches</a></li>
-                        <li><a href="#">Rocket Propulsion</a></li>
-                        <li>
-                          <a href="#">Rocketry FAQ</a>
-                          <ul>
-                            <li><a href="#">Rocket building</a></li>
-                            <li><a href="#">Rocket launches</a></li>
-                            <li><a href="#">Rocket propulsion</a></li>
-                            <li><a href="#">Rocket safety</a></li>
-                            <li><a href="#">Rocket financing</a></li>
-                          </ul>
-                        </li>
-                      </ul> -->
-            </li>
-            <li>
-              <a href="about.html">About</a>
-              <!-- <ul>
-                        <li><a href="left-sidebar.html">Left Sidebar</a></li>
-                        <li><a href="right-sidebar.html">Right Sidebar</a></li>
-                        <li><a href="no-sidebar.html">No Sidebar</a></li>
-                      </ul> -->
-            </li>
-            <li>
-              <a href="calendar.html">Calendar</a>
-            </li>
-          </ul>
-        </nav>
-      </section>
-
-      <section>
-        <div id="calendar-container">
-          <button
-            id="createEventBtn"
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#createEventModal"
-          >
-            Create New Event
-          </button>
-          <div id="calendar"></div>
-        </div>
-      </section>
-
-      <!-- Footer -->
-      <section id="footer" class="wrapper">
-        <div class="title">Contact</div>
-        <div class="container">
-          <header class="style1">
-            <h2>Want to reach out to us?</h2>
-            <p>
-              The best way to reach out is to contact us through the
-              <a
-                href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact"
-                >Contact Link</a
-              >.
-            </p>
-          </header>
-          <div class="row">
-            <div class="col-12 col-12-medium">
-              <!-- Contact -->
-              <section class="feature-list small">
-                <div class="row">
-                  <div class="col-4 col-12-small">
-                    <section>
-                      <h3 class="icon solid fa-home">Mailing Address</h3>
-                      <p>
-                        Pioneer Involvement Center<br />
-                        1 University Plaza<br />
-                        Platteville, WI 53818<br />
-                        United States
-                      </p>
-                    </section>
-                  </div>
-                  <div class="col-4 col-12-small">
-                    <section>
-                      <h3 class="icon solid fa-comment">Social</h3>
-                      <p>
-                        <a
-                          href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact"
-                          >Contact Link</a
-                        >
-                      </p>
-                    </section>
-                  </div>
-                  <div class="col-4 col-12-small">
-                    <section
-                      style="
+    <!-- Footer -->
+    <section id="footer" class="wrapper">
+      <div class="title">Contact</div>
+      <div class="container">
+        <header class="style1">
+          <h2>Want to reach out to us?</h2>
+          <p>
+            The best way to reach out is to contact us through the
+            <a href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact">Contact Link</a>.
+          </p>
+        </header>
+        <div class="row">
+          <div class="col-12 col-12-medium">
+            <!-- Contact -->
+            <section class="feature-list small">
+              <div class="row">
+                <div class="col-4 col-12-small">
+                  <section>
+                    <h3 class="icon solid fa-home">Mailing Address</h3>
+                    <p>
+                      Pioneer Involvement Center<br />
+                      1 University Plaza<br />
+                      Platteville, WI 53818<br />
+                      United States
+                    </p>
+                  </section>
+                </div>
+                <div class="col-4 col-12-small">
+                  <section>
+                    <h3 class="icon solid fa-comment">Social</h3>
+                    <p>
+                      <a href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact">Contact
+                        Link</a>
+                    </p>
+                  </section>
+                </div>
+                <div class="col-4 col-12-small">
+                  <section style="
                         padding-top: 0px !important;
                         border-top: 0px !important;
-                      "
-                    >
-                      <h3 class="icon solid fa-envelope">Email</h3>
-                      <p>
-                        <a href="mailto:weekset@uwplatt.edu"
-                          >weekset@uwplatt.edu</a
-                        >
-                      </p>
-                    </section>
-                  </div>
+                      ">
+                    <h3 class="icon solid fa-envelope">Email</h3>
+                    <p>
+                      <a href="mailto:weekset@uwplatt.edu">weekset@uwplatt.edu</a>
+                    </p>
+                  </section>
                 </div>
-              </section>
-            </div>
-          </div>
-          <div id="copyright">
-            <ul>
-              <li>&copy; Pioneer Rocketry (2024)</li>
-              <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-            </ul>
+              </div>
+            </section>
           </div>
         </div>
-      </section>
-      <!-- Modal -->
-      <div
-        class="modal fade"
-        id="createEventModal"
-        tabindex="-1"
-        aria-labelledby="createEventModalLabel"
-        aria-hidden="true"
-        data-bs-theme="dark"
-      >
-        <div class="modal-dialog" role="document" data-bs-theme="dark">
-          <div class="modal-content" data-bs-theme="dark">
-            <!-- Modal Header -->
-            <div class="modal-header" data-bs-theme="dark">
-              <h1
-                class="modal-title fs-5"
-                id="exampleModalLabel"
-                data-bs-theme="dark"
-              >
-                Create New Event
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                data-bs-theme="dark"
-              ></button>
-            </div>
+        <div id="copyright">
+          <ul>
+            <li>&copy; Pioneer Rocketry (2024)</li>
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="eventData" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          
+          <strong class="me-auto">Event Data</strong>
+          <small>Just Now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel"
+      aria-hidden="true" data-bs-theme="dark">
+      <div class="modal-dialog" data-bs-theme="dark">
+        <div class="modal-content" data-bs-theme="dark">
+          <!-- Modal Header -->
+          <div class="modal-header" data-bs-theme="dark">
+            <h1 class="modal-title fs-5" id="exampleModalLabel" data-bs-theme="dark">
+              Create New Event
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+              data-bs-theme="dark"></button>
+          </div>
 
-            <!-- Modal Body -->
-            <div class="modal-body" data-bs-theme="dark">
-              <form id="createEventForm" data-bs-theme="dark">
-                <!-- Event Title -->
-                <div class="form-group">
-                  <label for="securityKey">Personal Key</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="securityKey"
-                    name="securityKey"
-                    required
-                  />
-                </div>
+          <!-- Modal Body -->
+          <div class="modal-body" data-bs-theme="dark">
+            <form id="createEventForm" data-bs-theme="dark">
+              <!-- Event Title -->
+              <div class="form-group">
+                <label for="eventTitle">Title</label>
+                <input type="text" class="form-control" id="eventTitle" name="eventTitle" required />
+              </div>
 
-                <!-- Event Title -->
-                <div class="form-group">
-                  <label for="eventTitle">Title</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="eventTitle"
-                    name="eventTitle"
-                    required
-                  />
-                </div>
+              <!-- Event Start Date -->
+              <div class="form-group">
+                <label for="eventStartDate">Start Date/Time</label>
+                <input type="datetime-local" class="form-control" id="eventStartDate" name="eventStartDate" required />
+              </div>
 
-                <!-- Event Start Date -->
-                <div class="form-group">
-                  <label for="eventStartDate">Start Date</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="eventStartDate"
-                    name="eventStartDate"
-                    required
-                  />
-                </div>
+              <!-- Event End Date -->
+              <div class="form-group">
+                <label for="eventEndDate">End Date/Time</label>
+                <input type="datetime-local" class="form-control" id="eventEndDate" name="eventEndDate" required />
+              </div>
 
-                <!-- Event End Date -->
-                <div class="form-group">
-                  <label for="eventEndDate">End Date</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="eventEndDate"
-                    name="eventEndDate"
-                    required
-                  />
-                </div>
+              <!-- Event Description -->
+              <div class="form-group">
+                <label for="eventDescription">Description</label>
+                <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3"></textarea>
+              </div>
 
-                <!-- Event Description -->
-                <div class="form-group">
-                  <label for="eventDescription">Description</label>
-                  <textarea
-                    class="form-control"
-                    id="eventDescription"
-                    name="eventDescription"
-                    rows="3"
-                  ></textarea>
-                </div>
+              <!-- Advanced Settings Dropdown -->
+              <div class="form-group">
+                <button class="btn btn-link" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#advancedSettingsCollapse" aria-expanded="false"
+                  aria-controls="advancedSettingsCollapse">
+                  Advanced Settings
+                </button>
+              </div>
 
-                <!-- Advanced Settings Dropdown -->
-                <div class="form-group">
-                  <button
-                    class="btn btn-link"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#advancedSettingsCollapse"
-                    aria-expanded="false"
-                    aria-controls="advancedSettingsCollapse"
-                  >
-                    Advanced Settings
-                  </button>
-                </div>
+              <!-- Collapsible Advanced Settings -->
+              <div class="collapse" id="advancedSettingsCollapse">
+                <div class="card card-body">
+                  <!-- Advanced Settings Fields -->
+                  <div class="form-group">
+                    <label for="eventId">Event ID</label>
+                    <input type="text" class="form-control" id="eventId" name="eventId" />
+                  </div>
 
-                <!-- Collapsible Advanced Settings -->
-                <div class="collapse" id="advancedSettingsCollapse">
-                  <div class="card card-body">
-                    <!-- Advanced Settings Fields -->
-                    <div class="form-group">
-                      <label for="eventId">Event ID</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventId"
-                        name="eventId"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventGroupId">Group ID</label>
+                    <input type="text" class="form-control" id="eventGroupId" name="eventGroupId" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventGroupId">Group ID</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventGroupId"
-                        name="eventGroupId"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventAllDay">All Day</label>
+                    <select class="form-control" id="eventAllDay" name="eventAllDay">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventAllDay">All Day</label>
-                      <select
-                        class="form-control"
-                        id="eventAllDay"
-                        name="eventAllDay"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventDaysOfWeek">Days of Week ([0,1,2,3,4,5,6])</label>
+                    <input type="text" class="form-control" id="eventDaysOfWeek" name="eventDaysOfWeek" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventStart">Start Date/Time</label>
-                      <input
-                        type="datetime-local"
-                        class="form-control"
-                        id="eventStart"
-                        name="eventStart"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventStartTime">Start Time</label>
+                    <input type="time" class="form-control" id="eventStartTime" name="eventStartTime" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventEnd">End Date/Time</label>
-                      <input
-                        type="datetime-local"
-                        class="form-control"
-                        id="eventEnd"
-                        name="eventEnd"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventEndTime">End Time</label>
+                    <input type="time" class="form-control" id="eventEndTime" name="eventEndTime" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventDaysOfWeek"
-                        >Days of Week ([0,1,2,3,4,5,6])</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventDaysOfWeek"
-                        name="eventDaysOfWeek"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventStartRecur">Start Recurrence</label>
+                    <input type="datetime-local" class="form-control" id="eventStartRecur" name="eventStartRecur" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventStartTime">Start Time</label>
-                      <input
-                        type="time"
-                        class="form-control"
-                        id="eventStartTime"
-                        name="eventStartTime"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventEndRecur">End Recurrence</label>
+                    <input type="datetime-local" class="form-control" id="eventEndRecur" name="eventEndRecur" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventEndTime">End Time</label>
-                      <input
-                        type="time"
-                        class="form-control"
-                        id="eventEndTime"
-                        name="eventEndTime"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventUrl">URL</label>
+                    <input type="url" class="form-control" id="eventUrl" name="eventUrl" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventStartRecur">Start Recurrence</label>
-                      <input
-                        type="datetime-local"
-                        class="form-control"
-                        id="eventStartRecur"
-                        name="eventStartRecur"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventInteractive">Interactive</label>
+                    <select class="form-control" id="eventInteractive" name="eventInteractive">
+                      <option value="true">True</option>
+                      <option value="false">False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventEndRecur">End Recurrence</label>
-                      <input
-                        type="datetime-local"
-                        class="form-control"
-                        id="eventEndRecur"
-                        name="eventEndRecur"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventClassName">Class Name (Or Class Names)</label>
+                    <input type="text" class="form-control" id="eventClassName" name="eventClassName" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventUrl">URL</label>
-                      <input
-                        type="url"
-                        class="form-control"
-                        id="eventUrl"
-                        name="eventUrl"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventClassNames">Class Names ([ 'myclass1', myclass2' ])</label>
+                    <input type="text" class="form-control" id="eventClassNames" name="eventClassNames" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventInteractive">Interactive</label>
-                      <select
-                        class="form-control"
-                        id="eventInteractive"
-                        name="eventInteractive"
-                      >
-                        <option value="true">True</option>
-                        <option value="false">False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventEditable">Editable</label>
+                    <select class="form-control" id="eventEditable" name="eventEditable">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventClassName"
-                        >Class Name (Or Class Names)</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventClassName"
-                        name="eventClassName"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventStartEditable">Start Editable</label>
+                    <select class="form-control" id="eventStartEditable" name="eventStartEditable">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventClassNames"
-                        >Class Names ([ 'myclass1', myclass2' ])</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventClassNames"
-                        name="eventClassNames"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventDurationEditable">Duration Editable</label>
+                    <select class="form-control" id="eventDurationEditable" name="eventDurationEditable">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventEditable">Editable</label>
-                      <select
-                        class="form-control"
-                        id="eventEditable"
-                        name="eventEditable"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventResourceEditable">Resource Editable</label>
+                    <select class="form-control" id="eventResourceEditable" name="eventResourceEditable">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventStartEditable">Start Editable</label>
-                      <select
-                        class="form-control"
-                        id="eventStartEditable"
-                        name="eventStartEditable"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventResourceId">Resource ID</label>
+                    <input type="text" class="form-control" id="eventResourceId" name="eventResourceId" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventDurationEditable"
-                        >Duration Editable</label
-                      >
-                      <select
-                        class="form-control"
-                        id="eventDurationEditable"
-                        name="eventDurationEditable"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventResourceIds">Resource IDs (JSON Array)</label>
+                    <input type="text" class="form-control" id="eventResourceIds" name="eventResourceIds" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventResourceEditable"
-                        >Resource Editable</label
-                      >
-                      <select
-                        class="form-control"
-                        id="eventResourceEditable"
-                        name="eventResourceEditable"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventDisplay">Display</label>
+                    <input type="text" class="form-control" id="eventDisplay" name="eventDisplay" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventResourceId">Resource ID</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventResourceId"
-                        name="eventResourceId"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventOverlap">Overlap</label>
+                    <select class="form-control" id="eventOverlap" name="eventOverlap">
+                      <option value="true">True</option>
+                      <option value="false" selected>False</option>
+                    </select>
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventResourceIds"
-                        >Resource IDs (JSON Array)</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventResourceIds"
-                        name="eventResourceIds"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventConstraint">Constraint</label>
+                    <input type="text" class="form-control" id="eventConstraint" name="eventConstraint" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventDisplay">Display</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventDisplay"
-                        name="eventDisplay"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventColor">Color</label>
+                    <input type="color" class="form-control" id="eventColor" name="eventColor" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventOverlap">Overlap</label>
-                      <select
-                        class="form-control"
-                        id="eventOverlap"
-                        name="eventOverlap"
-                      >
-                        <option value="true">True</option>
-                        <option value="false" selected>False</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="eventBackgroundColor">Background Color</label>
+                    <input type="color" class="form-control" id="eventBackgroundColor" name="eventBackgroundColor" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventConstraint">Constraint</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventConstraint"
-                        name="eventConstraint"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventBorderColor">Border Color</label>
+                    <input type="color" class="form-control" id="eventBorderColor" name="eventBorderColor" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventColor">Color</label>
-                      <input
-                        type="color"
-                        class="form-control"
-                        id="eventColor"
-                        name="eventColor"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventTextColor">Text Color</label>
+                    <input type="color" class="form-control" id="eventTextColor" name="eventTextColor" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventBackgroundColor">Background Color</label>
-                      <input
-                        type="color"
-                        class="form-control"
-                        id="eventBackgroundColor"
-                        name="eventBackgroundColor"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventRrule">RRule</label>
+                    <input type="text" class="form-control" id="eventRrule" name="eventRrule" />
+                  </div>
 
-                    <div class="form-group">
-                      <label for="eventBorderColor">Border Color</label>
-                      <input
-                        type="color"
-                        class="form-control"
-                        id="eventBorderColor"
-                        name="eventBorderColor"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="eventTextColor">Text Color</label>
-                      <input
-                        type="color"
-                        class="form-control"
-                        id="eventTextColor"
-                        name="eventTextColor"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="eventRrule">RRule</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventRrule"
-                        name="eventRrule"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="eventDuration">Duration</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="eventDuration"
-                        name="eventDuration"
-                      />
-                    </div>
+                  <div class="form-group">
+                    <label for="eventDuration">Duration</label>
+                    <input type="text" class="form-control" id="eventDuration" name="eventDuration" />
                   </div>
                 </div>
+              </div>
 
-                <!-- Submit Button -->
-              </form>
-            </div>
+              <div class="form-group">
+                <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
+                  data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
+              </div>
 
-            <!-- Modal Footer (optional) -->
-            <div class="modal-footer">
-              <button
-                type="submit"
-                id="createEventSubmit"
-                class="btn btn-primary"
-              >
-                Create Event
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-            </div>
+              <!-- Submit Button -->
+            </form>
+          </div>
+
+          <!-- Modal Footer (optional) -->
+          <div class="modal-footer">
+            <button type="submit" id="createEventSubmit" class="btn btn-primary">
+              Create Event
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
+  <!-- Scripts -->
 
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/jquery.dropotron.min.js"></script>
-    <script src="assets/js/browser.min.js"></script>
-    <script src="assets/js/breakpoints.min.js"></script>
-    <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js"></script>
-  </body>
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/jquery.dropotron.min.js"></script>
+  <script src="assets/js/browser.min.js"></script>
+  <script src="assets/js/breakpoints.min.js"></script>
+  <script src="assets/js/util.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+
 </html>
