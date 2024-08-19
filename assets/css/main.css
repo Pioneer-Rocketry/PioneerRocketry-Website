@@ -1510,6 +1510,14 @@ input, select, textarea {
 
 /* Image */
 
+	img {
+		border-radius: 5px;
+	}
+
+	.highlight .image img{
+		border-radius: 0px;
+	}
+
 	.image {
 		display: inline-block;
 	}
@@ -2368,7 +2376,7 @@ input, select, textarea {
 		/* Logo */
 
 			#logo {
-				margin-top: -0.5em !important;
+				margin-top: 4em !important;
 			}
 
 				#logo h1 {
@@ -2672,7 +2680,7 @@ input, select, textarea {
 
 /* Small */
 
-	@media screen and (max-width: 736px) {
+	@media screen and (max-width: 776px) {
 
 		/* Basic */
 
@@ -2724,7 +2732,7 @@ input, select, textarea {
 			input[type="button"],
 			input[type="submit"],
 			input[type="reset"],
-			button,
+			button:not([title="This month"]),
 			.button {
 				display: block;
 				width: 100%;
@@ -2732,6 +2740,34 @@ input, select, textarea {
 				max-width: 30em;
 				margin: 0 auto;
 			}
+
+			
+			button[title="This month"],button[title="Previous month"],button[title="Next month"]
+			 {
+				display: block;
+				width: 50%;
+				max-width: 25vw;
+				font-size: 1em;
+				
+				margin: 0 auto;
+			}
+
+			.fc .fc-toolbar {
+				display: flex!important;
+				flex-direction: column!important;
+				align-items: flex-start!important;
+				max-width: 100%!important;
+			}
+			.fc-toolbar-chunk{
+				max-width: 100vw!important;
+				min-width: 100vw;
+			}
+
+			.fc .fc-toolbar button {
+				min-width: 50px!important;
+				width: 25vw;
+			}
+
 
 		/* Actions */
 
