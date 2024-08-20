@@ -1,60 +1,35 @@
 function repairEvent(event) {
-    // Default values for missing fields
-    const defaults = {
-        id: null,
-        groupId: null,
-        allDay: false,
-        start: null,
-        end: null,
-        daysOfWeek: null,
-        startTime: null,
-        endTime: null,
-        startRecur: null,
-        endRecur: null,
-        title: 'Untitled Event',
-        url: null,
-        interactive: true,
-        className: null,
-        classNames: null,
-        editable: false,
-        startEditable: false,
-        durationEditable: false,
-        resourceEditable: false,
-        resourceId: null,
-        resourceIds: null,
-        display: null,
-        overlap: false,
-        constraint: null,
-        color: '#000000',
-        backgroundColor: '#000000',
-        borderColor: '#000000',
-        textColor: '#000000',
-        rrule: null,
-        duration: null,
-    };
+    // List of keys to check for removal
+    const keysToCheck = [
+        'id', 'groupId', 'allDay', 'start', 'end', 'daysOfWeek', 'startTime', 'endTime',
+        'startRecur', 'endRecur', 'title', 'url', 'interactive', 'className',
+        'classNames', 'editable', 'startEditable', 'durationEditable', 'resourceEditable',
+        'resourceId', 'resourceIds', 'display', 'overlap', 'constraint',
+        'color', 'backgroundColor', 'borderColor', 'textColor', 'rrule', 'duration'
+    ];
 
-    // Ensure each property has a valid value, or use default
-    for (const key in defaults) {
-        if (!event.hasOwnProperty(key) || event[key] === '' || event[key] === 'null') {
-            event[key] = defaults[key];
+    // Remove properties that are null, empty strings, or invalid
+    for (const key of keysToCheck) {
+        if (event[key] === null || event[key] === '' || event[key] === 'null' || event[key] === undefined) {
+            delete event[key];
         }
     }
 
     // Convert strings to boolean where necessary
-    event.allDay = event.allDay === 'true';
-    event.interactive = event.interactive === 'true';
-    event.editable = event.editable === 'true';
-    event.startEditable = event.startEditable === 'true';
-    event.durationEditable = event.durationEditable === 'true';
-    event.resourceEditable = event.resourceEditable === 'true';
-    event.overlap = event.overlap === 'true';
+    if (event.allDay === 'true') event.allDay = true;
+    if (event.interactive === 'true') event.interactive = true;
+    if (event.editable === 'true') event.editable = true;
+    if (event.startEditable === 'true') event.startEditable = true;
+    if (event.durationEditable === 'true') event.durationEditable = true;
+    if (event.resourceEditable === 'true') event.resourceEditable = true;
+    if (event.overlap === 'true') event.overlap = true;
 
     // Convert daysOfWeek from string to array if necessary
     if (typeof event.daysOfWeek === 'string') {
         try {
             event.daysOfWeek = JSON.parse(event.daysOfWeek);
         } catch (e) {
-            event.daysOfWeek = null;
+            delete event.daysOfWeek;
         }
     }
 
@@ -63,19 +38,21 @@ function repairEvent(event) {
         try {
             event.classNames = JSON.parse(event.classNames);
         } catch (e) {
-            event.classNames = null;
+            delete event.classNames;
         }
     }
     if (typeof event.resourceIds === 'string') {
         try {
             event.resourceIds = JSON.parse(event.resourceIds);
         } catch (e) {
-            event.resourceIds = null;
+            delete event.resourceIds;
         }
     }
+
     console.log(event);
     return event;
 }
+
 
 function repairEvents(events) {
     return events.map(repairEvent);
@@ -100,13 +77,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
+                plugins: ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'],
+                initialView: 'dayGridWeek',
                 timeZone: 'local',
                 events: repairedEvents,
                 themeSystem: 'bootstrap5',
                 height: '100%',
                 contentHeight: 'auto',
                 expandRows: true,
+
+                headerToolbar: {
+                    left: 'title',
+                    center: 'prev,next today',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                }
             });
             console.log(repairedEvents);
             console.log('rendering calendar');
