@@ -2019,7 +2019,7 @@ input, select, textarea {
 		width: 100%;
 		text-align: center;
 		position: relative;
-		top: 1.5em;
+		top: 10em;
 	}
 
 		#logo h1 {
@@ -2045,7 +2045,7 @@ input, select, textarea {
 	#nav {
 		position: absolute;
 		display: block;
-		top: 2.5em;
+		top: 1em;
 		left: 0;
 		width: 100%;
 		text-align: center;
@@ -2462,7 +2462,7 @@ input, select, textarea {
 		/* Logo */
 
 			#logo {
-				top: 0;
+				margin-top: 0 !important;
 			}
 
 		/* Intro */
