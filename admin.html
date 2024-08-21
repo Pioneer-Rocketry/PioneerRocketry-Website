@@ -33,9 +33,8 @@
                   };
                   let response = await fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings)
                     .then((response) => {
-                        response.json()
                         console.log(response);
-                        createTable(response.body);
+                        createTable(response);
                       });
             }
         }
@@ -57,9 +56,9 @@
                     })
                 });
 
-                const data = await response.json();
-                createTable(data.body);
-                console.log(data.body);
+                const data = response;
+                createTable(data);
+                console.log(data);
             }
             catch(error){
                 console.log(error);
