@@ -33,12 +33,32 @@
                   };
                   let response = await fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings)
                    if(response.ok){
-                       createTable(await response.json());
+                    createUserTable(await response.json());
                    }
                     
                         
                      
             }
+        }
+        async function loadEvents() {
+            fetch('https://api.pioneerrocketry.com/calendar/get_all', {
+                method: 'GET',
+                headers: {
+                    // Add this header to pull all data
+                },
+            })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            let repairedEvents = data.result.events;
+            createEventTable(repairedEvents);
+        }).catch((error) => {
+            console.error('Error:', error);
+        });
         }
         async function changeUser(id,flags,name,email){
             try{
@@ -59,14 +79,14 @@
                 });
 
                 const data = await response.json();
-                createTable(data);
+                createUserTable(data);
                 console.log(data);
             }
             catch(error){
                 console.log(error);
             }
         }
-        function createTable(response) {
+        function createUserTable(response) {
             let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
         
             console.log(response);
@@ -117,7 +137,41 @@
             // Clear previous table and append the new one
             $("#users").empty().append(table);
         }
-        
+
+        function createEventTable(response) {
+            let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
+                //there needs to be a form for editing an event.
+
+            for (const event of response.result.events) {
+                let row = $("<tr>").appendTo(table);
+                
+                let cellName = $("<td>").text(event.name).appendTo(row);
+                let cellDescription = $("<td>").text(event.description).appendTo(row);
+                let cellStart = $("<td>").text(event.start).appendTo(row);
+                let cellEnd = $("<td>").text(event.end).appendTo(row);
+                let buttonCell = $("<td>").appendTo(row);
+
+                let editButton = $("<button>")
+                    .attr("id", `${event.id}button`)
+                    .addClass("btn btn-primary")
+                    .text("Edit Event")
+                    .appendTo(buttonCell);
+                editButton.click(function () {
+                    console.log(event);
+                })
+
+                let deleteButton = $("<button>")
+                    .attr("id", `${event.id}button`)
+                    .addClass("btn btn-danger")
+                    .text("Delete Event")
+                    .appendTo(buttonCell);
+                deleteButton.click(function () {
+                    console.log(event);
+                })
+            }
+            $("#events").empty().append(table);
+                
+        }
     </script>
 </head>
 
