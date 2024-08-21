@@ -32,10 +32,12 @@
                     body:JSON.stringify({ User: window.user}),
                   };
                   let response = await fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings)
-                    .then((response) => {
-                        console.log(response);
-                        createTable(response);
-                      });
+                   if(response.ok){
+                       createTable(await response.json());
+                   }
+                    
+                        
+                     
             }
         }
         async function changeUser(id,flags,name,email){
@@ -56,7 +58,7 @@
                     })
                 });
 
-                const data = response;
+                const data = response.json();
                 createTable(data);
                 console.log(data);
             }
