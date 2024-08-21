@@ -27,7 +27,7 @@
                 const settings = {
                     "url": "https://api.pioneerrocketry.com/admin/getAllUsers",
                     "method": "POST",
-                    "data": {"User" : window.user}
+                    "body":JSON.stringify({ User: window.user}),
                   };
                   
                   $.ajax(settings).done(function (response) {
