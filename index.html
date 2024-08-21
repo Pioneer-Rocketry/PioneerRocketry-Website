@@ -81,7 +81,7 @@
       <div class="container">
         <!-- Image -->
         <a href="#" class="image featured">
-          <img src="images/collegepr.jpg" alt="" />
+          <img src="https://api.pioneerrocketry.com/image/collegepr.jpg" alt="" />
         </a>
 
         <!-- Features -->
@@ -187,8 +187,8 @@
         <div class="row aln-center">
           <div class="col-4 col-12-medium">
             <section class="highlight">
-              <a href="https://www.nar.org/high-power-rocketry-info/level-2-hpr-certification-procedures/"
-                class="image featured"><img src="images/l1.jpg" alt="" /></a>
+              <a href="https://www.nar.org/high-power-rocketry-info/level-1-hpr-certification-procedures/"
+                class="image featured"><img src="https://api.pioneerrocketry.com/image/l1.jpg" alt="" /></a>
               <h3>
                 <a href="https://www.nar.org/high-power-rocketry-info/level-2-hpr-certification-procedures/">Level 1</a>
               </h3>
@@ -210,7 +210,7 @@
           <div class="col-4 col-12-medium">
             <section class="highlight">
               <a href="https://www.nar.org/high-power-rocketry-info/level-2-hpr-certification-procedures/"
-                class="image featured"><img src="images/l2.jpg" alt="" /></a>
+                class="image featured"><img src="https://api.pioneerrocketry.com/image/l2.jpg" alt="" /></a>
               <h3>
                 <a href="https://www.nar.org/high-power-rocketry-info/level-2-hpr-certification-procedures/">Level 2</a>
               </h3>
@@ -229,7 +229,7 @@
           <div class="col-4 col-12-medium">
             <section class="highlight">
               <a href="https://www.nar.org/high-power-rocketry-info/level-3-certification/" class="image featured"><img
-                  src="images/l3.jpg" alt="" /></a>
+                  src="https://api.pioneerrocketry.com/image/l3.jpg" alt="" /></a>
               <h3>
                 <a href="https://www.nar.org/high-power-rocketry-info/level-3-certification/">Level 3</a>
               </h3>
@@ -253,79 +253,25 @@
     </section>
 
     <!-- Footer -->
-    <section id="footer" class="wrapper">
-      <div class="title">Contact</div>
-      <div class="container">
-        <div class="row aln-center">
-          <div class="col-4 col-12-medium">
-            <div style="display: flex; justify-content: center;">
-              <img src="images/collegepr.jpg" alt="" style="max-width: 100%; border-radius: 5px;" />
-            </div>
-          </div>
-        </div>
-      </div>
+    <script> 
+      document.addEventListener('DOMContentLoaded', function() {
+        fetch('./template.html') 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); 
+        })
+        .then(data => {
 
-
-      <div class="container">
-        <header class="style1">
-
-          <p class="icon solid fa-comment">
-          <h2 class="">Have a question about the club?</h2>
-          </p>
-
-          <p>
-            The best way to reach out is to contact us through the
-            <a href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact">Contact Link</a>.
-          </p>
-        </header>
-        <div class="row">
-          <div class="col-12 col-12-medium">
-            <!-- Contact -->
-            <section class="feature-list small">
-              <div class="row">
-                <div class="col-4 col-12-small">
-                  <section>
-                    <h3 class="icon solid fa-home">Mailing Address</h3>
-                    <p>
-                      Pioneer Involvement Center<br />
-                      1 University Plaza<br />
-                      Platteville, WI 53818<br />
-                      United States
-                    </p>
-                  </section>
-                </div>
-                <div class="col-4 col-12-small">
-                  <section>
-                    <h3 class="icon solid fa-comment">Social</h3>
-                    <p>
-                      <a href="https://uwplatt.campuslabs.com/engage/organization/pioneerrocketry/contact">Contact
-                        Link</a>
-                    </p>
-                  </section>
-                </div>
-                <div class="col-4 col-12-small">
-                  <section style="
-                        padding-top: 0px !important;
-                        border-top: 0px !important;
-                      ">
-                    <h3 class="icon solid fa-envelope">Email</h3>
-                    <p>
-                      <a href="mailto:weekset@uwplatt.edu">weekset@uwplatt.edu</a>
-                    </p>
-                  </section>
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-        <div id="copyright">
-          <ul>
-            <li>&copy; Pioneer Rocketry (2024)</li>
-            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-          </ul>
-        </div>
-      </div>
-    </section>
+            $('body').append(data.split("<!-- Footer -->")[1].split("<!-- Footer -->")[0]);
+            
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+       }); 
+    </script>
   </div>
 
   <!-- Scripts -->
