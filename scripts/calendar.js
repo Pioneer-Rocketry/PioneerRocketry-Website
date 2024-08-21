@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 // Enable plugins here
-                initialView: 'dayGridWeek',
+                initialView: 'dayGridMonth',
                 timeZone: 'local',
                 events: repairedEvents,
                 themeSystem: 'bootstrap5',
