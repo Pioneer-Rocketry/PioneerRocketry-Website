@@ -67,6 +67,7 @@
         }
     function createTable(response){
         let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
+            console.log(response);
             for(const user of response.result.users){
                 //create a table that will show the user info. in the flags field have a dropsown with 1-10 flags using jquery
 
