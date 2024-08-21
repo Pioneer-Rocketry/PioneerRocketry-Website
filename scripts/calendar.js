@@ -73,11 +73,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.json();
         })
         .then((data) => {
-            const repairedEvents = repairEvents(data.result.events);
+            repairedEvents = repairEvents(data.result.events);
 
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: ['dayGridMonth', 'timeGridWeek', 'timeGridDay', 'listMonth'],
+                // Enable plugins here
                 initialView: 'dayGridWeek',
                 timeZone: 'local',
                 events: repairedEvents,
@@ -88,10 +88,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 headerToolbar: {
                     left: 'title',
-                    center: 'prev,next today',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                    center: 'prev next today',
+                    right: 'dayGridMonth dayGridWeek dayGridDay'
                 }
             });
+
             console.log(repairedEvents);
             console.log('rendering calendar');
             calendar.render();
@@ -119,100 +120,115 @@ document.addEventListener('DOMContentLoaded', function () {
         const time = new Date(localDatetime);
         return time.toISOString();
     }
+    
+
+    
 
     document.getElementById('createEventSubmit').addEventListener('click', async function (event) {
-      event.preventDefault(); // Prevent default form submission
-      console.log('Form submitted');
-  
-      const formData = new FormData(document.getElementById('createEventForm'));
-  
-      // Utility function to add values to an object if they are valid
-      const addIfValid = (obj, key, value, condition = value !== null && value !== undefined && value !== '') => {
-          if (condition) {
-              obj[key] = value;
-          }
-      };
-  
-      // Gather basic event data
-      const basicEventData = {};
-      addIfValid(basicEventData, 'title', formData.get('eventTitle'));
-      addIfValid(basicEventData, 'start', dateTimeToUTC(formData.get('eventStartDate')));
-      addIfValid(basicEventData, 'end', dateTimeToUTC(formData.get('eventEndDate')));
-      addIfValid(basicEventData, 'description', formData.get('eventDescription'));
-  
-      // Gather advanced event data
-      const advancedEventData = {};
-      const parseJsonIfValid = (value) => (value ? JSON.parse(value) : '');
-  
-      // Add advanced fields
-      const advancedFields = [
-          { key: 'id', value: formData.get('eventId') },
-          { key: 'groupId', value: formData.get('eventGroupId') },
-          { key: 'allDay', value: formData.get('eventAllDay') === 'true' },
-          { key: 'daysOfWeek', value: parseJsonIfValid(formData.get('eventDaysOfWeek')) },
-          { key: 'startTime', value: formData.get('eventStartTime') },
-          { key: 'endTime', value: formData.get('eventEndTime') },
-          { key: 'startRecur', value: formData.get('eventStartRecur') },
-          { key: 'endRecur', value: formData.get('eventEndRecur') },
-          { key: 'title', value: formData.get('eventTitle') },
-          { key: 'url', value: formData.get('eventUrl') },
-          { key: 'interactive', value: formData.get('eventInteractive') === 'true' },
-          { key: 'className', value: formData.get('eventClassName') },
-          { key: 'classNames', value: parseJsonIfValid(formData.get('eventClassNames')) },
-          { key: 'editable', value: formData.get('eventEditable') === 'true' },
-          { key: 'startEditable', value: formData.get('eventStartEditable') === 'true' },
-          { key: 'durationEditable', value: formData.get('eventDurationEditable') === 'true' },
-          { key: 'resourceEditable', value: formData.get('eventResourceEditable') === 'true' },
-          { key: 'resourceId', value: formData.get('eventResourceId') },
-          { key: 'resourceIds', value: parseJsonIfValid(formData.get('eventResourceIds')) },
-          { key: 'display', value: formData.get('eventDisplay') },
-          { key: 'overlap', value: formData.get('eventOverlap') === 'true' },
-          { key: 'constraint', value: formData.get('eventConstraint') },
-          { key: 'color', value: formData.get('eventColor'), condition: formData.get('eventColor') !== '#000000' },
-          { key: 'backgroundColor', value: formData.get('eventBackgroundColor'), condition: formData.get('eventBackgroundColor') !== '#000000' },
-          { key: 'borderColor', value: formData.get('eventBorderColor'), condition: formData.get('eventBorderColor') !== '#000000' },
-          { key: 'textColor', value: formData.get('eventTextColor'), condition: formData.get('eventTextColor') !== '#000000' },
-          { key: 'rrule', value: formData.get('eventRrule') },
-          { key: 'duration', value: formData.get('eventDuration') }
-      ];
-  
-      // Add each advanced field if valid
-      advancedFields.forEach(({ key, value, condition }) => addIfValid(advancedEventData, key, value, condition));
-  
-      // Combine basic and advanced data into a single object
-      const eventData = {
-          CalanderEvent: { ...basicEventData, ...advancedEventData },
-          User: window.user,
-      };
-  
-      console.log(eventData);
-  
-      try {
-          // Send data to the backend for insertion into the database
-          const response = await fetch('https://api.pioneerrocketry.com/calendar/create_event', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(eventData),
-          });
-  
-          if (!response.ok) {
-              throw new Error('Failed to insert event');
-          }
-  
-          // Handle success response
-          console.log('New Event Inserted Successfully');
-  
-          // Optionally, close the modal or reset the form
-          $('#createEventModal').modal('hide');
-          $('#eventData .toast-body').html('Event created successfully');
-          $('#eventData').toast('show');
-      } catch (error) {
-          // Handle error
-          console.error('Error inserting event:', error.message);
-          // Optionally, display an error message to the user
-      }
-  });
-  
+        event.preventDefault(); // Prevent default form submission
+        console.log('Form submitted');
+
+        const formData = new FormData(document.getElementById('createEventForm'));
+
+        // Utility function to add values to an object if they are valid
+        const addIfValid = (obj, key, value, condition = value !== null && value !== undefined && value !== '') => {
+            if (condition) {
+                obj[key] = value;
+            }
+        };
+
+        // Convert comma-separated daysOfWeek to an array of integers
+        function parseDaysOfWeek(){
+            let selectedDaysOfWeek = [];
+            $("#daysOfWeekButtons").find("input[type=checkbox]").each(function () {
+                if($(this).prop("checked")) {
+                    selectedDaysOfWeek.push($(this).val());
+                }
+            })
+            $("#eventDaysOfWeek").val(selectedDaysOfWeek.join(","));
+            return selectedDaysOfWeek;
+        };
+
+        // Gather basic event data
+        const basicEventData = {};
+        addIfValid(basicEventData, 'title', formData.get('eventTitle'));
+        addIfValid(basicEventData, 'start', dateTimeToUTC(formData.get('eventStartDate')));
+        addIfValid(basicEventData, 'end', dateTimeToUTC(formData.get('eventEndDate')));
+        addIfValid(basicEventData, 'description', formData.get('eventDescription'));
+
+        // Gather advanced event data
+        const advancedEventData = {};
+
+        // Add advanced fields
+        const advancedFields = [
+            { key: 'id', value: formData.get('eventId') },
+            { key: 'groupId', value: formData.get('eventGroupId') },
+            { key: 'allDay', value: formData.get('eventAllDay') === 'true' },
+            { key: 'daysOfWeek', value: parseDaysOfWeek(formData.get('eventDaysOfWeek')) },  // Adjusted to parse daysOfWeek correctly
+            { key: 'startTime', value: formData.get('eventStartTime') },
+            { key: 'endTime', value: formData.get('eventEndTime') },
+            { key: 'startRecur', value: formData.get('eventStartRecur') },
+            { key: 'endRecur', value: formData.get('eventEndRecur') },
+            { key: 'url', value: formData.get('eventUrl') },
+            { key: 'interactive', value: formData.get('eventInteractive') === 'true' },
+            { key: 'className', value: formData.get('eventClassName') },
+            { key: 'classNames', value: formData.get('eventClassNames') },
+            { key: 'editable', value: formData.get('eventEditable') === 'true' },
+            { key: 'startEditable', value: formData.get('eventStartEditable') === 'true' },
+            { key: 'durationEditable', value: formData.get('eventDurationEditable') === 'true' },
+            { key: 'resourceEditable', value: formData.get('eventResourceEditable') === 'true' },
+            { key: 'resourceId', value: formData.get('eventResourceId') },
+            { key: 'resourceIds', value: formData.get('eventResourceIds') },
+            { key: 'display', value: formData.get('eventDisplay') },
+            { key: 'overlap', value: formData.get('eventOverlap') === 'true' },
+            { key: 'constraint', value: formData.get('eventConstraint') },
+            { key: 'color', value: formData.get('eventColor'), condition: formData.get('eventColor') !== '#000000' },
+            { key: 'backgroundColor', value: formData.get('eventBackgroundColor'), condition: formData.get('eventBackgroundColor') !== '#000000' },
+            { key: 'borderColor', value: formData.get('eventBorderColor'), condition: formData.get('eventBorderColor') !== '#000000' },
+            { key: 'textColor', value: formData.get('eventTextColor'), condition: formData.get('eventTextColor') !== '#000000' },
+            { key: 'rrule', value: formData.get('eventRrule') },
+            { key: 'duration', value: formData.get('eventDuration') }
+        ];
+
+        // Add each advanced field if valid
+        advancedFields.forEach(({ key, value, condition = true }) => addIfValid(advancedEventData, key, value, condition));
+
+        // Combine basic and advanced data into a single object
+        const eventData = {
+            CalendarEvent: { ...basicEventData, ...advancedEventData },
+            User: window.user,
+        };
+
+        console.log(eventData);
+
+        try {
+            // Send data to the backend for insertion into the database
+            const response = await fetch('https://api.pioneerrocketry.com/calendar/create_event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(eventData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to insert event');
+            }
+
+            // Handle success response
+            console.log('New Event Inserted Successfully');
+
+            // Optionally, close the modal or reset the form
+            $('#createEventModal').modal('hide');
+            $('#eventData .toast-body').html('Event created successfully');
+            $('#eventData').toast('show');
+        } catch (error) {
+            // Handle error
+            console.error('Error inserting event:', error.message);
+            // Optionally, display an error message to the user
+        }
+    });
+
+
+
 });
