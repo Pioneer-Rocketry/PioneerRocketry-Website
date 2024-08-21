@@ -35,7 +35,7 @@
                     .then((response) => {
                         response.json()
                         console.log(response);
-                        createTable(response);
+                        createTable(response.body);
                       });
             }
         }
@@ -58,8 +58,8 @@
                 });
 
                 const data = await response.json();
-                createTable(data);
-                console.log(data);
+                createTable(data.body);
+                console.log(data.body);
             }
             catch(error){
                 console.log(error);
