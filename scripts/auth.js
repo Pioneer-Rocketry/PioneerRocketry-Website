@@ -6,7 +6,7 @@ class User {
     this.picture = data.picture;
     this.id = data.sub;
     this.token = token;
-    this.flags = data.flags||0;
+    this.flags = data.flags||"0";
   }
 
   //getters
