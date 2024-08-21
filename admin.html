@@ -99,7 +99,10 @@
                     }
                 })
                 cell5.append(
-                    "<button id='"+user.id+"button' class='btn btn-primary' onclick='changeUser("+user.id+", "+$("#"+user.id+"flag").val()+", "+user.name+", "+user.email+")'>Change User</button>")
+                    "<button id='"+user.id+"button' class='btn btn-primary'>Change User</button>")
+                $("#"+user.id+"button").click(function(){
+                    changeUser(user.id, $("#"+user.id+"flag").val(), user.name, user.email);
+                })
             }
             $("#users").html('');
             $("#users").append(table);
