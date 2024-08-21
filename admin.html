@@ -25,12 +25,13 @@
         function loadUsers(){
             if (window.user != null||window.user != undefined||window.user != ""){
                 const settings = {
-                    "url": "https://api.pioneerrocketry.com/admin/getAllUsers",
                     "method": "POST",
-                    "body":JSON.stringify({ User: window.user}),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body:JSON.stringify({ User: window.user}),
                   };
-                  
-                  $.ajax(settings).done(function (response) {
+                  fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings).done(function (response) {
                     console.log(response);
                     let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
                     for(const user of response.results.users){
@@ -70,11 +71,12 @@
             }
         }
         function changeUser(id,flags,name,email){
-            $.ajax({
-                url: "https://api.pioneerrocketry.com/admin/changeUser",
-                type: "POST",
-                data: JSON.stringify(
-                    {
+            fetch("https://api.pioneerrocketry.com/admin/changeUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
                     "ChangeUser":{
                         id: id,
                         flags: flags,
@@ -82,9 +84,9 @@
                         email: email
                     },
                     "User": window.user
+                }),
                 }
-                ),
-                }).done(function (response) {
+                ).done(function (response) {
                     
                 })
                 .fail(function (response) {
