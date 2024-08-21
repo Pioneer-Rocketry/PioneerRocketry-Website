@@ -58,7 +58,7 @@
                     })
                 });
 
-                const data = response.json();
+                const data = await response.json();
                 createTable(data);
                 console.log(data);
             }
