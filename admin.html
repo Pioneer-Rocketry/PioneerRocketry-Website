@@ -22,7 +22,7 @@
     <script src="assets/js/main.js"></script>
     <script src="/scripts/auth.js"></script>
     <script> 
-        function loadUsers(){
+        async function loadUsers(){
             if (window.user != null||window.user != undefined||window.user != ""){
                 const settings = {
                     "method": "POST",
@@ -31,68 +31,76 @@
                     },
                     body:JSON.stringify({ User: window.user}),
                   };
-                  fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings).done(function (response) {
-                    console.log(response);
-                    let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
-                    for(const user of response.results.users){
-                        //create a table that will show the user info. in the flags field have a dropsown with 1-10 flags using jquery
-
-                        let row = $("<tr>").appendTo(table);
-                        let cell = $("<td>").appendTo(row);
-                        let cell2 = $("<td>").appendTo(row);
-                        let cell3 = $("<td>").appendTo(row);
-                        let cell4 = $("<td>").appendTo(row);
-                        let cell5 = $("<td>").appendTo(row);
-
-                        cell.text(user.name);
-                        cell2.text(user.email);
-                        cell3.text(user.id);
-                        cell4.append($("<select>").attr("id", user.id+"flag").addClass("form-select").append(
-                            $("<option>").text("Viewer").val(0),
-                            $("<option>").text("Member").val(1),
-                            $("<option>").text("Helper").val(2),
-                            $("<option>").text("Admin").val(3),
-                            ));
-                        //select the given flag 
-                        cell4.children("select").find("option[value='"+user.flags+"']").attr("selected", true);
-                        cell4.children("select").change(function(){
-                            $("#"+user.id+"flag").val($(this).val());
-                            if($(this).val() == user.flags){
-                                $("#"+user.id+"button").attr("disabled", true);
-                            }else{
-                                $("#"+user.id+"button").attr("disabled", false);
-                            }
-                        })
-                        cell5.append(
-                            "<button id='"+user.id+"button' class='btn btn-primary' onclick='changeUser("+user.id+", "+$("#"+user.id+"flag").val()+", "+user.name+", "+user.email+")'>Change User</button>")
-                    }
-
-                  });
+                  let response = await fetch("https://api.pioneerrocketry.com/admin/getAllUsers", settings)
+                    .then((response) => {
+                        response.json()
+                        console.log(response);
+                        createTable(response);
+                      });
             }
         }
-        function changeUser(id,flags,name,email){
-            fetch("https://api.pioneerrocketry.com/admin/changeUser", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
+        async function changeUser(id,flags,name,email){
+            try{
+                const response = await fetch("https://api.pioneerrocketry.com/admin/changeUser", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    "ChangeUser":{
-                        id: id,
-                        flags: flags,
-                        name: name,
-                        email: email
-                    },
-                    "User": window.user
-                }),
-                }
-                ).done(function (response) {
-                    
+                    body: JSON.stringify({
+                        "ChangeUser":{
+                            id: id,
+                            flags: flags,
+                            name: name,
+                            email: email
+                        },
+                        "User": window.user
+                    })
+                });
+
+                const data = await response.json();
+                createTable(data);
+                console.log(data);
+            }
+            catch(error){
+                console.log(error);
+            }
+        }
+    function createTable(response){
+        let table = $("<table>").addClass("table table-hover placeholder-glow placeholder-sm");
+            for(const user of response.results.users){
+                //create a table that will show the user info. in the flags field have a dropsown with 1-10 flags using jquery
+
+                let row = $("<tr>").appendTo(table);
+                let cell = $("<td>").appendTo(row);
+                let cell2 = $("<td>").appendTo(row);
+                let cell3 = $("<td>").appendTo(row);
+                let cell4 = $("<td>").appendTo(row);
+                let cell5 = $("<td>").appendTo(row);
+
+                cell.text(user.name);
+                cell2.text(user.email);
+                cell3.text(user.id);
+                cell4.append($("<select>").attr("id", user.id+"flag").addClass("form-select").append(
+                    $("<option>").text("Viewer").val(0),
+                    $("<option>").text("Member").val(1),
+                    $("<option>").text("Helper").val(2),
+                    $("<option>").text("Admin").val(3),
+                    ));
+                //select the given flag 
+                cell4.children("select").find("option[value='"+user.flags+"']").attr("selected", true);
+                cell4.children("select").change(function(){
+                    $("#"+user.id+"flag").val($(this).val());
+                    if($(this).val() == user.flags){
+                        $("#"+user.id+"button").attr("disabled", true);
+                    }else{
+                        $("#"+user.id+"button").attr("disabled", false);
+                    }
                 })
-                .fail(function (response) {
-                    console.log(response);}
-                    )
-            
+                cell5.append(
+                    "<button id='"+user.id+"button' class='btn btn-primary' onclick='changeUser("+user.id+", "+$("#"+user.id+"flag").val()+", "+user.name+", "+user.email+")'>Change User</button>")
+            }
+            $("#users").html('');
+            $("#users").append(table);
         }
     </script>
 </head>
