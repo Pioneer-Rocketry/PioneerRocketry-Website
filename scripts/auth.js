@@ -6,8 +6,13 @@ class User {
     this.picture = data.picture;
     this.id = data.sub;
     this.token = token;
+    this.flags = data.flags||0;
   }
 
+  //getters
+  getUser(id) {
+    return this;
+  }
   getId() {
     return this.id;
   }
@@ -27,6 +32,35 @@ class User {
   getToken() {  
     return this.token;
   }
+
+  getFlags() {
+    return this.flags;
+  }
+
+  //setters
+  setFlags(flags) {
+    this.flags = flags;
+  }
+
+  setToken(token) {
+    this.token = token;
+  }
+
+  setName(name) {
+    this.name = name;
+  }
+
+  setEmail(email) {
+    this.email = email;
+  }
+
+  setPicture(picture) {
+    this.picture = picture;
+  }
+
+  setId(id) {
+    this.id = id;
+  } 
 
 }
 //decode JWT
