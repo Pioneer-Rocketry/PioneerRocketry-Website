@@ -184,8 +184,10 @@
                     console.log(eventData);
 
                     try {
+
                         // Send data to the backend for insertion into the database
-                        const response = await fetch(
+                        if(update== true){
+                            const response = await fetch(
                             "https://api.pioneerrocketry.com/calendar/updateEvent",
                             {
                                 method: "POST",
@@ -195,6 +197,19 @@
                                 body: JSON.stringify(eventData),
                             }
                         );
+                        }else{
+                            const response = await fetch(
+                            "https://api.pioneerrocketry.com/calendar/createEvent",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(eventData),
+                            }
+                        );
+                        }
+                        
 
                         if (!response.ok) {
                             throw new Error("Failed to insert event");

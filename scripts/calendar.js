@@ -60,7 +60,7 @@ function repairEvents(events) {
 
 let calendar;
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('https://api.pioneerrocketry.com/calendar/get_all', {
+    fetch('https://api.pioneerrocketry.com/calendar/getAllEvents', {
         method: 'GET',
         headers: {
             // Add this header to pull all data
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             // Send data to the backend for insertion into the database
-            const response = await fetch('https://api.pioneerrocketry.com/calendar/create_event', {
+            const response = await fetch('https://api.pioneerrocketry.com/admin/createEvent', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
