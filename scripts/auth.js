@@ -110,6 +110,8 @@ function handleCredentialResponse(response) {
   }).done(function (data) {
     console.log(JSON.parse(data));
     let flags = JSON.parse(data).flags;
+    let sub = JSON.parse(data).email;
+    localStorage.setItem("lastUserEmail", sub);
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
       $("#createEventBtn").show();

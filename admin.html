@@ -22,6 +22,7 @@
     <script src="assets/js/main.js"></script>
     <script src="/scripts/auth.js"></script>
     <script> 
+        document.getElementById("g_id_onload").setAttribute("data-login_hint", localStorage.getItem('lastUserEmail'));
         async function loadUsers(){
             if (window.user != null||window.user != undefined||window.user != ""){
                 const settings = {
@@ -177,7 +178,7 @@
 
 <body data-bs-theme="dark">
     <div id="g_id_onload" data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
-        data-context="signin" data-ux_mode="popup" data-callback="onTokenResponse" data-auto_select="true"
+        data-context="signin" data-include_granted_scopes="true" data-login_hint="" data-ux_mode="popup" data-callback="onTokenResponse" data-auto_select="true"
         data-itp_support="true">
     </div>
     <div class="g_id_signin"  data-type="standard" data-shape="rectangular" data-theme="filled_black"
