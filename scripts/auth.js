@@ -115,7 +115,11 @@ function handleCredentialResponse(response) {
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
       $("#createEventBtn").show();
+      $(".loginRequired").show()
+      $(".triggerChangeOnLogin").trigger("change");
+      $(".triggerClickOnLogin").trigger("click");
     }
+    $("#g_id_signin").hide();
     //create popper toast for success
     let toastDiv = document.createElement("div");
     toastDiv.setAttribute("id", "liveToast");

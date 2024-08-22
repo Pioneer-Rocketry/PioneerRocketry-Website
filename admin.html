@@ -485,16 +485,16 @@
         data-auto_select="true" data-itp_support="true"></div>
     <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
         data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-    <h1>User Management</h1>
-    <div id="users"></div>
+    <h1 class="loginRequired">User Management</h1>
+    <div class="loginRequired" id="users"></div>
 
-    <button class="btn btn-primary hide" onclick="loadUsers()">
+    <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">
         Load Users
     </button>
     <script></script>
-    <h1>Event Manager</h1>
-    <div id="events"></div>
-    <button class="btn btn-primary hide" onclick="loadEvents()">
+    <h1 class="loginRequired">Event Manager</h1>
+    <div class="loginRequired" id="events"></div>
+    <button  class=" triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">
         Load Events
     </button>
 
