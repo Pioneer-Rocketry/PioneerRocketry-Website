@@ -42,24 +42,13 @@
             }
         }
         async function loadEvents() {
-            fetch('https://api.pioneerrocketry.com/calendar/get_all', {
+            let data = await fetch('https://api.pioneerrocketry.com/calendar/get_all', {
                 method: 'GET',
                 headers: {
-                    // Add this header to pull all data
+                   "Content-Type": "application/json",
                 },
             })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            let repairedEvents = data.result.events;
-            createEventTable(repairedEvents);
-        }).catch((error) => {
-            console.error('Error:', error);
-        });
+            createEventTable(await response.json());
         }
         async function changeUser(id,flags,name,email){
             try{
