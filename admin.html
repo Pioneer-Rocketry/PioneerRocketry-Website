@@ -215,7 +215,7 @@
         let [hours, minutes] = timeString.split(':');
         
         // Set the time part manually to the date object
-        date.setHours(hours);
+        date.setHours(hours - 5);
         date.setMinutes(minutes);
         
         // Return the formatted string for the input field (yyyy-MM-ddTHH:mm)
