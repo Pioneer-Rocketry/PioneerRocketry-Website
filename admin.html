@@ -43,12 +43,9 @@
         }
         async function loadEvents() {
             let data = await fetch('https://api.pioneerrocketry.com/calendar/get_all', {
-                method: 'GET',
-                headers: {
-                   "Content-Type": "application/json",
-                },
+                method: 'GET', 
             })
-            createEventTable(await response.json());
+            createEventTable(await data.json());
         }
         async function changeUser(id,flags,name,email){
             try{
