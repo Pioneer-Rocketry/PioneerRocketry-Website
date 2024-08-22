@@ -27,7 +27,7 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
-
+        let update= false;
         $(document).ready(function () {
             $(".loginRequired").hide();
             $("#events").after(
@@ -40,6 +40,92 @@
                         "data-bs-target": "#createEventModal",
                     })
                     .text("Create New Event")
+                    .on("click", function () {
+                        update = false;
+                        event = {};
+                        $("#eventTitle").val(event.title || "");
+                    $("#eventDescription").val(event.description || "");
+                    $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
+                    $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
+                    $("#eventId").val(event.id || "");
+                    $("#eventGroupId").val(event.groupId || "");
+                    $("#eventAllDay").val(
+                        event.allDay !== null ? event.allDay.toString() : "false"
+                    );
+
+                    // Set days of the week checkboxes
+                    $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
+                    if (event.daysOfWeek) {
+                        event.daysOfWeek.forEach(function (day) {
+                            $(`#daysOfWeekButtons input[value="${day}"]`).prop(
+                                "checked",
+                                true
+                            );
+                        });
+                    }
+                    $("#eventDaysOfWeek").val(
+                        event.daysOfWeek ? event.daysOfWeek.join(",") : ""
+                    );
+
+                    $("#eventStartTime").val(event.startTime || "");
+                    $("#eventEndTime").val(event.endTime || "");
+                    $("#eventStartRecur").val(
+                        event.startRecur
+                            ? new Date(event.startRecur).toISOString().slice(0, 16)
+                            : ""
+                    );
+                    $("#eventEndRecur").val(
+                        event.endRecur
+                            ? new Date(event.endRecur).toISOString().slice(0, 16)
+                            : ""
+                    );
+                    $("#eventUrl").val(event.url || "");
+                    $("#eventInteractive").val(
+                        event.interactive !== null
+                            ? event.interactive.toString()
+                            : "false"
+                    );
+                    $("#eventClassName").val(event.className || "");
+                    $("#eventClassNames").val(
+                        event.classNames ? event.classNames.join(", ") : ""
+                    );
+                    $("#eventEditable").val(
+                        event.editable !== null ? event.editable.toString() : "false"
+                    );
+                    $("#eventStartEditable").val(
+                        event.startEditable !== null
+                            ? event.startEditable.toString()
+                            : "false"
+                    );
+                    $("#eventDurationEditable").val(
+                        event.durationEditable !== null
+                            ? event.durationEditable.toString()
+                            : "false"
+                    );
+                    $("#eventResourceEditable").val(
+                        event.resourceEditable !== null
+                            ? event.resourceEditable.toString()
+                            : "false"
+                    );
+                    $("#eventResourceId").val(event.resourceId || "");
+                    $("#eventResourceIds").val(
+                        event.resourceIds ? event.resourceIds.join(", ") : ""
+                    );
+                    $("#eventDisplay").val(event.display || "");
+                    $("#eventOverlap").val(
+                        event.overlap !== null ? event.overlap.toString() : "false"
+                    );
+                    $("#eventConstraint").val(event.constraint || "");
+                    $("#eventColor").val(event.color || "");
+                    $("#eventBackgroundColor").val(event.backgroundColor || "");
+                    $("#eventBorderColor").val(event.borderColor || "");
+                    $("#eventTextColor").val(event.textColor || "");
+                    $("#eventRrule").val(event.rrule || "");
+                    $("#eventDuration").val(event.duration || "");
+
+                    // Change the submit button text
+                    $("#createEventSubmit").text("Update Event");
+                    })
                     .hide()
             );
             document
@@ -376,6 +462,7 @@
                     .text("Edit Event")
                     .appendTo(buttonCell);
                 editButton.click(function () {
+                    update = true;
                     // Get the event object (assuming it's passed to this function)
 
                     // Set the modal fields with the event data
