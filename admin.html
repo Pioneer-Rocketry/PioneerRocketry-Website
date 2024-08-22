@@ -263,12 +263,12 @@
                         $("#eventDescription").val(event.description || "");
                     
                         // Set the date fields (still in ISO format for datetime-local input)
-                        $("#eventStartDate").val(event.start ? new Date(event.start).toISOString().slice(0, 16) : "");
-                        $("#eventEndDate").val(event.end ? new Date(event.end).toISOString().slice(0, 16) : "");
+                        $("#eventStartDate").val(event.start ? formatLocalTime(event.start) : "");
+                        $("#eventEndDate").val(event.end ? formatLocalTime(event.start) : "");
                     
                         // Set the time fields using local time format
-                        $("#eventStartTime").val(event.start ? formatLocalTime(event.start) : "");
-                        $("#eventEndTime").val(event.end ? formatLocalTime(event.end) : "");
+                        $("#eventStartTime").val(event.startTime ? formatLocalTime(event.startTime) : "");
+                        $("#eventEndTime").val(event.endTime ? formatLocalTime(event.endTime) : "");
                     
                         $("#eventId").val(event.id || "");
                         $("#eventGroupId").val(event.groupId || "");
@@ -283,8 +283,8 @@
                         }
                         $("#eventDaysOfWeek").val(event.daysOfWeek ? event.daysOfWeek.join(",") : "");
                     
-                        $("#eventStartRecur").val(event.startRecur ? new Date(event.startRecur).toISOString().slice(0, 16) : "");
-                        $("#eventEndRecur").val(event.endRecur ? new Date(event.endRecur).toISOString().slice(0, 16) : "");
+                        $("#eventStartRecur").val(event.startRecur ? formatLocalTime(event.startRecur) : "");
+                        $("#eventEndRecur").val(event.endRecur ? formatLocalTime(event.endRecur) : "");
                         $("#eventUrl").val(event.url || "");
                         $("#eventInteractive").val(event.interactive !== null ? event.interactive.toString() : "false");
                         $("#eventClassName").val(event.className || "");
