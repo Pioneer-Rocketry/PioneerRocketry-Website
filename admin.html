@@ -251,16 +251,29 @@
                     .text("Edit Event")
                     .appendTo(buttonCell);
                     editButton.click(function () {
-
-                        // Set the modal fields with the event data
+                        let event = /* your event object here */;
+                    
+                        // Convert UTC date/time to local time and format
+                        function formatLocalTime(dateString) {
+                            let date = new Date(dateString);
+                            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
+                    
                         $("#eventTitle").val(event.title || "");
                         $("#eventDescription").val(event.description || "");
+                    
+                        // Set the date fields (still in ISO format for datetime-local input)
                         $("#eventStartDate").val(event.start ? new Date(event.start).toISOString().slice(0, 16) : "");
                         $("#eventEndDate").val(event.end ? new Date(event.end).toISOString().slice(0, 16) : "");
+                    
+                        // Set the time fields using local time format
+                        $("#eventStartTime").val(event.start ? formatLocalTime(event.start) : "");
+                        $("#eventEndTime").val(event.end ? formatLocalTime(event.end) : "");
+                    
                         $("#eventId").val(event.id || "");
                         $("#eventGroupId").val(event.groupId || "");
                         $("#eventAllDay").val(event.allDay !== null ? event.allDay.toString() : "false");
-                        
+                    
                         // Set days of the week checkboxes
                         $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
                         if (event.daysOfWeek) {
@@ -270,8 +283,6 @@
                         }
                         $("#eventDaysOfWeek").val(event.daysOfWeek ? event.daysOfWeek.join(",") : "");
                     
-                        $("#eventStartTime").val(event.startTime || "");
-                        $("#eventEndTime").val(event.endTime || "");
                         $("#eventStartRecur").val(event.startRecur ? new Date(event.startRecur).toISOString().slice(0, 16) : "");
                         $("#eventEndRecur").val(event.endRecur ? new Date(event.endRecur).toISOString().slice(0, 16) : "");
                         $("#eventUrl").val(event.url || "");
@@ -300,6 +311,7 @@
                         // Show the modal
                         $("#createEventModal").modal('show');
                     });
+                    
                     
 
                 let deleteButton = $("<button>")
