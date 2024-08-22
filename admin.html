@@ -25,6 +25,11 @@
     <script src="assets/js/main.js"></script>
     <script src="/scripts/auth.js"></script>
     <script>
+        function dateTimeToUTC(localDatetime) {
+            const time = new Date(localDatetime);
+            return time.toISOString();
+        }
+        
       $(document).ready(function () {
         $("#events").after(
           $("<button>")
