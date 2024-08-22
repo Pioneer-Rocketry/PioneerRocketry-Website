@@ -218,6 +218,9 @@
         let combinedDateTime = new Date(`${datePart}T${timeString}`);
 
         // Return the combined date and time in ISO format, sliced to fit datetime-local input
+
+        console.log(datePart , timeString, combinedDateTime);
+
         return combinedDateTime.toISOString().slice(0, 16);
       }
       async function loadUsers() {
