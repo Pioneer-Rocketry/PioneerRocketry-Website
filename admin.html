@@ -251,29 +251,31 @@
                     .text("Edit Event")
                     .appendTo(buttonCell);
                     editButton.click(function () {
-                        
-                    
-                        // Convert UTC date/time to local time and format
                         function formatLocalTime(dateString) {
                             let date = new Date(dateString);
                             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         }
-                    
+                        
+                        function formatLocalDate(dateString) {
+                            let date = new Date(dateString);
+                            return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
+                        }
+                        
                         $("#eventTitle").val(event.title || "");
                         $("#eventDescription").val(event.description || "");
-                    
-                        // Set the date fields (still in ISO format for datetime-local input)
-                        $("#eventStartDate").val(event.start ? formatLocalTime(event.start) : "");
-                        $("#eventEndDate").val(event.end ? formatLocalTime(event.start) : "");
-                    
+                        
+                        // Set the date field (using only the date part of the ISO string)
+                        $("#eventStartDate").val(event.start ? formatLocalDate(event.start) : "");
+                        $("#eventEndDate").val(event.end ? formatLocalDate(event.end) : "");
+                        
                         // Set the time fields using local time format
-                        $("#eventStartTime").val(event.startTime ? formatLocalTime(event.startTime) : "");
-                        $("#eventEndTime").val(event.endTime ? formatLocalTime(event.endTime) : "");
-                    
+                        $("#eventStartTime").val(event.startTime || "");
+                        $("#eventEndTime").val(event.endTime || "");
+                        
                         $("#eventId").val(event.id || "");
                         $("#eventGroupId").val(event.groupId || "");
                         $("#eventAllDay").val(event.allDay !== null ? event.allDay.toString() : "false");
-                    
+                        
                         // Set days of the week checkboxes
                         $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
                         if (event.daysOfWeek) {
@@ -282,9 +284,11 @@
                             });
                         }
                         $("#eventDaysOfWeek").val(event.daysOfWeek ? event.daysOfWeek.join(",") : "");
-                    
-                        $("#eventStartRecur").val(event.startRecur ? formatLocalTime(event.startRecur) : "");
-                        $("#eventEndRecur").val(event.endRecur ? formatLocalTime(event.endRecur) : "");
+                        
+                        // Set the recurrence start and end dates (using date part) and times
+                        $("#eventStartRecur").val(event.startRecur ? formatLocalDate(event.startRecur) : "");
+                        $("#eventEndRecur").val(event.endRecur ? formatLocalDate(event.endRecur) : "");
+
                         $("#eventUrl").val(event.url || "");
                         $("#eventInteractive").val(event.interactive !== null ? event.interactive.toString() : "false");
                         $("#eventClassName").val(event.className || "");
