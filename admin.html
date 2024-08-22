@@ -208,21 +208,19 @@
             }
           });
       });
-      function spliceTimeIntoDate(dateString, timeString) {
+      function formatDateForInput(dateString, timeString) {
         let date = new Date(dateString);
-
-        // Extract the date part (YYYY-MM-DD)
-        let datePart = date.toISOString().split("T")[0];
-
-        // Combine date with the time string
-        let combinedDateTime = new Date(`${datePart}T${timeString}`);
-
-        // Return the combined date and time in ISO format, sliced to fit datetime-local input
-
-        console.log(datePart , timeString, combinedDateTime);
-
-        return combinedDateTime.toISOString().slice(0, 16);
-      }
+        
+        // Split time into hours and minutes
+        let [hours, minutes] = timeString.split(':');
+        
+        // Set the time part manually to the date object
+        date.setHours(hours);
+        date.setMinutes(minutes);
+        
+        // Return the formatted string for the input field (yyyy-MM-ddTHH:mm)
+        return date.toISOString().slice(0, 16);
+    }
       async function loadUsers() {
         if (
           window.user != null ||
@@ -361,14 +359,8 @@
             // Set the modal fields with the event data
             $("#eventTitle").val(event.title || "");
             $("#eventDescription").val(event.description || "");
-            $("#eventStartDate").val(
-              event.start
-                ? spliceTimeIntoDate(event.start, event.startTime)
-                : ""
-            );
-            $("#eventEndDate").val(
-              event.end ? spliceTimeIntoDate(event.end, event.endTime) : ""
-            );
+            $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
+            $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
             $("#eventId").val(event.id || "");
             $("#eventGroupId").val(event.groupId || "");
             $("#eventAllDay").val(
