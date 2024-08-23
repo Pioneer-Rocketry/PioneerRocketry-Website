@@ -573,19 +573,32 @@
         data-auto_select="true" data-itp_support="true"></div>
     <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
         data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-    <h1 class="loginRequired">User Management</h1>
-    <div class="loginRequired" id="users"></div>
+        <div class="card loginRequired">
+          <div class="card-header">
+          <h1 class=" card-title loginRequired">User Management</h1>
+          </div>
+          <div class="card-body">
+            <div class="loginRequired" id="users"></div>
+          </div>
+        </div>
+    
+    
 
     <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">
         Load Users
     </button>
-    <script></script>
-    <h1 class="loginRequired">Event Manager</h1>
-    <div class="loginRequired" id="events"></div>
-    <button  class=" triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">
-        Load Events
-    </button>
-
+    
+    <div class="card">
+      <div class="card-header">
+      <h1 class=" card-title loginRequired">Event Manager</h1>
+      </div>
+      <div class="card-body">
+      <div class="loginRequired" id="events"></div>
+      </div>
+      <button  class=" triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">
+          Load Events
+      </button>
+    </div>
     <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel"
         aria-hidden="true" data-bs-theme="dark">
         <div class="modal-dialog" data-bs-theme="dark">
