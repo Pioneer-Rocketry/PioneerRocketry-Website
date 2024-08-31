@@ -120,9 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const time = new Date(localDatetime);
         return time.toISOString();
     }
-    
 
-    
 
     document.getElementById('createEventSubmit').addEventListener('click', async function (event) {
         event.preventDefault(); // Prevent default form submission
@@ -203,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             // Send data to the backend for insertion into the database
-            const response = await fetch('https://api.pioneerrocketry.com/admin/createEvent', {
+            const response = await fetch('https://api.pioneerrocketry.com/admin/create_event', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
