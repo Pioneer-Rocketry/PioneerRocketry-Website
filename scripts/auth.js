@@ -6,8 +6,13 @@ class User {
     this.picture = data.picture;
     this.id = data.sub;
     this.token = token;
+    this.flags = data.flags||"0";
   }
 
+  //getters
+  getUser(id) {
+    return this;
+  }
   getId() {
     return this.id;
   }
@@ -27,6 +32,35 @@ class User {
   getToken() {  
     return this.token;
   }
+
+  getFlags() {
+    return this.flags;
+  }
+
+  //setters
+  setFlags(flags) {
+    this.flags = flags;
+  }
+
+  setToken(token) {
+    this.token = token;
+  }
+
+  setName(name) {
+    this.name = name;
+  }
+
+  setEmail(email) {
+    this.email = email;
+  }
+
+  setPicture(picture) {
+    this.picture = picture;
+  }
+
+  setId(id) {
+    this.id = id;
+  } 
 
 }
 //decode JWT
@@ -76,10 +110,16 @@ function handleCredentialResponse(response) {
   }).done(function (data) {
     console.log(JSON.parse(data));
     let flags = JSON.parse(data).flags;
+    let sub = JSON.parse(data).email;
+    localStorage.setItem("lastUserEmail", sub);
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
       $("#createEventBtn").show();
+      $(".loginRequired").show()
+      $(".triggerChangeOnLogin").trigger("change");
+      $(".triggerClickOnLogin").trigger("click");
     }
+    $("#g_id_signin").hide();
     //create popper toast for success
     let toastDiv = document.createElement("div");
     toastDiv.setAttribute("id", "liveToast");
