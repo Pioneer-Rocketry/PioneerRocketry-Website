@@ -935,7 +935,7 @@
                         if (xhr.status === 200) {
                             alert('Image uploaded successfully!');
                         } else {
-                            alert('Upload failed. Status: ' + xhr.status);
+                            alert('Upload failed. Status: ' + xhr.status + "\n Error: " + xhr.response.json()['error']);
                         }
                     };
 
