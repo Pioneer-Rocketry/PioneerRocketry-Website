@@ -898,12 +898,12 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" id="imageUploadForm" class="btn btn-primary">
+            <button type="submit" id="imageUploadBtn" class="btn btn-primary">
                 Upload Image
             </button>
 
             <script>
-                document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                document.getElementById('imageUploadForm').addEventListener('submit', function(event) {
                     event.preventDefault();
 
                     const imageName = document.getElementById('imageName').value;
