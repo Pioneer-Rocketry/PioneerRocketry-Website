@@ -887,7 +887,7 @@
         <div class="loginRequired" id="events"></div>
         </div>
 
-        <form id="imageUploadForm">
+        <form id="imageUploadForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="imageFile">Image File</label>
                 <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*"/>
@@ -926,9 +926,9 @@
                     xhr.open('POST', `https://api.pioneerrocketry.com/image/upload/${encodeURIComponent(imageName)}`, true);
 
                     // Set custom headers
-                    for (const key in headers) {
-                        xhr.setRequestHeader(key, headers[key]);
-                    }
+                    // for (const key in headers) {
+                    //     xhr.setRequestHeader(key, headers[key]);
+                    // }
 
                     // Handle the response
                     xhr.onload = function() {
