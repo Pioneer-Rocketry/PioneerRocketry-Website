@@ -320,8 +320,13 @@
             let date = new Date(dateString);
 
             // Split time into hours and minutes
-            if(timeString == null || timeString == undefined || timeString == ""){console.log("Invalid Time", timeString);return ""}
             if(dateString == null || dateString == undefined || dateString == ""){console.log("Invalid Date", dateString);return ""}
+            if(timeString == null || timeString == undefined || timeString == ""){
+                console.log("Invalid Time", timeString, "Attempting to get time from date");
+                  dateString = date.toISOString().slice(0, 16);
+                  timeString = date.toISOString().slice(11, 16);
+            }
+            
             let [hours, minutes] = timeString.split(':');
 
             // Set the time part manually to the date object
