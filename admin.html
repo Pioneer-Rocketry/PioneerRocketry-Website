@@ -27,6 +27,10 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
+        function UTCToDateTime(utcDatetime) {
+            const time = new Date(utcDatetime);
+            return time;
+        }
         let update= false;
         $(document).ready(function () {
             $(".loginRequired").hide();
@@ -320,6 +324,13 @@
             let date = new Date(dateString);
 
             // Split time into hours and minutes
+            if(dateString == null || dateString == undefined || dateString == ""){console.log("Invalid Date", dateString);return ""}
+            if(timeString == null || timeString == undefined || timeString == ""){
+                console.log("Invalid Time", timeString, "Attempting to get time from date");
+                  dateString = date.toISOString().slice(0, 16);
+                  timeString = date.toISOString().slice(11, 16);
+            }
+            
             let [hours, minutes] = timeString.split(':');
 
             // Set the time part manually to the date object
@@ -468,8 +479,9 @@
                     // Set the modal fields with the event data
                     $("#eventTitle").val(event.title || "");
                     $("#eventDescription").val(event.description || "");
-                    $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-                    $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
+                    //$("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
+                    $("#eventStartDate").val(event.start ? UTCToDateTime(event.start).toISOString() : "");
+                    $("#eventEndDate").val(event.end ? UTCToDateTime(event.end).toISOString() : "");
                     $("#eventId").val(event.id || "");
                     $("#eventGroupId").val(event.groupId || "");
                     $("#eventAllDay").val(
