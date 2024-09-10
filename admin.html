@@ -36,8 +36,8 @@
             }
         }
         function UTCToLocalDateTime(utcDatetime) {
-            window.time = new Date("2024-09-10T22:33:00.000Z");
-            time.toLocaleDateString() + " " + time.toLocaleTimeString();
+            window.time = new Date(utcDatetime);
+            time.toLocaleString('en-GB', { timeZone: 'CST' });
             time = new Date(time).toISOString().replace("Z","")
             return time;
         }
