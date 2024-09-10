@@ -27,6 +27,10 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
+        function UTCToDateTime(utcDatetime) {
+            const time = new Date(utcDatetime);
+            return time;
+        }
         let update= false;
         $(document).ready(function () {
             $(".loginRequired").hide();
@@ -475,8 +479,9 @@
                     // Set the modal fields with the event data
                     $("#eventTitle").val(event.title || "");
                     $("#eventDescription").val(event.description || "");
-                    $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-                    $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
+                    //$("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
+                    $("#eventStartDate").val(event.start ? UTCToDateTime(event.start) : "");
+                    $("#eventEndDate").val(event.end ? UTCToDateTime(event.end) : "");
                     $("#eventId").val(event.id || "");
                     $("#eventGroupId").val(event.groupId || "");
                     $("#eventAllDay").val(
