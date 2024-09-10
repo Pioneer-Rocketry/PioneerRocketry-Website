@@ -36,11 +36,11 @@
             }
         }
         function UTCToLocalDateTime(utcDatetime) {
-            window.time = new Date(utcDatetime);
+            time = new Date(utcDatetime);
             //get the local time from UTC time
             time = new Date(time.getTime() - time.getTimezoneOffset() * 60000);
            
-            return time.toISOString();
+            return time.toISOString().replace("Z", ""); 
         }
         let update = false;
         $(document).ready(function () {
