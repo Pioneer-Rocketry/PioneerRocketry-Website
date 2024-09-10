@@ -480,8 +480,8 @@
                     $("#eventTitle").val(event.title || "");
                     $("#eventDescription").val(event.description || "");
                     //$("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-                    $("#eventStartDate").val(event.start ? UTCToDateTime(event.start) : "");
-                    $("#eventEndDate").val(event.end ? UTCToDateTime(event.end) : "");
+                    $("#eventStartDate").val(event.start ? UTCToDateTime(event.start).toISOString() : "");
+                    $("#eventEndDate").val(event.end ? UTCToDateTime(event.end).toISOString() : "");
                     $("#eventId").val(event.id || "");
                     $("#eventGroupId").val(event.groupId || "");
                     $("#eventAllDay").val(
