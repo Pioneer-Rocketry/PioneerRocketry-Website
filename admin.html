@@ -37,9 +37,10 @@
         }
         function UTCToLocalDateTime(utcDatetime) {
             window.time = new Date(utcDatetime);
-            time.toLocaleString('en-GB', { timeZone: 'CST' });
-            time = new Date(time).toISOString().replace("Z","")
-            return time;
+            //get the local time from UTC time
+            time = new Date(time.getTime() - time.getTimezoneOffset() * 60000);
+           
+            return time.toISOString();
         }
         let update = false;
         $(document).ready(function () {
