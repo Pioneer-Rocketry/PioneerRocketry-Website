@@ -27,14 +27,7 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
-        function zeroPadded(val) {
-            if (val >= 10) {
-                return val;
-            }
-            else {
-                return '0' + val;
-            }
-        }
+        
         function UTCToLocalDateTime(utcDatetime) {
             time = new Date(utcDatetime);
             //get the local time from UTC time
