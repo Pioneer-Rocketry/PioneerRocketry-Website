@@ -27,9 +27,9 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
-        function UTCToDateTime(utcDatetime) {
+        function UTCToLocalDateTime(utcDatetime) {
             const time = new Date(utcDatetime);
-            return time;
+            return time.toLocaleString();
         }
         let update= false;
         $(document).ready(function () {
@@ -480,8 +480,8 @@
                     $("#eventTitle").val(event.title || "");
                     $("#eventDescription").val(event.description || "");
                     //$("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-                    $("#eventStartDate").val(event.start ? UTCToDateTime(event.start).toISOString() : "");
-                    $("#eventEndDate").val(event.end ? UTCToDateTime(event.end).toISOString() : "");
+                    $("#eventStartDate").val(event.start ? UTCToLocalDateTime(event.start) : "");
+                    $("#eventEndDate").val(event.end ? UTCToLocalDateTime(event.end) : "");
                     $("#eventId").val(event.id || "");
                     $("#eventGroupId").val(event.groupId || "");
                     $("#eventAllDay").val(
@@ -506,12 +506,12 @@
                     $("#eventEndTime").val(event.endTime || "");
                     $("#eventStartRecur").val(
                         event.startRecur
-                            ? new Date(event.startRecur).toISOString().slice(0, 16)
+                            ? UTCToLocalDateTime(event.startRecur)
                             : ""
                     );
                     $("#eventEndRecur").val(
                         event.endRecur
-                            ? new Date(event.endRecur).toISOString().slice(0, 16)
+                            ? UTCToLocalDateTime(event.endRecur)
                             : ""
                     );
                     $("#eventUrl").val(event.url || "");
