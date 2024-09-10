@@ -27,11 +27,21 @@
             const time = new Date(localDatetime);
             return time.toISOString();
         }
-        function UTCToLocalDateTime(utcDatetime) {
-            const time = new Date(utcDatetime);
-            return time.toLocaleString();
+        function zeroPadded(val) {
+            if (val >= 10) {
+                return val;
+            }
+            else {
+                return '0' + val;
+            }
         }
-        let update= false;
+        function UTCToLocalDateTime(utcDatetime) {
+            window.time = new Date("2024-09-10T22:33:00.000Z");
+            time.toLocaleDateString() + " " + time.toLocaleTimeString();
+            time = new Date(time).toISOString().replace("Z","")
+            return time;
+        }
+        let update = false;
         $(document).ready(function () {
             $(".loginRequired").hide();
             $("#events").after(
@@ -48,87 +58,87 @@
                         update = false;
                         event = {};
                         $("#eventTitle").val(event.title || "");
-                    $("#eventDescription").val(event.description || "");
-                    $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-                    $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
-                    $("#eventId").val(event.id || "");
-                    $("#eventGroupId").val(event.groupId || "");
-                    $("#eventAllDay").val(
-                        event.allDay !== null ? event.allDay.toString() : "false"
-                    );
+                        $("#eventDescription").val(event.description || "");
+                        $("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
+                        $("#eventEndDate").val(event.end ? formatDateForInput(event.end, event.endTime) : "");
+                        $("#eventId").val(event.id || "");
+                        $("#eventGroupId").val(event.groupId || "");
+                        $("#eventAllDay").val(
+                            event.allDay !== null ? event.allDay.toString() : "false"
+                        );
 
-                    // Set days of the week checkboxes
-                    $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
-                    if (event.daysOfWeek) {
-                        event.daysOfWeek.forEach(function (day) {
-                            $(`#daysOfWeekButtons input[value="${day}"]`).prop(
-                                "checked",
-                                true
-                            );
-                        });
-                    }
-                    $("#eventDaysOfWeek").val(
-                        event.daysOfWeek ? event.daysOfWeek.join(",") : ""
-                    );
+                        // Set days of the week checkboxes
+                        $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
+                        if (event.daysOfWeek) {
+                            event.daysOfWeek.forEach(function (day) {
+                                $(`#daysOfWeekButtons input[value="${day}"]`).prop(
+                                    "checked",
+                                    true
+                                );
+                            });
+                        }
+                        $("#eventDaysOfWeek").val(
+                            event.daysOfWeek ? event.daysOfWeek.join(",") : ""
+                        );
 
-                    $("#eventStartTime").val(event.startTime || "");
-                    $("#eventEndTime").val(event.endTime || "");
-                    $("#eventStartRecur").val(
-                        event.startRecur
-                            ? new Date(event.startRecur).toISOString().slice(0, 16)
-                            : ""
-                    );
-                    $("#eventEndRecur").val(
-                        event.endRecur
-                            ? new Date(event.endRecur).toISOString().slice(0, 16)
-                            : ""
-                    );
-                    $("#eventUrl").val(event.url || "");
-                    $("#eventInteractive").val(
-                        event.interactive !== null
-                            ? event.interactive.toString()
-                            : "false"
-                    );
-                    $("#eventClassName").val(event.className || "");
-                    $("#eventClassNames").val(
-                        event.classNames ? event.classNames.join(", ") : ""
-                    );
-                    $("#eventEditable").val(
-                        event.editable !== null ? event.editable.toString() : "false"
-                    );
-                    $("#eventStartEditable").val(
-                        event.startEditable !== null
-                            ? event.startEditable.toString()
-                            : "false"
-                    );
-                    $("#eventDurationEditable").val(
-                        event.durationEditable !== null
-                            ? event.durationEditable.toString()
-                            : "false"
-                    );
-                    $("#eventResourceEditable").val(
-                        event.resourceEditable !== null
-                            ? event.resourceEditable.toString()
-                            : "false"
-                    );
-                    $("#eventResourceId").val(event.resourceId || "");
-                    $("#eventResourceIds").val(
-                        event.resourceIds ? event.resourceIds.join(", ") : ""
-                    );
-                    $("#eventDisplay").val(event.display || "");
-                    $("#eventOverlap").val(
-                        event.overlap !== null ? event.overlap.toString() : "false"
-                    );
-                    $("#eventConstraint").val(event.constraint || "");
-                    $("#eventColor").val(event.color || "");
-                    $("#eventBackgroundColor").val(event.backgroundColor || "");
-                    $("#eventBorderColor").val(event.borderColor || "");
-                    $("#eventTextColor").val(event.textColor || "");
-                    $("#eventRrule").val(event.rrule || "");
-                    $("#eventDuration").val(event.duration || "");
+                        $("#eventStartTime").val(event.startTime || "");
+                        $("#eventEndTime").val(event.endTime || "");
+                        $("#eventStartRecur").val(
+                            event.startRecur
+                                ? new Date(event.startRecur).toISOString().slice(0, 16)
+                                : ""
+                        );
+                        $("#eventEndRecur").val(
+                            event.endRecur
+                                ? new Date(event.endRecur).toISOString().slice(0, 16)
+                                : ""
+                        );
+                        $("#eventUrl").val(event.url || "");
+                        $("#eventInteractive").val(
+                            event.interactive !== null
+                                ? event.interactive.toString()
+                                : "false"
+                        );
+                        $("#eventClassName").val(event.className || "");
+                        $("#eventClassNames").val(
+                            event.classNames ? event.classNames.join(", ") : ""
+                        );
+                        $("#eventEditable").val(
+                            event.editable !== null ? event.editable.toString() : "false"
+                        );
+                        $("#eventStartEditable").val(
+                            event.startEditable !== null
+                                ? event.startEditable.toString()
+                                : "false"
+                        );
+                        $("#eventDurationEditable").val(
+                            event.durationEditable !== null
+                                ? event.durationEditable.toString()
+                                : "false"
+                        );
+                        $("#eventResourceEditable").val(
+                            event.resourceEditable !== null
+                                ? event.resourceEditable.toString()
+                                : "false"
+                        );
+                        $("#eventResourceId").val(event.resourceId || "");
+                        $("#eventResourceIds").val(
+                            event.resourceIds ? event.resourceIds.join(", ") : ""
+                        );
+                        $("#eventDisplay").val(event.display || "");
+                        $("#eventOverlap").val(
+                            event.overlap !== null ? event.overlap.toString() : "false"
+                        );
+                        $("#eventConstraint").val(event.constraint || "");
+                        $("#eventColor").val(event.color || "");
+                        $("#eventBackgroundColor").val(event.backgroundColor || "");
+                        $("#eventBorderColor").val(event.borderColor || "");
+                        $("#eventTextColor").val(event.textColor || "");
+                        $("#eventRrule").val(event.rrule || "");
+                        $("#eventDuration").val(event.duration || "");
 
-                    // Change the submit button text
-                    $("#createEventSubmit").text("Update Event");
+                        // Change the submit button text
+                        $("#createEventSubmit").text("Update Event");
                     })
                     .hide()
             );
@@ -277,30 +287,30 @@
                     try {
 
                         // Send data to the backend for insertion into the database
-                        if(update== true){
+                        if (update == true) {
                             const response = await fetch(
-                            "https://api.pioneerrocketry.com/calendar/updateEvent",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify(eventData),
-                            }
-                        );
-                        }else{
+                                "https://api.pioneerrocketry.com/calendar/updateEvent",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(eventData),
+                                }
+                            );
+                        } else {
                             const response = await fetch(
-                            "https://api.pioneerrocketry.com/calendar/createEvent",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify(eventData),
-                            }
-                        );
+                                "https://api.pioneerrocketry.com/calendar/createEvent",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(eventData),
+                                }
+                            );
                         }
-                        
+
 
                         if (!response.ok) {
                             throw new Error("Failed to insert event");
@@ -324,13 +334,13 @@
             let date = new Date(dateString);
 
             // Split time into hours and minutes
-            if(dateString == null || dateString == undefined || dateString == ""){console.log("Invalid Date", dateString);return ""}
-            if(timeString == null || timeString == undefined || timeString == ""){
+            if (dateString == null || dateString == undefined || dateString == "") { console.log("Invalid Date", dateString); return "" }
+            if (timeString == null || timeString == undefined || timeString == "") {
                 console.log("Invalid Time", timeString, "Attempting to get time from date");
-                  dateString = date.toISOString().slice(0, 16);
-                  timeString = date.toISOString().slice(11, 16);
+                dateString = date.toISOString().slice(0, 16);
+                timeString = date.toISOString().slice(11, 16);
             }
-            
+
             let [hours, minutes] = timeString.split(':');
 
             // Set the time part manually to the date object
@@ -585,31 +595,31 @@
         data-auto_select="true" data-itp_support="true"></div>
     <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
         data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-        <div class="card loginRequired">
-          <div class="card-header">
-          <h1 class=" card-title loginRequired">User Management</h1>
-          </div>
-          <div class="card-body">
-            <div class="loginRequired" id="users"></div>
-          </div>
+    <div class="card loginRequired">
+        <div class="card-header">
+            <h1 class=" card-title loginRequired">User Management</h1>
         </div>
-    
-    
+        <div class="card-body">
+            <div class="loginRequired" id="users"></div>
+        </div>
+    </div>
+
+
 
     <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">
         Load Users
     </button>
-    
+
     <div class="card">
-      <div class="card-header">
-      <h1 class=" card-title loginRequired">Event Manager</h1>
-      </div>
-      <div class="card-body">
-      <div class="loginRequired" id="events"></div>
-      </div>
-      <button  class=" triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">
-          Load Events
-      </button>
+        <div class="card-header">
+            <h1 class=" card-title loginRequired">Event Manager</h1>
+        </div>
+        <div class="card-body">
+            <div class="loginRequired" id="events"></div>
+        </div>
+        <button class=" triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">
+            Load Events
+        </button>
     </div>
     <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel"
         aria-hidden="true" data-bs-theme="dark">
@@ -893,16 +903,16 @@
 
     <div class="card loginRequired">
         <div class="card-header">
-        <h1 class=" card-title loginRequired">Image Upload</h1>
+            <h1 class=" card-title loginRequired">Image Upload</h1>
         </div>
         <div class="card-body">
-        <div class="loginRequired" id="events"></div>
+            <div class="loginRequired" id="events"></div>
         </div>
 
         <form id="imageUploadForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="imageFile">Image File</label>
-                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*"/>
+                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
             </div>
             <div class="form-group">
                 <label for="imageName">Image Name</label>
@@ -915,7 +925,7 @@
             </button>
 
             <script>
-                document.getElementById('imageUploadForm').addEventListener('submit', function(event) {
+                document.getElementById('imageUploadForm').addEventListener('submit', function (event) {
                     event.preventDefault();
 
                     const imageName = document.getElementById('imageName').value;
@@ -928,9 +938,9 @@
                     // Define the headers you want to include
                     const headers = {
                         'token': window.user.getToken(),
-                        'name':  window.user.getName(),
+                        'name': window.user.getName(),
                         'email': window.user.getEmail(),
-                        'id':    window.user.getId()
+                        'id': window.user.getId()
                     };
 
                     // Create a new XMLHttpRequest to send the form data
@@ -943,7 +953,7 @@
                     }
 
                     // Handle the response
-                    xhr.onload = function() {
+                    xhr.onload = function () {
                         if (xhr.status === 200) {
                             alert('Image uploaded successfully!');
                         } else {
@@ -955,7 +965,7 @@
                     xhr.send(formData);
                 });
             </script>
-      </div>
+    </div>
 </body>
 
 </html>
