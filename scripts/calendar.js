@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             $("#eventDaysOfWeek").val(selectedDaysOfWeek.join(","));
             if(selectedDaysOfWeek.length === 0){
-                return null;
+                return "";
             }
             return selectedDaysOfWeek;
         };
