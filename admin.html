@@ -170,6 +170,8 @@
                             });
                         if (selectedDaysOfWeek.length !== 0) {
                             $("#eventDaysOfWeek").val(selectedDaysOfWeek.join(","));
+                        }else{
+                            return null;
                         }
 
                         return selectedDaysOfWeek;
