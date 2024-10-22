@@ -31,6 +31,8 @@ function repairEvent(event) {
         } catch (e) {
             delete event.daysOfWeek;
         }
+    }else if(event.daysOfWeek.length <=0){
+        delete event.daysOfWeek;
     }
 
     // Convert classNames and resourceIds from string to array if necessary
