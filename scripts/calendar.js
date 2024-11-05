@@ -75,14 +75,13 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.json();
         })
         .then((data) => {
-            repairedEvents = repairEvents(data.result.events);
+            eventsPre = data.result.events;
 
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 // Enable plugins here
                 initialView: 'dayGridMonth',
                 timeZone: 'local',
-                events: repairedEvents,
                 themeSystem: 'bootstrap5',
                 height: '100%',
                 contentHeight: 'auto',
@@ -95,7 +94,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            console.log(repairedEvents);
+            for (let i = 0; i < eventsPre.length; i++) {
+                calendar.addEvent(eventsPre[i]);
+            }
+            
             console.log('rendering calendar');
             calendar.render();
         })
