@@ -535,7 +535,7 @@
             </div>
             <div class="card-body">
               <div id="indexSplashImage">
-                <img src="https://api.pioneerrocketry.com/image/home1.jpg" class="img-fluid img-small rounded mx-auto"/>
+                <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto"/>
                 <input type="file" class="form-control" id="indexSplashImageFile" name="indexSplashImageFile" accept="image/*" />
                 <button class="btn btn-primary" id="indexSplashImageUploadBtn" disabled>Upload Image</button>
                 <script>
@@ -543,10 +543,11 @@
                         $("#indexSplashImageUploadBtn").addClass("btn-danger").removeClass("btn-primary").prop("disabled", false);
                     })
                     $("#indexSplashImageUploadBtn").on("click", function () {
+
                         $.ajax({
                             type: "POST",
-                            url: "https://api.pioneerrocketry.com/image/replace/home1",
-                            data: new FormData($("#imageUploadForm")[0]),
+                            url: "https://api.pioneerrocketry.com/image/replace/home2.jpg",
+                            data: $("#indexSplashImageFile").prop("files")[0],
                             token: window.user.getToken(),
                             name: window.user.getName(),
                             email: window.user.getEmail(),
