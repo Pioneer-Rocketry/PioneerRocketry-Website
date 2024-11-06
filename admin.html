@@ -535,25 +535,45 @@
             </div>
             <div class="card-body">
               <div id="indexSplashImage">
-                <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto"/>
+                <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto" />
                 <input type="file" class="form-control" id="indexSplashImageFile" name="indexSplashImageFile" accept="image/*" />
                 <button class="btn btn-primary" id="indexSplashImageUploadBtn" disabled>Upload Image</button>
                 <script>
-                    $("#indexSplashImageFile").on("change", function () {
-                        $("#indexSplashImageUploadBtn").addClass("btn-danger").removeClass("btn-primary").prop("disabled", false);
-                    })
-                    $("#indexSplashImageUploadBtn").on("click", function () {
+                  $("#indexSplashImageFile").on("change", function () {
+                    $("#indexSplashImageUploadBtn").addClass("btn-danger").removeClass("btn-primary").prop("disabled", false);
+                  });
+                  $("#indexSplashImageUploadBtn").on("click", function () {
+                    const formData = new FormData();
+                    const file = $("#indexSplashImageFile").prop("files")[0];
 
-                        $.ajax({
-                            type: "POST",
-                            url: "https://api.pioneerrocketry.com/image/replace/home2.jpg",
-                            data: $("#indexSplashImageFile").prop("files")[0],
-                            token: window.user.getToken(),
-                            name: window.user.getName(),
-                            email: window.user.getEmail(),
-                            id: window.user.getId()
-                        })
+                    if (!file) {
+                      alert("Please select a file before uploading.");
+                      return;
+                    }
+
+                    formData.append("file", file); // Append the file to the form data
+
+                    // Include any additional data if needed
+                    formData.append("user", window.user);
+                    
+                    // Make the AJAX request
+                    $.ajax({
+                      type: "POST",
+                      url: "https://api.pioneerrocketry.com/image/replace/home2.jpg",
+                      data: formData,
+                      processData: false, // Required for FormData
+                      contentType: false, // Required for FormData
+                      
+                      success: function (response) {
+                        alert("Image uploaded successfully!");
+                        console.log(response);
+                      },
+                      error: function (error) {
+                        alert("Error uploading image.");
+                        console.error(error);
+                      },
                     });
+                  });
                 </script>
               </div>
             </div>
