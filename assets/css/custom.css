@@ -1,17 +1,12 @@
 .cimg{
     position: inherit;
-    height: 40em;
+    max-height: 40em;
     object-fit: cover;
-    max-width: 100%;
-    
+    width: 100%;
+    min-width: 100%;
+    max-width: 90vw;
 }
-#autoplay{
-    margin-bottom: 100px;
-    margin-top: 10px;
-    margin-left: 30px;
-    margin-right: 30px;
-}
-.carousel-indicators > button{
-        min-width: none!important;
+.fc .fc-button, .fc .fc-button-primary {
+    font-size: .7em !important;
 }
 

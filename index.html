@@ -4,7 +4,7 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html lang="en">
 
 <head>
   <title>Pioneer Rocketry</title>
@@ -181,7 +181,7 @@
     <!-- Highlights -->
     <section id="highlights" class="wrapper style3">
       <div class="title">
-        <a href="https://www.nar.org/high-power-rocketry-certifications/">The Endorsements</a>
+        <a class="text-light" href="https://www.nar.org/high-power-rocketry-certifications/">Rocketry Endorsements</a>
       </div>
       <div class="container">
         <div class="row aln-center">
@@ -252,25 +252,92 @@
       </div>
     </section>
 
+    <!-- Sponsors -->
+    <section id="main" class="wrapper style2">
+      <div class="title">Our Sponsors</div>
+      <div class="container">
+        <div class="row aln-center">
+          <div class="col-4 col-12-medium">
+            <section class="highlight row-cols-1">
+              <a href="https://www.onshape.com/en/" class="image featured cimg d-flex justify-content-center"
+                style="height: 300px; width: 300px; min-height: 300px;">
+                <img src="./images/onshape-logo-RGB_color.svg" alt="Onshape Logo" />
+              </a>
+              <h3>
+                <a href="https://www.onshape.com/en/">Onshape</a>
+              </h3>
+              <p style="max-height: 400px; max-width: 300px; min-height: 400px;">
+                Onshape is a computer-aided design (CAD) software system, delivered over the Internet via a software as
+                a service (SaaS) model. It makes extensive use of cloud computing, with compute-intensive processing and
+                rendering performed on Internet-based servers, and users are able to interact with the system via a web
+                browser or the iOS and Android apps. As a SaaS system, Onshape upgrades are released directly to the
+                web interface, and the software does not require maintenance by the user. <small>- <a href="https://en.wikipedia.org/wiki/Onshape">Wikipedia</a> </small>
+              </p>
+              <ul class="actions">
+                <li><a href="https://www.onshape.com/en/" class="button style1">Visit Website</a></li>
+              </ul>
+            </section>
+          </div>
+          <div class="col-4 col-12-medium">
+            <section class="highlight">
+              <a href="https://spacegrant.carthage.edu/" class="image featured"
+                style="max-height: 300px; max-width: 300px; min-height: 300px;">
+                <img src="./images/wsgc-logo.png" alt="WSGC Logo" />
+              </a>
+              <h3>
+                <a href="https://spacegrant.carthage.edu/">Wisconsin Space Grant Consortium</a>
+              </h3>
+              <p style="max-height: 400px; max-width: 500px; min-height: 400px;">
+                The Wisconsin Space Grant Consortium is a member institution of the national network of Space Grant
+                Consortia funded by NASA's National Space Grant College and Fellowship Program. Congress established the
+                program in 1988 to contribute to the nation's scientific enterprise by funding research, education, and
+                public service projects through a national network of 52 university-based Space Grant consortia. <small>- <a href="https://spacegrant.carthage.edu/about/">WSGC</a></small>
+              </p>
+              <ul class="actions">
+                <li><a href="https://spacegrant.carthage.edu/" class="button style1">Visit Website</a></li>
+              </ul>
+            </section>
+          </div>
+          <!-- <div class="col-4 col-12-medium">
+            <section class="highlight">
+              <a href="https://sponsor3.com" class="image featured">
+                <img src="https://via.placeholder.com/300" alt="Sponsor 3 Logo" />
+              </a>
+              <h3>
+                <a href="https://sponsor3.com">Sponsor 3</a>
+              </h3>
+              <p>
+                Dedicated to educational outreach, Sponsor 3 empowers the next generation of aerospace
+                engineers.
+              </p>
+              <ul class="actions">
+                <li><a href="https://sponsor3.com" class="button style1">Visit Website</a></li>
+              </ul>
+            </section>
+          </div> -->
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
-    <script> 
-      document.addEventListener('DOMContentLoaded', function() {
-        fetch('./template.html') 
-        .then(response => {
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        fetch('./template.html')
+          .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+              throw new Error('Network response was not ok');
             }
-            return response.text(); 
-        })
-        .then(data => {
+            return response.text();
+          })
+          .then(data => {
 
             $('body').append(data.split("<!-- Footer -->")[1].split("<!-- Footer -->")[0]);
-            
-        })
-        .catch(error => {
+
+          })
+          .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-        });
-       }); 
+          });
+      }); 
     </script>
   </div>
 
