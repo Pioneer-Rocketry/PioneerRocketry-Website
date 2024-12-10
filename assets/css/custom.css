@@ -81,7 +81,7 @@
   margin: 0;
 }
 
-/* Link styles */
+/* Apply transition to the social link */
 .social-link {
   text-decoration: none;
   padding: 5px;
@@ -91,6 +91,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: all 0.3s ease; /* Transition for hover and active states */
+}
+
+/* Hover state */
+.social-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Change background color on hover */
+  transform: scale(1.05); /* Slightly enlarge the link on hover */
+}
+
+/* Active state (when clicked) */
+.social-link:active {
+  transform: scale(0.98); /* Slightly shrink the link when clicked */
+  background-color: rgba(255, 255, 255, 0.2); /* Darker background when active */
 }
 
 /* Icon styles */
