@@ -69,7 +69,11 @@ $(document).on("ready", function () {
   console.log("checking for Session");
   if(localStorage.getItem("JWT") != null){
     console.log("JWT found");
-    localJWTSession = JSON.parse(localStorage.getItem("JWT"));
+    try{
+      localJWTSession = JSON.parse(localStorage.getItem("JWT"));
+    }catch(e){
+      console.log(e);
+    }
     tempData = {email:localJWTSession.email, name:localJWTSession.name, id:localJWTSession.id, token:localJWTSession.token, flags:localJWTSession.flags};
     window.user = new User(tempData, tempData.token);
     $.ajax({
@@ -89,6 +93,7 @@ $(document).on("ready", function () {
       }
       $("#g_id_signin").hide();
     }).fail(function (error) {
+      localStorage.removeItem("JWT");
       console.log(error);
       $("#g_id_signin").show();
       window.user = null;
@@ -146,7 +151,7 @@ function handleCredentialResponse(response) {
     localStorage.setItem("lastUserEmail", sub);
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
-      localStorage.setItem("JWT", {payload: responsePayload.payload, credential: response.credential});
+      localStorage.setItem("JWT", JSON.stringify(window.user));
       $("#createEventBtn").show();
       $(".loginRequired").show()
       $(".triggerChangeOnLogin").trigger("change");
