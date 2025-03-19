@@ -66,12 +66,12 @@ class User {
 
 //check if user is already verified
 $(document).on("ready", function () {
-  console.log("checking for JWT");
+  console.log("checking for Session");
   if(localStorage.getItem("JWT") != null){
     console.log("JWT found");
-    localJWTSession = localStorage.getItem("JWT");
-    const responsePayload = decodeJwtResponse(localJWTSession.credential);
-    window.user = new User(localJWTSession.payload, localJWTSession.credential);
+    localJWTSession = JSON.parse(localStorage.getItem("JWT"));
+    tempData = {email:localJWTSession.email, name:localJWTSession.name, id:localJWTSession.id, token:localJWTSession.token, flags:localJWTSession.flags};
+    window.user = new User(tempData, tempData.token);
     $.ajax({
       type: "POST",
       url: "https://api.pioneerrocketry.com/googleAuth",
