@@ -65,7 +65,7 @@ class User {
 }
 
 //check if user is already verified
-$(document).on("ready", function () {
+$(document).ready(function () {
   console.log("checking for Session");
   if(localStorage.getItem("JWT") != null){
     console.log("JWT found");
