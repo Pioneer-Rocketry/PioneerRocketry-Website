@@ -63,6 +63,37 @@ class User {
   } 
 
 }
+
+//check if user is already verified
+$(document).on("ready", function () {
+  if(localStorage.getItem("JWT") != null){
+    localJWTSession = localStorage.getItem("JWT");
+    const responsePayload = decodeJwtResponse(localJWTSession.credential);
+    window.user = new User(localJWTSession.payload, localJWTSession.credential);
+    $.ajax({
+      type: "POST",
+      url: "https://api.pioneerrocketry.com/googleAuth",
+      data: JSON.stringify(window.user),
+      contentType: "application/json",
+    }).done(function (data) {
+      console.log(JSON.parse(data));
+      let flags = JSON.parse(data).flags;
+      let sub = JSON.parse(data).email;
+      if(parseFloat(flags) >=2.0){
+        $("#createEventBtn").show();
+        $(".loginRequired").show()
+        $(".triggerChangeOnLogin").trigger("change");
+        $(".triggerClickOnLogin").trigger("click");
+      }
+      $("#g_id_signin").hide();
+    }).fail(function (error) {
+      console.log(error);
+      $("#g_id_signin").show();
+      window.user = null;
+    })
+  }
+})
+
 //decode JWT
 function decodeJwtResponse(token) {
   try {
@@ -94,7 +125,6 @@ function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
   //console.log(response);
-
   const responsePayload = decodeJwtResponse(response.credential);
   //console.log(responsePayload.header);
   window.user = new User(responsePayload.payload, response.credential);
@@ -114,6 +144,7 @@ function handleCredentialResponse(response) {
     localStorage.setItem("lastUserEmail", sub);
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
+      localStorage.setItem("JWT", {payload: responsePayload.payload, credential: response.credential});
       $("#createEventBtn").show();
       $(".loginRequired").show()
       $(".triggerChangeOnLogin").trigger("change");
