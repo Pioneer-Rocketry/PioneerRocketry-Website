@@ -66,7 +66,9 @@ class User {
 
 //check if user is already verified
 $(document).on("ready", function () {
+  console.log("checking for JWT");
   if(localStorage.getItem("JWT") != null){
+    console.log("JWT found");
     localJWTSession = localStorage.getItem("JWT");
     const responsePayload = decodeJwtResponse(localJWTSession.credential);
     window.user = new User(localJWTSession.payload, localJWTSession.credential);
