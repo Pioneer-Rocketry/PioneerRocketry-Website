@@ -1,3 +1,13 @@
+//if local use localhost
+let localAPIurl = "localhost:8787";
+let remoteAPIurl = "https://api.pioneerrocketry.com";
+let currentAPIurl = null;
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    currentAPIurl = localAPIurl;
+}else{
+    currentAPIurl = remoteAPIurl;
+}
+
 function repairEvent(event) {
     // List of keys to check for removal
     const keysToCheck = [
@@ -62,7 +72,7 @@ function repairEvents(events) {
 
 let calendar;
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('https://api.pioneerrocketry.com/calendar/getAllEvents', {
+    fetch(`${currentAPIurl}/calendar/getAllEvents`, {
         method: 'GET',
         headers: {
             // Add this header to pull all data
@@ -208,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             // Send data to the backend for insertion into the database
-            const response = await fetch('https://api.pioneerrocketry.com/admin/create_event', {
+            const response = await fetch(`${currentAPIurl}/admin/create_event`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

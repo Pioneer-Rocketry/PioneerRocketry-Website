@@ -1,7 +1,17 @@
+//if local use localhost
+let localAPIurl = "localhost:8787";
+let remoteAPIurl = "https://api.pioneerrocketry.com";
+let currentAPIurl = null;
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    currentAPIurl = localAPIurl;
+}else{
+    currentAPIurl = remoteAPIurl;
+}
+
 function getAllUsers(){
     $.ajax({
         type: "GET",
-        url: "https://api.pioneerrocketry.com/users",
+        url: `${currentAPIurl}/users`,
         success: function (data) {
             console.log(data);
         },
