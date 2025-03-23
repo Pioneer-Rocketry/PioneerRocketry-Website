@@ -1,3 +1,13 @@
+//if local use localhost
+window.localAPIurl = "http://localhost:8787";
+window.remoteAPIurl = "https://api.pioneerrocketry.com";
+window.currentAPIurl = null;
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+  window.currentAPIurl = localAPIurl;
+}else{
+  window.currentAPIurl = remoteAPIurl;
+}
+
 // Google Auth
 class User {
   constructor(data, token) {
@@ -78,7 +88,7 @@ $(document).ready(function () {
     window.user = new User(tempData, tempData.token);
     $.ajax({
       type: "POST",
-      url: "https://api.pioneerrocketry.com/googleAuth",
+      url: `${currentAPIurl}/googleAuth`,
       data: JSON.stringify(window.user),
       contentType: "application/json",
     }).done(function (data) {
@@ -140,7 +150,7 @@ function handleCredentialResponse(response) {
 
   $.ajax({
     type: "POST",
-    url: "https://api.pioneerrocketry.com/googleAuth",
+    url: `${currentAPIurl}/googleAuth`,
     data: JSON.stringify(window.user),
     contentType: "application/json",
    

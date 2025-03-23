@@ -1,11 +1,11 @@
 //if local use localhost
-let localAPIurl = "localhost:8787";
-let remoteAPIurl = "https://api.pioneerrocketry.com";
-let currentAPIurl = null;
+window.localAPIurl = "http://localhost:8787";
+window.remoteAPIurl = "https://api.pioneerrocketry.com";
+window.currentAPIurl = null;
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    currentAPIurl = localAPIurl;
+    window.currentAPIurl = localAPIurl;
 }else{
-    currentAPIurl = remoteAPIurl;
+    window.currentAPIurl = remoteAPIurl;
 }
 
 function repairEvent(event) {
