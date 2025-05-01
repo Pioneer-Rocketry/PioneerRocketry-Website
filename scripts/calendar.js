@@ -8,6 +8,23 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
     window.currentAPIurl = remoteAPIurl;
 }
 
+//check if the currentAPIurl is valid by calling the api
+fetch(`${currentAPIurl}/calendar/getAllEvents`, {
+    method: 'GET',
+    headers: {
+    },
+})
+    .then((response) => {})
+    .catch((error) => {
+        //if local use remote
+        //if remote use local
+        if (window.currentAPIurl === window.localAPIurl) {
+            window.currentAPIurl = window.remoteAPIurl;
+        } else {
+            window.currentAPIurl = window.localAPIurl;
+        }
+    })
+
 function repairEvent(event) {
     // List of keys to check for removal
     const keysToCheck = [
