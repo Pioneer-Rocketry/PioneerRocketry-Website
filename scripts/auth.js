@@ -1,3 +1,13 @@
+//if local use localhost
+window.localAPIurl = "http://localhost:8787";
+window.remoteAPIurl = "https://api.pioneerrocketry.com";
+window.currentAPIurl = null;
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+  window.currentAPIurl = localAPIurl;
+}else{
+  window.currentAPIurl = remoteAPIurl;
+}
+
 // Google Auth
 class User {
   constructor(data, token) {
@@ -63,6 +73,44 @@ class User {
   } 
 
 }
+
+//check if user is already verified
+$(document).ready(function () {
+  console.log("checking for Session");
+  if(localStorage.getItem("JWT") != null){
+    console.log("JWT found");
+    try{
+      localJWTSession = JSON.parse(localStorage.getItem("JWT"));
+    }catch(e){
+      console.log(e);
+    }
+    tempData = {email:localJWTSession.email, name:localJWTSession.name, id:localJWTSession.id, token:localJWTSession.token, flags:localJWTSession.flags};
+    window.user = new User(tempData, tempData.token);
+    $.ajax({
+      type: "POST",
+      url: `${currentAPIurl}/googleAuth`,
+      data: JSON.stringify(window.user),
+      contentType: "application/json",
+    }).done(function (data) {
+      console.log(JSON.parse(data));
+      let flags = JSON.parse(data).flags;
+      let sub = JSON.parse(data).email;
+      if(parseFloat(flags) >=2.0){
+        $("#createEventBtn").show();
+        $(".loginRequired").show()
+        $(".triggerChangeOnLogin").trigger("change");
+        $(".triggerClickOnLogin").trigger("click");
+      }
+      $("#g_id_signin").hide();
+    }).fail(function (error) {
+      localStorage.removeItem("JWT");
+      console.log(error);
+      $("#g_id_signin").show();
+      window.user = null;
+    })
+  }
+})
+
 //decode JWT
 function decodeJwtResponse(token) {
   try {
@@ -94,7 +142,6 @@ function handleCredentialResponse(response) {
   // decodeJwtResponse() is a custom function defined by you
   // to decode the credential response.
   //console.log(response);
-
   const responsePayload = decodeJwtResponse(response.credential);
   //console.log(responsePayload.header);
   window.user = new User(responsePayload.payload, response.credential);
@@ -103,7 +150,7 @@ function handleCredentialResponse(response) {
 
   $.ajax({
     type: "POST",
-    url: "https://api.pioneerrocketry.com/googleAuth",
+    url: `${currentAPIurl}/googleAuth`,
     data: JSON.stringify(window.user),
     contentType: "application/json",
    
@@ -114,6 +161,7 @@ function handleCredentialResponse(response) {
     localStorage.setItem("lastUserEmail", sub);
     console.log(parseFloat(flags));
     if(parseFloat(flags) >=2.0){
+      localStorage.setItem("JWT", JSON.stringify(window.user));
       $("#createEventBtn").show();
       $(".loginRequired").show()
       $(".triggerChangeOnLogin").trigger("change");
