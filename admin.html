@@ -432,6 +432,7 @@
                                 <th>Page Content</th>
                                 <th>User Access Level</th>
                                 <th>Modules</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody class="pageDataBody"></tbody>
@@ -439,76 +440,8 @@
                 </div>
             </div>
             <script>
-                $(document).ready(function () {
-                    $('#loadPageBtn').on('click', function () {
-                        const pageName = document.getElementById('pageName').value;
-                        $.ajax({
-                            type: 'POST',
-                            url: `${window.currentAPIurl}/admin/getPage`,
-                            data: {
-                                page: pageName,
-                            },
-                            success: function (response) {
-                                console.log('Raw response:', response);
-                                const parsedResponse = JSON.parse(response);
-                                console.log('Parsed response:', parsedResponse);
-                                
-                                if (parsedResponse.success === false) {
-                                    alert('Error: ' + parsedResponse.error);
-                                    return;
-                                }
-                                displayPageData(parsedResponse);
-                            },
-                            error: function (error) {
-                                console.error('AJAX error:', error);
-                            },
-                        });
-                    });
-                });
-
-                function displayPageData(data) {
-                    console.log('displayPageData called with:', data);
-                    const tableBody = $('.pageDataBody');
-                    console.log('Table body element:', tableBody);
-                    tableBody.empty();
-
-                    try {
-                        if (Array.isArray(data.result)) {
-                            console.log('Processing array of results');
-                            data.result.forEach(item => {
-                                console.log('Processing item:', item);
-                                const row = $('<tr>');
-                                row.html(`
-                                    <td>${item.ID ? item.ID.toString() : ''}</td>
-                                    <td>${item.Name || ''}</td>
-                                    <td>${item.PageContent || ''}</td>
-                                    <td>${item.UserAccessLevel ? item.UserAccessLevel.toString() : ''}</td>
-                                    <td>${item.Modules || ''}</td>
-                                `);
-                                tableBody.append(row);
-                            });
-                        } else if (data.result) {
-                            console.log('Processing single result');
-                            const item = data.result;
-                            console.log('Processing item:', item);
-                            const row = $('<tr>');
-                            row.html(`
-                                <td>${item.ID ? item.ID.toString() : ''}</td>
-                                <td>${item.Name || ''}</td>
-                                <td>${item.PageContent || ''}</td>
-                                <td>${item.UserAccessLevel ? item.UserAccessLevel.toString() : ''}</td>
-                                <td>${item.Modules || ''}</td>
-                            `);
-                            tableBody.append(row);
-                        } else {
-                            console.log('No results found in data');
-                            tableBody.append('<tr><td colspan="5">No data found</td></tr>');
-                        }
-                    } catch (error) {
-                        console.error('Error in displayPageData:', error);
-                        tableBody.append('<tr><td colspan="5">Error processing data</td></tr>');
-                    }
-                }
+                // Initialize the page editor functionality
+                initializePageEditor();
             </script>
         </div>
     </body>
