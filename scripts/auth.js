@@ -94,6 +94,7 @@ $(document).ready(function () {
         $(".triggerClickOnLogin").trigger("click");
       }
       $("#g_id_signin").hide();
+      $("#credential_picker_container").hide();
     }).fail(function (error) {
       localStorage.removeItem("JWT");
       console.log(error);
