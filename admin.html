@@ -434,7 +434,7 @@
                                 <th>Modules</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody class="pageDataBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -458,34 +458,34 @@
                 });
 
                 function displayPageData(data) {
-                    const tableBody = document.getElementById('pageData').getElementsByTagName('tbody')[0];
-                    tableBody.innerHTML = '';
+                    const tableBody = $('.pageDataBody');
+                    tableBody.empty(); 
 
                     if (Array.isArray(data.result)) {
                         // Multiple pages
                         for (const item of data.result) {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
+                            const row = $('<tr>');
+                           row.html(`
                                 <td>${item.ID}</td>
                                 <td>${item.Name}</td>
                                 <td>${item.PageContent}</td>
                                 <td>${item.UserAccessLevel}</td>
                                 <td>${item.Modules}</td>
-                            `;
-                            tableBody.appendChild(row);
+                            `);
+                            tableBody.append(row);
                         }
                     } else if (data.result) {
                         // Single page
                         const item = data.result;
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
+                        const row = $('<tr>');
+                        row.html(`
                             <td>${item.ID}</td>
                             <td>${item.Name}</td>
                             <td>${item.PageContent}</td>
                             <td>${item.UserAccessLevel}</td>
                             <td>${item.Modules}</td>
-                        `;
-                        tableBody.appendChild(row);
+                        `);
+                        tableBody.append(row);
                     }
                 }
             </script>
