@@ -488,6 +488,9 @@
                         tableBody.append(row);
                     }else{
                         // Single page
+                        console.log(data);
+                        console.log(data.result);
+                        
                         const item = data.result[0];
                         const row = $('<tr>');
                         row.html(`
