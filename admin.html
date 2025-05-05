@@ -443,7 +443,7 @@
                     const pageName = document.getElementById('pageName').value;
                     $.ajax({
                         type: 'POST',
-                        url: 'https://api.kris-adams3000.workers.dev',
+                        url: `${window.currentAPIurl}/admin/getPage`,
                         data: {
                             page: pageName,
                         },

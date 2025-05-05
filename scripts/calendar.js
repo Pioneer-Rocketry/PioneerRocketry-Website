@@ -5,6 +5,8 @@ window.testingAPIurl = "https://api.kris-adams3000.workers.dev";
 window.currentAPIurl = null;
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
     window.currentAPIurl = localAPIurl;
+} else if (window.location.hostname === "dev"){
+    window.currentAPIurl = testingAPIurl;
 } else {
     window.currentAPIurl = remoteAPIurl;
 }
