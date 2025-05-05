@@ -451,6 +451,8 @@
                             success: function (response) {
                                 console.log('Raw response:', response);
                                 const parsedResponse = JSON.parse(response);
+                                console.log('Parsed response:', parsedResponse);
+                                
                                 if (parsedResponse.success === false) {
                                     alert('Error: ' + parsedResponse.error);
                                     return;
@@ -458,56 +460,51 @@
                                 displayPageData(parsedResponse);
                             },
                             error: function (error) {
-                                console.error(error);
+                                console.error('AJAX error:', error);
                             },
                         });
                     });
                 });
 
                 function displayPageData(data) {
-                    const tableBody = $('#pageDataBody');
+                    console.log('displayPageData called with:', data);
+                    const tableBody = $('.pageDataBody');
+                    console.log('Table body element:', tableBody);
                     tableBody.empty();
 
-                    if (Array.isArray(data.result)) {
-                        // Multiple pages
-                        for (const item of data.result) {
+                    try {
+                        if (Array.isArray(data.result)) {
+                            console.log('Processing array of results');
+                            data.result.forEach(item => {
+                                const row = $('<tr>');
+                                row.html(`
+                                    <td>${item.ID || ''}</td>
+                                    <td>${item.Name || ''}</td>
+                                    <td>${item.PageContent || ''}</td>
+                                    <td>${item.UserAccessLevel || ''}</td>
+                                    <td>${item.Modules || ''}</td>
+                                `);
+                                tableBody.append(row);
+                            });
+                        } else if (data.result) {
+                            console.log('Processing single result');
+                            const item = data.result;
                             const row = $('<tr>');
                             row.html(`
-                                <td>${item.ID}</td>
-                                <td>${item.Name}</td>
-                                <td>${item.PageContent}</td>
-                                <td>${item.UserAccessLevel}</td>
-                                <td>${item.Modules}</td>
+                                <td>${item.ID || ''}</td>
+                                <td>${item.Name || ''}</td>
+                                <td>${item.PageContent || ''}</td>
+                                <td>${item.UserAccessLevel || ''}</td>
+                                <td>${item.Modules || ''}</td>
                             `);
                             tableBody.append(row);
+                        } else {
+                            console.log('No results found in data');
+                            tableBody.append('<tr><td colspan="5">No data found</td></tr>');
                         }
-                    } else if (data.result) {
-                        // Single page
-                        const item = data.result;
-                        const row = $('<tr>');
-                        row.html(`
-                            <td>${item.ID}</td>
-                            <td>${item.Name}</td>
-                            <td>${item.PageContent}</td>
-                            <td>${item.UserAccessLevel}</td>
-                            <td>${item.Modules}</td>
-                        `);
-                        tableBody.append(row);
-                    } else {
-                        // Single page
-                        console.log(data);
-                        console.log(data.result);
-
-                        const item = data.result[0];
-                        const row = $('<tr>');
-                        row.html(`
-                            <td>${item.ID}</td>
-                            <td>${item.Name}</td>
-                            <td>${item.PageContent}</td>
-                            <td>${item.UserAccessLevel}</td>
-                            <td>${item.Modules}</td>
-                        `);
-                        tableBody.append(row);
+                    } catch (error) {
+                        console.error('Error in displayPageData:', error);
+                        tableBody.append('<tr><td colspan="5">Error processing data</td></tr>');
                     }
                 }
             </script>
