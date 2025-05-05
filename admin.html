@@ -486,6 +486,18 @@
                             <td>${item.Modules}</td>
                         `);
                         tableBody.append(row);
+                    }else{
+                        // Single page
+                        const item = data.result[0];
+                        const row = $('<tr>');
+                        row.html(`
+                            <td>${item.ID}</td>
+                            <td>${item.Name}</td>
+                            <td>${item.PageContent}</td>
+                            <td>${item.UserAccessLevel}</td>
+                            <td>${item.Modules}</td>
+                        `);
+                        tableBody.append(row);
                     }
                 }
             </script>
