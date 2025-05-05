@@ -439,38 +439,40 @@
                 </div>
             </div>
             <script>
-                $('loadPageBtn').on('click', function () {
-                    const pageName = document.getElementById('pageName').value;
-                    $.ajax({
-                        type: 'POST',
-                        url: `${window.currentAPIurl}/admin/getPage`,
-                        data: {
-                            page: pageName,
-                        },
-                        success: function (response) {
-                            console.log(response);
-                            let response = JSON.parse(response);
-                            if (response.success === false) {
-                                alert('Error: ' + response.error);
-                                return;
-                            }
-                            displayPageData(response);
-                        },
-                        error: function (error) {
-                            console.error(error);
-                        },
+                $(document).ready(function () {
+                    $('#loadPageBtn').on('click', function () {
+                        const pageName = document.getElementById('pageName').value;
+                        $.ajax({
+                            type: 'POST',
+                            url: `${window.currentAPIurl}/admin/getPage`,
+                            data: {
+                                page: pageName,
+                            },
+                            success: function (response) {
+                                console.log(response);
+                                let response = JSON.parse(response);
+                                if (response.success === false) {
+                                    alert('Error: ' + response.error);
+                                    return;
+                                }
+                                displayPageData(response);
+                            },
+                            error: function (error) {
+                                console.error(error);
+                            },
+                        });
                     });
                 });
 
                 function displayPageData(data) {
                     const tableBody = $('.pageDataBody');
-                    tableBody.empty(); 
+                    tableBody.empty();
 
                     if (Array.isArray(data.result)) {
                         // Multiple pages
                         for (const item of data.result) {
                             const row = $('<tr>');
-                           row.html(`
+                            row.html(`
                                 <td>${item.ID}</td>
                                 <td>${item.Name}</td>
                                 <td>${item.PageContent}</td>
@@ -491,11 +493,11 @@
                             <td>${item.Modules}</td>
                         `);
                         tableBody.append(row);
-                    }else{
+                    } else {
                         // Single page
                         console.log(data);
                         console.log(data.result);
-                        
+
                         const item = data.result[0];
                         const row = $('<tr>');
                         row.html(`
