@@ -439,7 +439,7 @@
                 </div>
             </div>
             <script>
-                document.getElementById('loadPageBtn').addEventListener('click', function () {
+                $('loadPageBtn').on('click', function () {
                     const pageName = document.getElementById('pageName').value;
                     $.ajax({
                         type: 'POST',
