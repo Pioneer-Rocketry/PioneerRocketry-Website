@@ -476,12 +476,13 @@
                         if (Array.isArray(data.result)) {
                             console.log('Processing array of results');
                             data.result.forEach(item => {
+                                console.log('Processing item:', item);
                                 const row = $('<tr>');
                                 row.html(`
-                                    <td>${item.ID || ''}</td>
+                                    <td>${item.ID ? item.ID.toString() : ''}</td>
                                     <td>${item.Name || ''}</td>
                                     <td>${item.PageContent || ''}</td>
-                                    <td>${item.UserAccessLevel || ''}</td>
+                                    <td>${item.UserAccessLevel ? item.UserAccessLevel.toString() : ''}</td>
                                     <td>${item.Modules || ''}</td>
                                 `);
                                 tableBody.append(row);
@@ -489,12 +490,13 @@
                         } else if (data.result) {
                             console.log('Processing single result');
                             const item = data.result;
+                            console.log('Processing item:', item);
                             const row = $('<tr>');
                             row.html(`
-                                <td>${item.ID || ''}</td>
+                                <td>${item.ID ? item.ID.toString() : ''}</td>
                                 <td>${item.Name || ''}</td>
                                 <td>${item.PageContent || ''}</td>
-                                <td>${item.UserAccessLevel || ''}</td>
+                                <td>${item.UserAccessLevel ? item.UserAccessLevel.toString() : ''}</td>
                                 <td>${item.Modules || ''}</td>
                             `);
                             tableBody.append(row);

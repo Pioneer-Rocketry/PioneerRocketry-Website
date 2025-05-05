@@ -290,3 +290,18 @@ function createEventTable(response) {
     }
     $('#events').empty().append(table);
 }
+
+function updatePage(pageName, config){
+    if(config == null || config == undefined || config == ''){
+        console.log('Invalid Config', config);
+        return;
+    }
+
+    if(pageName == null || pageName == undefined || pageName == ''){
+        console.log('Invalid Page Name', pageName);
+        return;
+    }
+
+    //call update page with new config options
+    
+}
