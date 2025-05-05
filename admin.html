@@ -449,6 +449,11 @@
                         },
                         success: function (response) {
                             console.log(response);
+                            let response = JSON.parse(response);
+                            if (response.success === false) {
+                                alert('Error: ' + response.error);
+                                return;
+                            }
                             displayPageData(response);
                         },
                         error: function (error) {
