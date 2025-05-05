@@ -1,12 +1,4 @@
-//if local use localhost
-window.localAPIurl = "http://localhost:8787";
-window.remoteAPIurl = "https://api.pioneerrocketry.com";
-window.currentAPIurl = null;
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-  window.currentAPIurl = localAPIurl;
-}else{
-  window.currentAPIurl = remoteAPIurl;
-}
+
 
 // Google Auth
 class User {
