@@ -449,13 +449,13 @@
                                 page: pageName,
                             },
                             success: function (response) {
-                                console.log(response);
-                                let response = JSON.parse(response);
-                                if (response.success === false) {
-                                    alert('Error: ' + response.error);
+                                console.log('Raw response:', response);
+                                const parsedResponse = JSON.parse(response);
+                                if (parsedResponse.success === false) {
+                                    alert('Error: ' + parsedResponse.error);
                                     return;
                                 }
-                                displayPageData(response);
+                                displayPageData(parsedResponse);
                             },
                             error: function (error) {
                                 console.error(error);
