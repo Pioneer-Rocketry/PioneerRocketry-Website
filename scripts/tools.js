@@ -1,24 +1,64 @@
-window.localAPIurl = 'http://localhost:8787';
-window.remoteAPIurl = 'https://api.pioneerrocketry.com';
-window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
-window.currentAPIurl = null;
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    window.currentAPIurl = localAPIurl;
-} else if (window.location.hostname === 'dev.pioneerrocketry.com') {
-    window.currentAPIurl = testingAPIurl;
-} else {
-    window.currentAPIurl = remoteAPIurl;
-}
+$(document).ready(function () {
+    setAPIurl();
+    $('.loginRequired').hide();
+    //if the url consist of only numbers the show.
+    if (location.host.match(/^[0-9.:]+$/)) {
+        $('.loginRequired').show();
+        $('#createEventBtn').show();
+        $('.loginRequired').show();
+        $('.triggerChangeOnLogin').trigger('change');
+        $('.triggerClickOnLogin').trigger('click');
+    }
 
-//check if the currentAPIurl is valid by calling the api
-fetch(`${currentAPIurl}/calendar/getAllEvents`, {
-    method: 'GET',
-    headers: {},
-})
-    .then((response) => {})
-    .catch((error) => {
-        window.currentAPIurl = window.testingAPIurl;
+    $('#loadPageBtn').on('click', function () {
+        const pageName = document.getElementById('pageName').value;
+        $.ajax({
+            type: 'POST',
+            url: `${window.currentAPIurl}/admin/getPage`,
+            data: {
+                page: pageName,
+            },
+            success: function (response) {
+                console.log('Raw response:', response);
+                const parsedResponse = JSON.parse(response);
+                console.log('Parsed response:', parsedResponse);
+
+                if (parsedResponse.success === false) {
+                    alert('Error: ' + parsedResponse.error);
+                    return;
+                }
+                displayPageData(parsedResponse);
+            },
+            error: function (error) {
+                console.error('AJAX error:', error);
+            },
+        });
     });
+});
+
+function setAPIurl() {
+    window.localAPIurl = 'http://localhost:8787';
+    window.remoteAPIurl = 'https://api.pioneerrocketry.com';
+    window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
+    window.currentAPIurl = null;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.currentAPIurl = localAPIurl;
+    } else if (window.location.hostname === 'dev.pioneerrocketry.com') {
+        window.currentAPIurl = testingAPIurl;
+    } else {
+        window.currentAPIurl = remoteAPIurl;
+    }
+
+    //check if the currentAPIurl is valid by calling the api
+    fetch(`${currentAPIurl}/calendar/getAllEvents`, {
+        method: 'GET',
+        headers: {},
+    })
+        .then((response) => {})
+        .catch((error) => {
+            window.currentAPIurl = window.testingAPIurl;
+        });
+}
 
 function getAllUsers() {
     $.ajax({
@@ -90,43 +130,6 @@ function UTCToLocalDateTime(utcDatetime) {
 
     return time.toISOString().replace('Z', '');
 }
-
-$(document).ready(function () {
-    $('.loginRequired').hide();
-    //if the url consist of only numbers the show.
-    if (location.host.match(/^[0-9.:]+$/)) {
-        $('.loginRequired').show();
-        $('#createEventBtn').show();
-        $('.loginRequired').show();
-        $('.triggerChangeOnLogin').trigger('change');
-        $('.triggerClickOnLogin').trigger('click');
-    }
-
-    $('#loadPageBtn').on('click', function () {
-        const pageName = document.getElementById('pageName').value;
-        $.ajax({
-            type: 'POST',
-            url: `${window.currentAPIurl}/admin/getPage`,
-            data: {
-                page: pageName,
-            },
-            success: function (response) {
-                console.log('Raw response:', response);
-                const parsedResponse = JSON.parse(response);
-                console.log('Parsed response:', parsedResponse);
-
-                if (parsedResponse.success === false) {
-                    alert('Error: ' + parsedResponse.error);
-                    return;
-                }
-                displayPageData(parsedResponse);
-            },
-            error: function (error) {
-                console.error('AJAX error:', error);
-            },
-        });
-    });
-});
 
 function formatDateForInput(dateString, timeString) {
     let date = new Date(dateString);
@@ -447,10 +450,10 @@ function createPageDataRow(item) {
     const contentButton = $('<button>')
         .addClass('btn btn-outline-primary')
         .text('Edit Content')
-        .on('click', function() {
+        .on('click', function () {
             createPageContentModal();
             const modal = new bootstrap.Modal(document.getElementById('pageContentEditModal'));
-            
+
             try {
                 // Parse the content if it's JSON, otherwise use as is
                 let content = item.PageContent;
@@ -458,25 +461,18 @@ function createPageDataRow(item) {
                     content = JSON.parse(item.PageContent);
                 } catch (e) {
                     // If not JSON, create a single row
-                    content = { "main": item.PageContent };
+                    content = { main: item.PageContent };
                 }
 
                 // Clear existing table content
                 $('#pageContentTable tbody').empty();
                 $('#moduleContent').empty();
-                
+
                 // Add rows for each content section
                 Object.entries(content).forEach(([section, text]) => {
                     const contentRow = $('<tr>');
                     contentRow.append($('<td>').text(section));
-                    contentRow.append(
-                        $('<td>').append(
-                            $('<textarea>')
-                                .addClass('form-control')
-                                .attr('rows', '5')
-                                .val(text)
-                        )
-                    );
+                    contentRow.append($('<td>').append($('<textarea>').addClass('form-control').attr('rows', '5').val(text)));
                     $('#pageContentTable tbody').append(contentRow);
                 });
 
@@ -491,12 +487,7 @@ function createPageDataRow(item) {
 
                     // Create module table
                     const moduleTable = $('<table>').addClass('table table-bordered');
-                    const moduleHeader = $('<thead>').append(
-                        $('<tr>').append(
-                            $('<th>').text('Module ID'),
-                            $('<th>').text('Content')
-                        )
-                    );
+                    const moduleHeader = $('<thead>').append($('<tr>').append($('<th>').text('Module ID'), $('<th>').text('Content')));
                     const moduleBody = $('<tbody>');
                     moduleTable.append(moduleHeader, moduleBody);
                     $('#moduleContent').append(moduleTable);
@@ -505,46 +496,39 @@ function createPageDataRow(item) {
                     fetch(`${currentAPIurl}/admin/getModule`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
                             moduleIds: moduleIds,
-                            User: window.user
-                        })
+                            User: window.user,
+                        }),
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.result) {
-                            // Create a new table with all module details
-                            const detailedModuleTable = $('<table>').addClass('table table-bordered');
-                            const moduleHeader = $('<thead>').append(
-                                $('<tr>').append(
-                                    $('<th>').text('ID'),
-                                    $('<th>').text('Name'),
-                                    $('<th>').text('Module Content'),
-                                    $('<th>').text('Access Level')
-                                )
-                            );
-                            const moduleBody = $('<tbody>');
-                            
-                            data.result.forEach(module => {
-                                const moduleRow = $('<tr>');
-                                moduleRow.append(
-                                    $('<td>').text(module.ID || ''),
-                                    $('<td>').text(module.Name || ''),
-                                    $('<td>').append(
-                                        $('<button>')
-                                            .addClass('module-content-preview btn btn-outline-primary')
-                                            .css({
-                                                'max-height': '100px',
-                                                'overflow-y': 'auto',
-                                                'cursor': 'pointer'
-                                            })
-                                            .text("Edit Module Content")
-                                            .on('click', function() {
-                                                // Create and show edit module modal
-                                                if (!$('#editModuleModal').length) {
-                                                    const editModuleModal = $(`
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success && data.result) {
+                                // Create a new table with all module details
+                                const detailedModuleTable = $('<table>').addClass('table table-bordered');
+                                const moduleHeader = $('<thead>').append($('<tr>').append($('<th>').text('ID'), $('<th>').text('Name'), $('<th>').text('Module Content'), $('<th>').text('Access Level')));
+                                const moduleBody = $('<tbody>');
+
+                                data.result.forEach((module) => {
+                                    const moduleRow = $('<tr>');
+                                    moduleRow.append(
+                                        $('<td>').text(module.ID || ''),
+                                        $('<td>').text(module.Name || ''),
+                                        $('<td>').append(
+                                            $('<button>')
+                                                .addClass('module-content-preview btn btn-outline-primary')
+                                                .css({
+                                                    'max-height': '100px',
+                                                    'overflow-y': 'auto',
+                                                    cursor: 'pointer',
+                                                })
+                                                .text('Edit Module Content')
+                                                .on('click', function () {
+                                                    // Create and show edit module modal
+                                                    if (!$('#editModuleModal').length) {
+                                                        const editModuleModal = $(`
                                                         <div class="modal fade" id="editModuleModal" tabindex="-1">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
@@ -577,99 +561,99 @@ function createPageDataRow(item) {
                                                             </div>
                                                         </div>
                                                     `);
-                                                    $('body').append(editModuleModal);
+                                                        $('body').append(editModuleModal);
 
-                                                    // Handle save module changes
-                                                    $('#saveModuleChanges').on('click', function() {
-                                                        const moduleId = $('#editModuleId').val();
-                                                        const updatedModule = {
-                                                            ID: moduleId,
-                                                            Name: $('#editModuleName').val(),
-                                                            Content: $('#editModuleContent').val(),
-                                                            UserAccessLevel: $('#editModuleAccessLevel').val()
-                                                        };
+                                                        // Handle save module changes
+                                                        $('#saveModuleChanges').on('click', function () {
+                                                            const moduleId = $('#editModuleId').val();
+                                                            const updatedModule = {
+                                                                ID: moduleId,
+                                                                Name: $('#editModuleName').val(),
+                                                                Content: $('#editModuleContent').val(),
+                                                                UserAccessLevel: $('#editModuleAccessLevel').val(),
+                                                            };
 
-                                                        // Call API to update module
-                                                        fetch(`${currentAPIurl}/admin/updateModule`, {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json'
-                                                            },
-                                                            body: JSON.stringify({
-                                                                module: updatedModule,
-                                                                User: window.user
+                                                            // Call API to update module
+                                                            fetch(`${currentAPIurl}/admin/updateModule`, {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    module: updatedModule,
+                                                                    User: window.user,
+                                                                }),
                                                             })
-                                                        })
-                                                        .then(response => response.json())
-                                                        .then(data => {
-                                                            if (data.success) {
-                                                                bootstrap.Modal.getInstance($('#editModuleModal')).hide();
-                                                                // Refresh the module table
-                                                                $('#loadPageBtn').click();
-                                                            } else {
-                                                                alert('Error updating module: ' + (data.error || 'Unknown error'));
-                                                            }
-                                                        })
-                                                        .catch(error => {
-                                                            console.error('Error updating module:', error);
-                                                            alert('Error updating module: ' + error.message);
+                                                                .then((response) => response.json())
+                                                                .then((data) => {
+                                                                    if (data.success) {
+                                                                        bootstrap.Modal.getInstance($('#editModuleModal')).hide();
+                                                                        // Refresh the module table
+                                                                        $('#loadPageBtn').click();
+                                                                    } else {
+                                                                        alert('Error updating module: ' + (data.error || 'Unknown error'));
+                                                                    }
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error('Error updating module:', error);
+                                                                    alert('Error updating module: ' + error.message);
+                                                                });
                                                         });
-                                                    });
-                                                }
+                                                    }
 
-                                                // Populate the modal with module data
-                                                $('#editModuleId').val(module.ID);
-                                                $('#editModuleName').val(module.Name);
-                                                $('#editModuleContent').val(module.Content);
-                                                $('#editModuleAccessLevel').val(module.UserAccessLevel);
+                                                    // Populate the modal with module data
+                                                    $('#editModuleId').val(module.ID);
+                                                    $('#editModuleName').val(module.Name);
+                                                    $('#editModuleContent').val(module.Content);
+                                                    $('#editModuleAccessLevel').val(module.UserAccessLevel);
 
-                                                // Show the modal
-                                                const editModuleModal = new bootstrap.Modal(document.getElementById('editModuleModal'));
-                                                editModuleModal.show();
-                                            })
-                                    ),
-                                    $('<td>').text(module.UserAccessLevel || '0')
-                                );
-                                moduleBody.append(moduleRow);
-                            });
+                                                    // Show the modal
+                                                    const editModuleModal = new bootstrap.Modal(document.getElementById('editModuleModal'));
+                                                    editModuleModal.show();
+                                                })
+                                        ),
+                                        $('<td>').text(module.UserAccessLevel || '0')
+                                    );
+                                    moduleBody.append(moduleRow);
+                                });
 
-                            detailedModuleTable.append(moduleHeader, moduleBody);
-                            $('#moduleContent').empty().append(detailedModuleTable);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching modules:', error);
-                        $('#moduleContent').append(
-                            $('<div>').addClass('alert alert-danger')
-                                .text('Error loading modules: ' + error.message)
-                        );
-                    });
+                                detailedModuleTable.append(moduleHeader, moduleBody);
+                                $('#moduleContent').empty().append(detailedModuleTable);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching modules:', error);
+                            $('#moduleContent').append(
+                                $('<div>')
+                                    .addClass('alert alert-danger')
+                                    .text('Error loading modules: ' + error.message)
+                            );
+                        });
                 } else {
-                    $('#moduleContent').append(
-                        $('<p>').addClass('text-muted')
-                            .text('No modules associated with this page')
-                    );
+                    $('#moduleContent').append($('<p>').addClass('text-muted').text('No modules associated with this page'));
                 }
 
                 // Handle save button click
-                $('#savePageContent').off('click').on('click', function() {
-                    let newContent = {};
-                    $('#pageContentTable tbody tr').each(function() {
-                        const section = $(this).find('td:first').text();
-                        const text = $(this).find('textarea').val();
-                        newContent[section] = text;
-                    });
+                $('#savePageContent')
+                    .off('click')
+                    .on('click', function () {
+                        let newContent = {};
+                        $('#pageContentTable tbody tr').each(function () {
+                            const section = $(this).find('td:first').text();
+                            const text = $(this).find('textarea').val();
+                            newContent[section] = text;
+                        });
 
-                    // If there's only one "main" section, just save the text
-                    if (Object.keys(newContent).length === 1 && newContent.main) {
-                        item.PageContent = newContent.main;
-                    } else {
-                        item.PageContent = JSON.stringify(newContent);
-                    }
-                    
-                    enableUpdateButton();
-                    modal.hide();
-                });
+                        // If there's only one "main" section, just save the text
+                        if (Object.keys(newContent).length === 1 && newContent.main) {
+                            item.PageContent = newContent.main;
+                        } else {
+                            item.PageContent = JSON.stringify(newContent);
+                        }
+
+                        enableUpdateButton();
+                        modal.hide();
+                    });
 
                 modal.show();
             } catch (error) {
@@ -677,7 +661,7 @@ function createPageDataRow(item) {
                 alert('Error processing page content');
             }
         });
-    
+
     contentCell.append(contentButton);
 
     // Create editable access level cell
