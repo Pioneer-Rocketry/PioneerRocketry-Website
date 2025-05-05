@@ -448,12 +448,10 @@
                             page: pageName,
                         },
                         success: function (response) {
-                            alert('Page loaded successfully!');
                             console.log(response);
                             displayPageData(response);
                         },
                         error: function (error) {
-                            alert('Error loading page.');
                             console.error(error);
                         },
                     });
