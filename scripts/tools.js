@@ -48,16 +48,57 @@ function setAPIurl() {
     } else {
         window.currentAPIurl = remoteAPIurl;
     }
+    try {
+        //check if the currentAPIurl is valid by calling the api
+        fetch(`${currentAPIurl}/calendar/getAllEvents`, {
+            method: 'GET',
+            headers: {},
+        })
+            .then((response) => {})
+            .catch((error) => {
+                window.currentAPIurl = window.testingAPIurl;
+            });
+    } catch (error) {
+        window.currentAPIurl = window.testingAPIurl;
+    }
+}
 
-    //check if the currentAPIurl is valid by calling the api
-    fetch(`${currentAPIurl}/calendar/getAllEvents`, {
-        method: 'GET',
-        headers: {},
-    })
-        .then((response) => {})
-        .catch((error) => {
+async function asyncSetAPIurl() {
+    window.localAPIurl = 'http://localhost:8787';
+    window.remoteAPIurl = 'https://api.pioneerrocketry.com';
+    window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
+    window.currentAPIurl = null;
+
+    // Set initial API URL based on hostname
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.currentAPIurl = window.localAPIurl;
+    } else if (window.location.hostname === 'dev.pioneerrocketry.com') {
+        window.currentAPIurl = window.testingAPIurl;
+    } else {
+        window.currentAPIurl = window.remoteAPIurl;
+    }
+
+    // Return a promise that resolves with the validated API URL
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Test if the current API URL is valid
+            const response = await fetch(`${window.currentAPIurl}/calendar/getAllEvents`, {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                resolve(window.currentAPIurl);
+            } else {
+                // If primary URL fails, fallback to testing URL
+                window.currentAPIurl = window.testingAPIurl;
+                resolve(window.currentAPIurl);
+            }
+        } catch (error) {
+            // If fetch fails, fallback to testing URL
             window.currentAPIurl = window.testingAPIurl;
-        });
+            resolve(window.currentAPIurl);
+        }
+    });
 }
 
 function getAllUsers() {
@@ -155,6 +196,8 @@ function formatDateForInput(dateString, timeString) {
     return date.toISOString().slice(0, 16);
 }
 async function loadUsers() {
+    // ensure the currentAPIurl is set
+    await asyncSetAPIurl();
     if (window.user != null || window.user != undefined || window.user != '') {
         const settings = {
             method: 'POST',
@@ -170,6 +213,7 @@ async function loadUsers() {
     }
 }
 async function loadEvents() {
+    await asyncSetAPIurl();
     let data = await fetch(`${currentAPIurl}/calendar/getAllEvents`, {
         method: 'GET',
     });
@@ -433,8 +477,162 @@ function createPageContentModal() {
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="editModuleModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Module Content</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editModuleForm">
+                                <input type="hidden" id="editModuleId">
+                                <div class="mb-3">
+                                    <label for="editModuleName" class="form-label">Module Name</label>
+                                    <input type="text" class="form-control" id="editModuleName">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editModuleContent" class="form-label">Content</label>
+                                    <div id="splitContentArea">
+                                        <button type="button" class="form-control btn btn-outline-primary" id="editModuleContent">Edit Module Contents</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div id="separatedContent" class="mt-3"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editModuleAccessLevel" class="form-label">Access Level</label>
+                                    <input type="number" class="form-control" id="editModuleAccessLevel">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveModuleChanges">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual content edit modal -->
+            <div class="modal fade " id="individualContentModal" tabindex="-1">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Content</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <textarea class="form-control" id="individualContent" rows="5"></textarea>
+                            <div id="livePreview" class="mt-3"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveIndividualContent">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `);
         $('body').append(modal);
+
+        // Add event handler for content changes
+        $('#editModuleContent').on('click', function () {
+            parseSeparateContent($(this).val());
+        });
+
+
+
+        function parseSeparateContent(content) {
+            const listOfHiddenClasses = ['moduleSafe'];
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+
+            const separatedContent = $('#separatedContent').empty();
+
+            // Find elements with specific classes (e.g., style1, style2, style3)
+            const elements = doc.querySelectorAll('[class]');
+
+            elements.forEach((element, index) => {
+                const classNames = element.getAttribute('class');
+                const content = element.innerHTML;
+
+                const contentBox = $(`
+                <div class="card mb-2 content-box">
+                <div class="card-header">
+                    Element with class: ${classNames}
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-outline-primary edit-content-btn" 
+                        data-index="${index}" 
+                        data-class="${classNames}">
+                    Edit Content
+                    </button>
+                    <div class="content-preview mt-2">
+                    ${content}
+                    </div>
+                </div>
+                </div>
+            `);
+
+                if (listOfHiddenClasses.some((hiddenClass) => classNames.includes(hiddenClass))) {
+                    separatedContent.append(contentBox);
+                    contentBox.hide(); // Hide the content box if it contains a hidden class
+                } else {
+                    separatedContent.append(contentBox);
+                }
+
+            });
+        }
+
+        // Handle individual content editing
+        $(document).on('click', '.edit-content-btn', function () {
+            const index = $(this).data('index');
+            const className = $(this).data('class');
+            const content = $(this).closest('.card-body').find('.content-preview').html();
+
+            $('#individualContent').val(content);
+            $('#livePreview').html(content); // Show live preview
+            $('#individualContent').off('input')
+            $('#individualContent').on('input', function () {
+                //parse the html content and show the live preview
+                //if its not valid, show the error message
+                const content = $(this).val();
+                $('#livePreview').html(content); // Update live preview
+                try {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(content, 'text/html');
+                    
+                }catch (error) {
+                    console.error('Error parsing HTML:', error);
+                    $('#livePreview').html('<div class="alert alert-danger">Invalid HTML content</div>');
+                }
+            })
+            const individualModal = new bootstrap.Modal(document.getElementById('individualContentModal'));
+
+            $('#saveIndividualContent')
+                .off('click')
+                .on('click', function () {
+                    const newContent = $('#individualContent').val();
+                    const mainContent = $('#editModuleContent').val();
+
+                    // Update the specific element in the main content
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(mainContent, 'text/html');
+                    const elements = doc.querySelectorAll(`[class="${className}"]`);
+                    if (elements[index]) {
+                        elements[index].innerHTML = newContent;
+                        $('#editModuleContent').val(doc.body.innerHTML);
+                        parseSeparateContent(doc.body.innerHTML);
+                    }
+
+                    individualModal.hide();
+                });
+
+            individualModal.show();
+        });
     }
 }
 
@@ -538,18 +736,43 @@ function createPageDataRow(item) {
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <form id="editModuleForm">
-                                                                            <input type="hidden" id="editModuleId">
+                                                                            <!-- Module ID -->
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label">Module ID</label>
+                                                                                <input type="text" class="form-control" id="editModuleId" disabled>
+                                                                            </div>
+
+                                                                            <!-- Module Name -->
                                                                             <div class="mb-3">
                                                                                 <label for="editModuleName" class="form-label">Module Name</label>
                                                                                 <input type="text" class="form-control" id="editModuleName">
                                                                             </div>
-                                                                            <div class="mb-3">
-                                                                                <label for="editModuleContent" class="form-label">Content</label>
-                                                                                <textarea class="form-control" id="editModuleContent" rows="10"></textarea>
-                                                                            </div>
+
+                                                                            <!-- Module Access Level -->
                                                                             <div class="mb-3">
                                                                                 <label for="editModuleAccessLevel" class="form-label">Access Level</label>
                                                                                 <input type="number" class="form-control" id="editModuleAccessLevel">
+                                                                            </div>
+
+                                                                            <!-- Module Raw Content -->
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <div class="mb-3">
+                                                                                        <label for="editModuleContent" class="form-label">Raw HTML Content</label>
+                                                                                        <textarea class="form-control" id="editModuleContent" rows="10"></textarea>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <!-- Module Parsed Content Preview -->
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <div class="mb-3">
+                                                                                        <label class="form-label">Parsed Content Preview</label>
+                                                                                        <div id="separatedContent" class="border rounded p-3" style="min-height: 233px; overflow-y: auto;">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
                                                                         </form>
                                                                     </div>
@@ -604,7 +827,7 @@ function createPageDataRow(item) {
                                                     // Populate the modal with module data
                                                     $('#editModuleId').val(module.ID);
                                                     $('#editModuleName').val(module.Name);
-                                                    $('#editModuleContent').val(module.Content);
+                                                    $('#editModuleContent').val(module.ModuleContent);
                                                     $('#editModuleAccessLevel').val(module.UserAccessLevel);
 
                                                     // Show the modal
