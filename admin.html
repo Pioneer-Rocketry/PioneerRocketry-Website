@@ -56,6 +56,11 @@
             </div>
             <div class="card-body">
                 <div class="loginRequired" id="events"></div>
+                <!-- Add Event Modal Button -->
+                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                    <i class="fas fa-plus"></i>
+                    Add Event
+                </button>
             </div>
             <button class="triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">Load Events</button>
         </div>
@@ -66,236 +71,244 @@
                 <div class="modal-content" data-bs-theme="dark">
                     <!-- Modal Header -->
                     <div class="modal-header" data-bs-theme="dark">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel" data-bs-theme="dark">Create New Event</h1>
+                        <h1 class="modal-title fs-5" id="createEventModalLabel" data-bs-theme="dark">Create New Event</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-bs-theme="dark"></button>
                     </div>
 
                     <!-- Modal Body -->
                     <div class="modal-body" data-bs-theme="dark">
                         <form id="createEventForm" data-bs-theme="dark">
-                            <!-- Event Title -->
-                            <div class="form-group">
-                                <label for="eventTitle">Title</label>
-                                <input type="text" class="form-control" id="eventTitle" name="eventTitle" required />
+                            <!-- Simple Fields -->
+                            <input type="hidden" id="eventId" name="id" />
+                            <div class="form-group mb-2">
+                                <label for="eventTitle">
+                                    Title
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="eventTitle" name="title" required />
                             </div>
-
-                            <!-- Event Start Date -->
-                            <div class="form-group">
-                                <label for="eventStartDate">Start Date/Time</label>
-                                <input type="datetime-local" class="form-control" id="eventStartDate" name="eventStartDate" required />
+                            <div class="form-group mb-2">
+                                <label for="eventDescription">
+                                    Description
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" id="eventDescription" name="description" rows="2" required></textarea>
                             </div>
-
-                            <!-- Event End Date -->
-                            <div class="form-group">
-                                <label for="eventEndDate">End Date/Time</label>
-                                <input type="datetime-local" class="form-control" id="eventEndDate" name="eventEndDate" required />
+                            <div class="form-group mb-2">
+                                <label for="eventStart">
+                                    Start
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="datetime-local" class="form-control" id="eventStart" name="start" required />
                             </div>
-
-                            <!-- Event Description -->
-                            <div class="form-group">
-                                <label for="eventDescription">Description</label>
-                                <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3"></textarea>
+                            <div class="form-group mb-2">
+                                <label for="eventEnd">End</label>
+                                <input type="datetime-local" class="form-control" id="eventEnd" name="end" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventAllDay">All Day</label>
+                                <select class="form-control" id="eventAllDay" name="allDay">
+                                    <option value="false" selected>No</option>
+                                    <option value="true">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventColor">Event Color</label>
+                                <input type="color" class="form-control form-control-color" id="eventColor" name="color" value="#3788d8" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventUrl">Event URL</label>
+                                <input type="url" class="form-control" id="eventUrl" name="url" />
                             </div>
 
                             <!-- Advanced Settings Dropdown -->
-                            <div class="form-group">
-                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSettingsCollapse" aria-expanded="false" aria-controls="advancedSettingsCollapse">Advanced Settings</button>
+                            <div class="form-group mb-2">
+                                <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSettingsCollapse" aria-expanded="false" aria-controls="advancedSettingsCollapse">Show Advanced Fields</button>
                             </div>
 
                             <!-- Collapsible Advanced Settings -->
                             <div class="collapse" id="advancedSettingsCollapse">
                                 <div class="card card-body">
-                                    <!-- Advanced Settings Fields -->
-                                    <div class="form-group">
-                                        <label for="eventId">Event ID</label>
-                                        <input type="text" class="form-control" id="eventId" name="eventId" />
-                                    </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventGroupId">Group ID</label>
-                                        <input type="text" class="form-control" id="eventGroupId" name="eventGroupId" />
+                                        <input type="text" class="form-control" id="eventGroupId" name="groupId" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventAllDay">All Day</label>
-                                        <select class="form-control" id="eventAllDay" name="eventAllDay">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="eventDaysOfWeek">Select Days of the Week</label>
-                                        <div id="daysOfWeekButtons" class="btn-group btn-group-toggle" data-bs-toggle="buttons">
-                                            <input type="checkbox" id="eventDaysOfWeekSun" class="btn-check" value="0" />
+                                    <div class="form-group mb-2">
+                                        <label>Select Days of the Week</label>
+                                        <div id="daysOfWeekButtons" class="btn-group btn-group-toggle mb-2" data-bs-toggle="buttons">
+                                            <input type="checkbox" id="eventDaysOfWeekSun" class="btn-check" value="0" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekSun">Sun</label>
-                                            <input type="checkbox" id="eventDaysOfWeekMon" class="btn-check" value="1" />
+                                            <input type="checkbox" id="eventDaysOfWeekMon" class="btn-check" value="1" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekMon">Mon</label>
-                                            <input type="checkbox" id="eventDaysOfWeekTue" class="btn-check" value="2" />
+                                            <input type="checkbox" id="eventDaysOfWeekTue" class="btn-check" value="2" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekTue">Tue</label>
-                                            <input type="checkbox" id="eventDaysOfWeekWed" class="btn-check" value="3" />
+                                            <input type="checkbox" id="eventDaysOfWeekWed" class="btn-check" value="3" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekWed">Wed</label>
-                                            <input type="checkbox" id="eventDaysOfWeekThu" class="btn-check" value="4" />
+                                            <input type="checkbox" id="eventDaysOfWeekThu" class="btn-check" value="4" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekThu">Thu</label>
-                                            <input type="checkbox" id="eventDaysOfWeekFri" class="btn-check" value="5" />
+                                            <input type="checkbox" id="eventDaysOfWeekFri" class="btn-check" value="5" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekFri">Fri</label>
-                                            <input type="checkbox" id="eventDaysOfWeekSat" class="btn-check" value="6" />
+                                            <input type="checkbox" id="eventDaysOfWeekSat" class="btn-check" value="6" autocomplete="off" />
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekSat">Sat</label>
                                         </div>
-                                        <input type="hidden" id="eventDaysOfWeek" name="eventDaysOfWeek" />
+                                        <input type="hidden" id="eventDaysOfWeek" name="daysOfWeek" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventStartTime">Start Time</label>
-                                        <input type="time" class="form-control" id="eventStartTime" name="eventStartTime" />
+                                        <input type="time" class="form-control" id="eventStartTime" name="startTime" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventEndTime">End Time</label>
-                                        <input type="time" class="form-control" id="eventEndTime" name="eventEndTime" />
+                                        <input type="time" class="form-control" id="eventEndTime" name="endTime" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventStartRecur">Start Recurrence</label>
-                                        <input type="datetime-local" class="form-control" id="eventStartRecur" name="eventStartRecur" />
+                                    <div class="form-group mb-2">
+                                        <label for="eventStartRecur">Recurrence Start</label>
+                                        <input type="datetime-local" class="form-control" id="eventStartRecur" name="startRecur" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventEndRecur">End Recurrence</label>
-                                        <input type="datetime-local" class="form-control" id="eventEndRecur" name="eventEndRecur" />
+                                    <div class="form-group mb-2">
+                                        <label for="eventEndRecur">Recurrence End</label>
+                                        <input type="datetime-local" class="form-control" id="eventEndRecur" name="endRecur" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventUrl">URL</label>
-                                        <input type="url" class="form-control" id="eventUrl" name="eventUrl" />
-                                    </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventInteractive">Interactive</label>
-                                        <select class="form-control" id="eventInteractive" name="eventInteractive">
-                                            <option value="true">True</option>
-                                            <option value="false">False</option>
+                                        <select class="form-control" id="eventInteractive" name="interactive">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventClassName">Class Name (Or Class Names)</label>
-                                        <input type="text" class="form-control" id="eventClassName" name="eventClassName" />
+                                    <div class="form-group mb-2">
+                                        <label for="eventClassName">Class Name</label>
+                                        <input type="text" class="form-control" id="eventClassName" name="className" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventClassNames">Class Names ([ 'myclass1', myclass2' ])</label>
-                                        <input type="text" class="form-control" id="eventClassNames" name="eventClassNames" />
+                                    <div class="form-group mb-2">
+                                        <label for="eventClassNames">Class Names (comma separated)</label>
+                                        <input type="text" class="form-control" id="eventClassNames" name="classNames" placeholder="e.g. myclass1,myclass2" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventEditable">Editable</label>
-                                        <select class="form-control" id="eventEditable" name="eventEditable">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
+                                        <select class="form-control" id="eventEditable" name="editable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventStartEditable">Start Editable</label>
-                                        <select class="form-control" id="eventStartEditable" name="eventStartEditable">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
+                                        <select class="form-control" id="eventStartEditable" name="startEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventDurationEditable">Duration Editable</label>
-                                        <select class="form-control" id="eventDurationEditable" name="eventDurationEditable">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
+                                        <select class="form-control" id="eventDurationEditable" name="durationEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventResourceEditable">Resource Editable</label>
-                                        <select class="form-control" id="eventResourceEditable" name="eventResourceEditable">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
+                                        <select class="form-control" id="eventResourceEditable" name="resourceEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventResourceId">Resource ID</label>
-                                        <input type="text" class="form-control" id="eventResourceId" name="eventResourceId" />
+                                        <input type="text" class="form-control" id="eventResourceId" name="resourceId" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventResourceIds">Resource IDs (JSON Array)</label>
-                                        <input type="text" class="form-control" id="eventResourceIds" name="eventResourceIds" />
+                                    <div class="form-group mb-2">
+                                        <label for="eventResourceIds">Resource IDs (comma separated)</label>
+                                        <input type="text" class="form-control" id="eventResourceIds" name="resourceIds" placeholder="e.g. id1,id2" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventDisplay">Display</label>
-                                        <input type="text" class="form-control" id="eventDisplay" name="eventDisplay" />
+                                        <input type="text" class="form-control" id="eventDisplay" name="display" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventOverlap">Overlap</label>
-                                        <select class="form-control" id="eventOverlap" name="eventOverlap">
-                                            <option value="true">True</option>
-                                            <option value="false" selected>False</option>
+                                        <select class="form-control" id="eventOverlap" name="overlap">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventConstraint">Constraint</label>
-                                        <input type="text" class="form-control" id="eventConstraint" name="eventConstraint" />
+                                        <input type="text" class="form-control" id="eventConstraint" name="constraint" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="eventColor">Color</label>
-                                        <input type="color" class="form-control" id="eventColor" name="eventColor" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="eventBackgroundColor">Background Color</label>
-                                        <input type="color" class="form-control" id="eventBackgroundColor" name="eventBackgroundColor" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="eventBorderColor">Border Color</label>
-                                        <input type="color" class="form-control" id="eventBorderColor" name="eventBorderColor" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="eventTextColor">Text Color</label>
-                                        <input type="color" class="form-control" id="eventTextColor" name="eventTextColor" />
-                                    </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventRrule">RRule</label>
-                                        <input type="text" class="form-control" id="eventRrule" name="eventRrule" />
+                                        <input type="text" class="form-control" id="eventRrule" name="rrule" />
                                     </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label for="eventDuration">Duration</label>
-                                        <input type="text" class="form-control" id="eventDuration" name="eventDuration" />
+                                        <input type="text" class="form-control" id="eventDuration" name="duration" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventBackgroundColor">Background Color</label>
+                                        <input type="color" class="form-control" id="eventBackgroundColor" name="backgroundColor" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventBorderColor">Border Color</label>
+                                        <input type="color" class="form-control" id="eventBorderColor" name="borderColor" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventTextColor">Text Color</label>
+                                        <input type="color" class="form-control" id="eventTextColor" name="textColor" />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
                             </div>
 
                             <!-- Submit Button -->
                         </form>
                     </div>
 
-                    <!-- Modal Footer (optional) -->
+                    <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="submit" id="createEventSubmit" class="btn btn-primary">Create Event</button>
+                        <button type="submit" form="createEventForm" id="createEventSubmit" class="btn btn-primary">Create Event</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            // Days of week checkboxes to hidden input
+            $(function () {
+                $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
+                    const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
+                        .map(function () {
+                            return this.value;
+                        })
+                        .get();
+                    $('#eventDaysOfWeek').val(selected.join(','));
+                });
+            });
+
+            // Event form submission
+            document.getElementById('createEventForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const form = event.target;
+                submitEventForm(
+                    form,
+                    function (result) {
+                        alert('Event created successfully!');
+                        if (typeof loadEvents === 'function') loadEvents();
+                        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
+                        modal.hide();
+                        form.reset();
+                    },
+                    function (error) {
+                        alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+                    }
+                );
+            });
+        </script>
 
         <!-- Image Upload -->
         <div class="card loginRequired">
@@ -443,6 +456,59 @@
                 // Initialize the page editor functionality
                 initializePageEditor();
             </script>
+        </div>
+
+        <!-- Edit Module Modal (moved from tools.js) -->
+        <div class="modal fade" id="editModuleModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Module Content</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editModuleForm">
+                            <!-- Module ID -->
+                            <div class="mb-3">
+                                <label class="form-label">Module ID</label>
+                                <input type="text" class="form-control" id="editModuleId" disabled />
+                            </div>
+                            <!-- Module Name -->
+                            <div class="mb-3">
+                                <label for="editModuleName" class="form-label">Module Name</label>
+                                <input type="text" class="form-control" id="editModuleName" />
+                            </div>
+                            <!-- Module Access Level -->
+                            <div class="mb-3">
+                                <label for="editModuleAccessLevel" class="form-label">Access Level</label>
+                                <input type="number" class="form-control" id="editModuleAccessLevel" />
+                            </div>
+                            <!-- Module Raw Content -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-12">
+                                        <label for="editModuleContent" class="form-label">Raw HTML Content</label>
+                                        <textarea class="form-control" id="editModuleContent" rows="10"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Module Parsed Content Preview -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-12">
+                                        <label class="form-label">Parsed Content Preview</label>
+                                        <div id="separatedContent" class="border rounded p-3" style="min-height: 233px; overflow-y: auto"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveModuleChanges">Save changes</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

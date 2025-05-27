@@ -37,7 +37,7 @@ $(document).ready(function () {
 });
 
 function setAPIurl() {
-    window.localAPIurl = 'http://localhost:8787';
+    window.localAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.remoteAPIurl = 'https://api.pioneerrocketry.com';
     window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
     window.currentAPIurl = null;
@@ -603,7 +603,7 @@ function createPageContentModal() {
                 $('#livePreview').html(content); // Update live preview
                 try {
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(content, 'text/html');
+                    parser.parseFromString(content, 'text/html');
                     
                 }catch (error) {
                     console.error('Error parsing HTML:', error);
@@ -625,7 +625,7 @@ function createPageContentModal() {
                     if (elements[index]) {
                         elements[index].innerHTML = newContent;
                         $('#editModuleContent').val(doc.body.innerHTML);
-                        parseSeparateContent(doc.body.innerHTML);
+                        parseSeparateContentInModal(doc.body.innerHTML);
                     }
 
                     individualModal.hide();
@@ -690,6 +690,17 @@ function createPageDataRow(item) {
                     moduleTable.append(moduleHeader, moduleBody);
                     $('#moduleContent').append(moduleTable);
 
+                    // Define mainContent for placeholder detection
+                    let mainContent = '';
+                    if (content.main) {
+                      mainContent = content.main;
+                    } else if (typeof content === 'string') {
+                      mainContent = content;
+                    } else if (typeof content === 'object') {
+                      // Use the first section as fallback
+                      mainContent = Object.values(content)[0] || '';
+                    }
+
                     // Fetch module data
                     fetch(`${currentAPIurl}/admin/getModule`, {
                         method: 'POST',
@@ -706,7 +717,7 @@ function createPageDataRow(item) {
                             if (data.success && data.result) {
                                 // Create a new table with all module details
                                 const detailedModuleTable = $('<table>').addClass('table table-bordered');
-                                const moduleHeader = $('<thead>').append($('<tr>').append($('<th>').text('ID'), $('<th>').text('Name'), $('<th>').text('Module Content'), $('<th>').text('Access Level')));
+                                const moduleHeader = $('<thead>').append($('<tr>').append($('<th>').text('ID'), $('<th>').text('Name'), $('<th>').text('Module Content'), $('<th>').text('Access Level'), $('<th>').text('Loaded/Placeholder Present')));
                                 const moduleBody = $('<tbody>');
 
                                 data.result.forEach((module) => {
@@ -724,118 +735,75 @@ function createPageDataRow(item) {
                                                 })
                                                 .text('Edit Module Content')
                                                 .on('click', function () {
-                                                    // Create and show edit module modal
-                                                    if (!$('#editModuleModal').length) {
-                                                        const editModuleModal = $(`
-                                                        <div class="modal fade" id="editModuleModal" tabindex="-1">
-                                                            <div class="modal-dialog modal-lg">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">Edit Module Content</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <form id="editModuleForm">
-                                                                            <!-- Module ID -->
-                                                                            <div class="mb-3">
-                                                                                <label class="form-label">Module ID</label>
-                                                                                <input type="text" class="form-control" id="editModuleId" disabled>
-                                                                            </div>
-
-                                                                            <!-- Module Name -->
-                                                                            <div class="mb-3">
-                                                                                <label for="editModuleName" class="form-label">Module Name</label>
-                                                                                <input type="text" class="form-control" id="editModuleName">
-                                                                            </div>
-
-                                                                            <!-- Module Access Level -->
-                                                                            <div class="mb-3">
-                                                                                <label for="editModuleAccessLevel" class="form-label">Access Level</label>
-                                                                                <input type="number" class="form-control" id="editModuleAccessLevel">
-                                                                            </div>
-
-                                                                            <!-- Module Raw Content -->
-                                                                            <div class="row">
-                                                                                <div class="col-md-6">
-                                                                                    <div class="mb-3">
-                                                                                        <label for="editModuleContent" class="form-label">Raw HTML Content</label>
-                                                                                        <textarea class="form-control" id="editModuleContent" rows="10"></textarea>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <!-- Module Parsed Content Preview -->
-                                                                            <div class="row">
-                                                                                <div class="col-md-6">
-                                                                                    <div class="mb-3">
-                                                                                        <label class="form-label">Parsed Content Preview</label>
-                                                                                        <div id="separatedContent" class="border rounded p-3" style="min-height: 233px; overflow-y: auto;">
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                        <button type="button" class="btn btn-primary" id="saveModuleChanges">Save changes</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    `);
-                                                        $('body').append(editModuleModal);
-
-                                                        // Handle save module changes
-                                                        $('#saveModuleChanges').on('click', function () {
-                                                            const moduleId = $('#editModuleId').val();
-                                                            const updatedModule = {
-                                                                ID: moduleId,
-                                                                Name: $('#editModuleName').val(),
-                                                                Content: $('#editModuleContent').val(),
-                                                                UserAccessLevel: $('#editModuleAccessLevel').val(),
-                                                            };
-
-                                                            // Call API to update module
-                                                            fetch(`${currentAPIurl}/admin/updateModule`, {
-                                                                method: 'POST',
-                                                                headers: {
-                                                                    'Content-Type': 'application/json',
-                                                                },
-                                                                body: JSON.stringify({
-                                                                    module: updatedModule,
-                                                                    User: window.user,
-                                                                }),
-                                                            })
-                                                                .then((response) => response.json())
-                                                                .then((data) => {
-                                                                    if (data.success) {
-                                                                        bootstrap.Modal.getInstance($('#editModuleModal')).hide();
-                                                                        // Refresh the module table
-                                                                        $('#loadPageBtn').click();
-                                                                    } else {
-                                                                        alert('Error updating module: ' + (data.error || 'Unknown error'));
-                                                                    }
-                                                                })
-                                                                .catch((error) => {
-                                                                    console.error('Error updating module:', error);
-                                                                    alert('Error updating module: ' + error.message);
-                                                                });
-                                                        });
-                                                    }
-
-                                                    // Populate the modal with module data
+                                                    console.log('Module Loaded');
+                                                    // Hide the page content modal before showing the module modal
+                                                    const pageModal = bootstrap.Modal.getInstance(document.getElementById('pageContentEditModal'));
+                                                    if (pageModal) pageModal.hide();
+                                                    // Show and fill the static editModuleModal
                                                     $('#editModuleId').val(module.ID);
                                                     $('#editModuleName').val(module.Name);
                                                     $('#editModuleContent').val(module.ModuleContent);
                                                     $('#editModuleAccessLevel').val(module.UserAccessLevel);
-
+                                                    // Parse and preview content
+                                                    parseSeparateContentInModal(module.ModuleContent);
                                                     // Show the modal
                                                     const editModuleModal = new bootstrap.Modal(document.getElementById('editModuleModal'));
                                                     editModuleModal.show();
+                                                    // When the module modal is closed, show the page content modal again
+                                                    $('#editModuleModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+                                                        const pageModal = new bootstrap.Modal(document.getElementById('pageContentEditModal'));
+                                                        pageModal.show();
+                                                    });
+                                                    // Handle save module changes
+                                                    $('#saveModuleChanges').off('click').on('click', function () {
+                                                        const moduleId = $('#editModuleId').val();
+                                                        const updatedModule = {
+                                                            ID: moduleId,
+                                                            Name: $('#editModuleName').val(),
+                                                            Content: $('#editModuleContent').val(),
+                                                            UserAccessLevel: $('#editModuleAccessLevel').val(),
+                                                        };
+                                                        // Call API to update module
+                                                        fetch(`${currentAPIurl}/admin/updateModule`, {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                            },
+                                                            body: JSON.stringify({
+                                                                module: updatedModule,
+                                                                User: window.user,
+                                                            }),
+                                                        })
+                                                            .then((response) => response.json())
+                                                            .then((data) => {
+                                                                if (data.success) {
+                                                                    bootstrap.Modal.getInstance(document.getElementById('editModuleModal')).hide();
+                                                                    // Refresh the module table
+                                                                    $('#loadPageBtn').click();
+                                                                } else {
+                                                                    alert('Error updating module: ' + (data.error || 'Unknown error'));
+                                                                }
+                                                            })
+                                                            .catch((error) => {
+                                                                console.error('Error updating module:', error);
+                                                                alert('Error updating module: ' + error.message);
+                                                            });
+                                                    });
+                                                    // Live preview and content separation
+                                                    $('#editModuleContent').off('input').on('input', function () {
+                                                        parseSeparateContentInModal($(this).val());
+                                                    });
                                                 })
                                         ),
-                                        $('<td>').text(module.UserAccessLevel || '0')
+                                        $('<td>').text(module.UserAccessLevel || '0'),
+                                        // Placeholder column
+                                        (function () {
+                                          // Accept both <!--moduleX--> and <!--moduleName-->
+                                          const placeholderTag = `<!--module${module.ID}-->`;
+                                          const placeholderNameTag = module.Name ? `<!--${module.Name}-->` : '';
+                                          const found = mainContent.includes(placeholderTag) || (placeholderNameTag && mainContent.includes(placeholderNameTag));
+                                          return $('<td>').html(found ? '✅' : '❌');
+                                        })()
                                     );
                                     moduleBody.append(moduleRow);
                                 });
@@ -940,4 +908,134 @@ function updatePageData(pageName, config) {
         .catch((error) => {
             alert('Error updating page: ' + error.message);
         });
+}
+
+/**
+ * Collects and parses event form data for FullCalendar event submission.
+ * @param {HTMLFormElement} form - The event creation form element.
+ * @returns {Object} - The parsed event object for API submission.
+ */
+function getEventFormData(form) {
+    const eventObj = {};
+    for (const el of form.elements) {
+        if (!el.name) continue;
+        if (el.type === 'checkbox' || el.type === 'radio') continue;
+        eventObj[el.name] = el.value;
+    }
+    // Parse booleans
+    [
+        'allDay', 'interactive', 'editable', 'startEditable',
+        'durationEditable', 'resourceEditable', 'overlap'
+    ].forEach(k => {
+        if (k in eventObj && eventObj[k] !== "") eventObj[k] = eventObj[k] === 'true';
+        else if (eventObj[k] === "") delete eventObj[k];
+    });
+    // Parse arrays
+    if (eventObj.classNames) eventObj.classNames = eventObj.classNames.split(',').map(s => s.trim()).filter(Boolean);
+    if (eventObj.resourceIds) eventObj.resourceIds = eventObj.resourceIds.split(',').map(s => s.trim()).filter(Boolean);
+    if (eventObj.daysOfWeek) eventObj.daysOfWeek = eventObj.daysOfWeek.split(',').map(Number).filter(n => !isNaN(n));
+    // Remove empty optional fields
+    Object.keys(eventObj).forEach(k => { if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k]; });
+    // FullCalendar event parsing compliance
+    // https://fullcalendar.io/docs/event-parsing
+    if (eventObj.start) eventObj.start = new Date(eventObj.start).toISOString();
+    if (eventObj.end) eventObj.end = new Date(eventObj.end).toISOString();
+    if (eventObj.startRecur) eventObj.startRecur = new Date(eventObj.startRecur).toISOString();
+    if (eventObj.endRecur) eventObj.endRecur = new Date(eventObj.endRecur).toISOString();
+    return eventObj;
+}
+
+/**
+ * Submits the event form to the API, using FullCalendar event object structure.
+ * @param {HTMLFormElement} form - The event creation form element.
+ * @param {Function} [onSuccess] - Optional callback on success.
+ * @param {Function} [onError] - Optional callback on error.
+ */
+async function submitEventForm(form, onSuccess, onError) {
+    const eventObj = getEventFormData(form);
+    const payload = { event: eventObj };
+    if (window.user && window.user.getToken) {
+        payload.token = window.user.getToken();
+    }
+    try {
+        const res = await fetch('https://api.pioneerrocketry.com/calendar/addEvent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+            if (typeof onSuccess === 'function') onSuccess(result);
+        } else {
+            if (typeof onError === 'function') onError(result);
+        }
+    } catch (err) {
+        if (typeof onError === 'function') onError(err);
+    }
+}
+
+// Helper for parsing and previewing separated content in the modal
+function parseSeparateContentInModal(content) {
+    const listOfHiddenClasses = ['moduleSafe'];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const separatedContent = $('#separatedContent').empty();
+    const elements = doc.querySelectorAll('[class]');
+    elements.forEach((element, index) => {
+        const classNames = element.getAttribute('class');
+        const htmlContent = element.innerHTML;
+        const contentBox = $(`
+            <div class="card mb-2 content-box">
+                <div class="card-header">Element with class: ${classNames}</div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-outline-primary edit-content-btn" 
+                        data-index="${index}" 
+                        data-class="${classNames}">
+                    Edit Content
+                    </button>
+                    <div class="content-preview mt-2">${htmlContent}</div>
+                </div>
+            </div>
+        `);
+        if (listOfHiddenClasses.some((hiddenClass) => classNames.includes(hiddenClass))) {
+            separatedContent.append(contentBox);
+            contentBox.hide();
+        } else {
+            separatedContent.append(contentBox);
+        }
+    });
+    // Individual content edit modal logic
+    $(document).off('click', '.edit-content-btn').on('click', '.edit-content-btn', function () {
+        const index = $(this).data('index');
+        const className = $(this).data('class');
+        const content = $(this).closest('.card-body').find('.content-preview').html();
+        $('#individualContent').val(content);
+        $('#livePreview').html(content);
+        $('#individualContent').off('input').on('input', function () {
+            const content = $(this).val();
+            $('#livePreview').html(content);
+            try {
+                const parser = new DOMParser();
+                parser.parseFromString(content, 'text/html');
+            } catch (error) {
+                console.error('Error parsing HTML:', error);
+                $('#livePreview').html('<div class="alert alert-danger">Invalid HTML content</div>');
+            }
+        });
+        const individualModal = new bootstrap.Modal(document.getElementById('individualContentModal'));
+        $('#saveIndividualContent').off('click').on('click', function () {
+            const newContent = $('#individualContent').val();
+            const mainContent = $('#editModuleContent').val();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(mainContent, 'text/html');
+            const elements = doc.querySelectorAll(`[class="${className}"]`);
+            if (elements[index]) {
+                elements[index].innerHTML = newContent;
+                $('#editModuleContent').val(doc.body.innerHTML);
+                parseSeparateContentInModal(doc.body.innerHTML);
+            }
+            individualModal.hide();
+        });
+        individualModal.show();
+    });
 }
