@@ -356,7 +356,36 @@ function createEventTable(response) {
 
         let deleteButton = $('<button>').attr('id', `${event.id}button`).addClass('btn btn-danger').text('Delete Event').appendTo(buttonCell);
         deleteButton.click(function () {
-            console.log(event);
+            // Store event id in modal data
+            $('#deleteEventModal').data('eventId', event.id);
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteEventModal'));
+            deleteModal.show();
+        });
+
+        // Only bind once
+        $(document).off('click', '#confirmDeleteEventBtn').on('click', '#confirmDeleteEventBtn', function () {
+            const eventId = $('#deleteEventModal').data('eventId');
+            fetch(`${currentAPIurl}/calendar/removeEvent`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: eventId, User: window.user })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                if (data.success) {
+                    alert('Event deleted successfully!');
+                    if (typeof loadEvents === 'function') loadEvents();
+                } else {
+                    alert('Error deleting event: ' + (data.error || 'Unknown error'));
+                }
+                deleteModal.hide();
+            })
+            .catch(err => {
+                alert('Error deleting event: ' + err.message);
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                deleteModal.hide();
+            });
         });
     }
     $('#events').empty().append(table);
