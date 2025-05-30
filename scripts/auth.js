@@ -107,6 +107,8 @@ $(document).ready(function () {
                 $('#g_id_signin').show();
                 window.user = null;
             });
+    }else{
+        console.log("No JWT Found, Skipping.")
     }
 });
 
@@ -150,7 +152,7 @@ function handleCredentialResponse(response) {
     $.ajax({
         type: 'POST',
         url: `${currentAPIurl}/googleAuth`,
-        data: JSON.stringify(response),
+        data: JSON.stringify(response.credential),
         contentType: 'application/json',
     })
         .done(function (data) {
