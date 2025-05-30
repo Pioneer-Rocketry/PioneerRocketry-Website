@@ -93,6 +93,7 @@ $(document).ready(function () {
                     $('.triggerChangeOnLogin').trigger('change');
                     $('.triggerClickOnLogin').trigger('click');
                 }
+                
                 $('#g_id_signin').hide();
                 $('#credential_picker_container').hide();
             })
