@@ -84,7 +84,7 @@ $(document).ready(function () {
         $.ajax({
             type: 'POST',
             url: `${currentAPIurl}/googleAuth`,
-            data: JSON.stringify(window.user.getToken()),
+            data: JSON.stringify({token:window.user.getToken()}),
             contentType: 'application/json',
         })
             .done(function (data) {
