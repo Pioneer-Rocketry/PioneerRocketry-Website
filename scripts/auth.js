@@ -84,13 +84,12 @@ $(document).ready(function () {
         $.ajax({
             type: 'POST',
             url: `${currentAPIurl}/googleAuth`,
-            data: JSON.stringify(window.user),
+            data: JSON.stringify(window.user.getToken()),
             contentType: 'application/json',
         })
             .done(function (data) {
-                console.log(JSON.parse(data));
-                let flags = JSON.parse(data).flags;
-                let sub = JSON.parse(data).email;
+                data = JSON.parse(data).result;
+                let flags = data.flags;
                 if (parseFloat(flags) >= 2.0) {
                     $('#createEventBtn').show();
                     $('.loginRequired').show();
@@ -157,9 +156,7 @@ function handleCredentialResponse(response) {
     })
         .done(function (data) {
             //data is within data.results
-            console.log(JSON.parse(data));
             data = JSON.parse(data).result;
-            console.log(JSON.parse(data));
             let flags = JSON.parse(data).flags;
             let sub = JSON.parse(data).email;
             localStorage.setItem('lastUserEmail', sub);
