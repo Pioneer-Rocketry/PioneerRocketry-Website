@@ -156,6 +156,9 @@ function handleCredentialResponse(response) {
         contentType: 'application/json',
     })
         .done(function (data) {
+            //data is within data.results
+            data = JSON.parse(data);
+            data = JSON.parse(data.result)
             console.log(JSON.parse(data));
             let flags = JSON.parse(data).flags;
             let sub = JSON.parse(data).email;
