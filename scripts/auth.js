@@ -61,6 +61,10 @@ class User {
     setId(id) {
         this.id = id;
     }
+
+    setCredentials(creds){
+        this.credential = creds;
+    }
 }
 
 //check if user is already verified
@@ -146,7 +150,7 @@ function handleCredentialResponse(response) {
     $.ajax({
         type: 'POST',
         url: `${currentAPIurl}/googleAuth`,
-        data: JSON.stringify(window.user),
+        data: JSON.stringify(response),
         contentType: 'application/json',
     })
         .done(function (data) {
