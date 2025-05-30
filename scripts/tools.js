@@ -200,7 +200,7 @@ async function loadUsers() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ User: window.user }),
+            body: JSON.stringify({ token: window.user.getToken() }),
         };
         let response = await fetch(`${currentAPIurl}/admin/getAllUsers`, settings);
         if (response.ok) {
@@ -229,7 +229,7 @@ async function changeUser(id, flags, name, email) {
                     name: name,
                     email: email,
                 },
-                User: window.user,
+                token: window.user.getToken(),
             }),
         });
 
@@ -366,7 +366,7 @@ function createEventTable(response) {
                 fetch(`${currentAPIurl}/calendar/removeEvent`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: eventId, User: window.user }),
+                    body: JSON.stringify({ id: eventId, token: window.user.getToken() }),
                 })
                     .then((res) => res.json())
                     .then((data) => {
@@ -415,7 +415,7 @@ function updatePage(pageName, config) {
                 UserAccessLevel: config.UserAccessLevel,
                 Modules: config.Modules,
             },
-            User: window.user,
+            token: window.user.getToken(),
         }),
     })
         .then((response) => response.json())
@@ -732,7 +732,6 @@ function createPageDataRow(item) {
                         },
                         body: JSON.stringify({
                             moduleIds: moduleIds,
-                            User: window.user,
                         }),
                     })
                         .then((response) => response.json())
@@ -798,7 +797,7 @@ function createPageDataRow(item) {
                                                                 },
                                                                 body: JSON.stringify({
                                                                     module: updatedModule,
-                                                                    User: window.user,
+                                                                    token: window.user.getToken(),
                                                                 }),
                                                             })
                                                                 .then((response) => response.json())
