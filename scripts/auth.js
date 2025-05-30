@@ -89,7 +89,7 @@ $(document).ready(function () {
         })
             .done(function (data) {
                 data = JSON.parse(data).result;
-                let flags = data.flags;
+                let flags = JSON.parse(data).flags;
                 if (parseFloat(flags) >= 2.0) {
                     $('#createEventBtn').show();
                     $('.loginRequired').show();
