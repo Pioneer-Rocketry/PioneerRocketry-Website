@@ -152,7 +152,7 @@ function handleCredentialResponse(response) {
     $.ajax({
         type: 'POST',
         url: `${currentAPIurl}/googleAuth`,
-        data: {token:JSON.stringify(response.credential)},
+        data: JSON.stringify({token: response.credential}),
         contentType: 'application/json',
     })
         .done(function (data) {
