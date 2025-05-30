@@ -160,8 +160,6 @@ function handleCredentialResponse(response) {
             console.log(JSON.parse(data));
             data = JSON.parse(data).result;
             console.log(JSON.parse(data));
-            data = JSON.parse(data)
-            console.log(JSON.parse(data));
             let flags = JSON.parse(data).flags;
             let sub = JSON.parse(data).email;
             localStorage.setItem('lastUserEmail', sub);
