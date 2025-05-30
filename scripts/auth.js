@@ -66,6 +66,7 @@ class User {
 //check if user is already verified
 $(document).ready(function () {
     console.log('checking for Session');
+    setAPIurl();
     if (localStorage.getItem('JWT') != null) {
         console.log('JWT found');
         try {
@@ -75,9 +76,10 @@ $(document).ready(function () {
         }
         tempData = { email: localJWTSession.email, name: localJWTSession.name, id: localJWTSession.id, token: localJWTSession.token, flags: localJWTSession.flags };
         window.user = new User(tempData, tempData.token);
+        
         $.ajax({
             type: 'POST',
-            url: `${currentAPIurl || 'https://api.pioneerrocketry.com'}/googleAuth`,
+            url: `${currentAPIurl}/googleAuth`,
             data: JSON.stringify(window.user),
             contentType: 'application/json',
         })
