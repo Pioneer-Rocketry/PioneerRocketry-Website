@@ -37,16 +37,13 @@ $(document).ready(function () {
 });
 
 function setAPIurl() {
-    window.localAPIurl = 'https://dev-api.pioneerrocketry.com';
-    window.remoteAPIurl = 'https://api.pioneerrocketry.com';
-    window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
+    window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
+    window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        window.currentAPIurl = localAPIurl;
-    } else if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = testingAPIurl;
+        window.currentAPIurl = devAPIurl;
     } else {
-        window.currentAPIurl = remoteAPIurl;
+        window.currentAPIurl = productionAPIurl;
     }
     try {
         //check if the currentAPIurl is valid by calling the api
@@ -56,26 +53,25 @@ function setAPIurl() {
         })
             .then((response) => {})
             .catch((error) => {
-                window.currentAPIurl = window.testingAPIurl;
+                window.currentAPIurl = window.productionAPIurl;
             });
     } catch (error) {
-        window.currentAPIurl = window.testingAPIurl;
+        window.currentAPIurl = window.productionAPIurl;
     }
 }
 
 async function asyncSetAPIurl() {
-    window.localAPIurl = 'http://localhost:8787';
-    window.remoteAPIurl = 'https://api.pioneerrocketry.com';
-    window.testingAPIurl = 'https://api.kris-adams3000.workers.dev';
+    window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
+    window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
 
     // Set initial API URL based on hostname
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        window.currentAPIurl = window.localAPIurl;
+        window.currentAPIurl = window.devAPIurl;
     } else if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = window.testingAPIurl;
+        window.currentAPIurl = window.devAPIurl;
     } else {
-        window.currentAPIurl = window.remoteAPIurl;
+        window.currentAPIurl = window.productionAPIurl;
     }
 
     // Return a promise that resolves with the validated API URL
@@ -90,12 +86,12 @@ async function asyncSetAPIurl() {
                 resolve(window.currentAPIurl);
             } else {
                 // If primary URL fails, fallback to testing URL
-                window.currentAPIurl = window.testingAPIurl;
+                window.currentAPIurl = window.devAPIurl;
                 resolve(window.currentAPIurl);
             }
         } catch (error) {
             // If fetch fails, fallback to testing URL
-            window.currentAPIurl = window.testingAPIurl;
+            window.currentAPIurl = window.devAPIurl;
             resolve(window.currentAPIurl);
         }
     });
@@ -363,30 +359,32 @@ function createEventTable(response) {
         });
 
         // Only bind once
-        $(document).off('click', '#confirmDeleteEventBtn').on('click', '#confirmDeleteEventBtn', function () {
-            const eventId = $('#deleteEventModal').data('eventId');
-            fetch(`${currentAPIurl}/calendar/removeEvent`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: eventId, User: window.user })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                if (data.success) {
-                    alert('Event deleted successfully!');
-                    if (typeof loadEvents === 'function') loadEvents();
-                } else {
-                    alert('Error deleting event: ' + (data.error || 'Unknown error'));
-                }
-                deleteModal.hide();
-            })
-            .catch(err => {
-                alert('Error deleting event: ' + err.message);
-                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                deleteModal.hide();
+        $(document)
+            .off('click', '#confirmDeleteEventBtn')
+            .on('click', '#confirmDeleteEventBtn', function () {
+                const eventId = $('#deleteEventModal').data('eventId');
+                fetch(`${currentAPIurl}/calendar/removeEvent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: eventId, User: window.user }),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                        if (data.success) {
+                            alert('Event deleted successfully!');
+                            if (typeof loadEvents === 'function') loadEvents();
+                        } else {
+                            alert('Error deleting event: ' + (data.error || 'Unknown error'));
+                        }
+                        deleteModal.hide();
+                    })
+                    .catch((err) => {
+                        alert('Error deleting event: ' + err.message);
+                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                        deleteModal.hide();
+                    });
             });
-        });
     }
     $('#events').empty().append(table);
 }
@@ -571,8 +569,6 @@ function createPageContentModal() {
             parseSeparateContent($(this).val());
         });
 
-
-
         function parseSeparateContent(content) {
             const listOfHiddenClasses = ['moduleSafe'];
 
@@ -612,7 +608,6 @@ function createPageContentModal() {
                 } else {
                     separatedContent.append(contentBox);
                 }
-
             });
         }
 
@@ -624,7 +619,7 @@ function createPageContentModal() {
 
             $('#individualContent').val(content);
             $('#livePreview').html(content); // Show live preview
-            $('#individualContent').off('input')
+            $('#individualContent').off('input');
             $('#individualContent').on('input', function () {
                 //parse the html content and show the live preview
                 //if its not valid, show the error message
@@ -633,12 +628,11 @@ function createPageContentModal() {
                 try {
                     const parser = new DOMParser();
                     parser.parseFromString(content, 'text/html');
-                    
-                }catch (error) {
+                } catch (error) {
                     console.error('Error parsing HTML:', error);
                     $('#livePreview').html('<div class="alert alert-danger">Invalid HTML content</div>');
                 }
-            })
+            });
             const individualModal = new bootstrap.Modal(document.getElementById('individualContentModal'));
 
             $('#saveIndividualContent')
@@ -722,12 +716,12 @@ function createPageDataRow(item) {
                     // Define mainContent for placeholder detection
                     let mainContent = '';
                     if (content.main) {
-                      mainContent = content.main;
+                        mainContent = content.main;
                     } else if (typeof content === 'string') {
-                      mainContent = content;
+                        mainContent = content;
                     } else if (typeof content === 'object') {
-                      // Use the first section as fallback
-                      mainContent = Object.values(content)[0] || '';
+                        // Use the first section as fallback
+                        mainContent = Object.values(content)[0] || '';
                     }
 
                     // Fetch module data
@@ -779,59 +773,65 @@ function createPageDataRow(item) {
                                                     const editModuleModal = new bootstrap.Modal(document.getElementById('editModuleModal'));
                                                     editModuleModal.show();
                                                     // When the module modal is closed, show the page content modal again
-                                                    $('#editModuleModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-                                                        const pageModal = new bootstrap.Modal(document.getElementById('pageContentEditModal'));
-                                                        pageModal.show();
-                                                    });
+                                                    $('#editModuleModal')
+                                                        .off('hidden.bs.modal')
+                                                        .on('hidden.bs.modal', function () {
+                                                            const pageModal = new bootstrap.Modal(document.getElementById('pageContentEditModal'));
+                                                            pageModal.show();
+                                                        });
                                                     // Handle save module changes
-                                                    $('#saveModuleChanges').off('click').on('click', function () {
-                                                        const moduleId = $('#editModuleId').val();
-                                                        const updatedModule = {
-                                                            ID: moduleId,
-                                                            Name: $('#editModuleName').val(),
-                                                            Content: $('#editModuleContent').val(),
-                                                            UserAccessLevel: $('#editModuleAccessLevel').val(),
-                                                        };
-                                                        // Call API to update module
-                                                        fetch(`${currentAPIurl}/admin/updateModule`, {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json',
-                                                            },
-                                                            body: JSON.stringify({
-                                                                module: updatedModule,
-                                                                User: window.user,
-                                                            }),
-                                                        })
-                                                            .then((response) => response.json())
-                                                            .then((data) => {
-                                                                if (data.success) {
-                                                                    bootstrap.Modal.getInstance(document.getElementById('editModuleModal')).hide();
-                                                                    // Refresh the module table
-                                                                    $('#loadPageBtn').click();
-                                                                } else {
-                                                                    alert('Error updating module: ' + (data.error || 'Unknown error'));
-                                                                }
+                                                    $('#saveModuleChanges')
+                                                        .off('click')
+                                                        .on('click', function () {
+                                                            const moduleId = $('#editModuleId').val();
+                                                            const updatedModule = {
+                                                                ID: moduleId,
+                                                                Name: $('#editModuleName').val(),
+                                                                Content: $('#editModuleContent').val(),
+                                                                UserAccessLevel: $('#editModuleAccessLevel').val(),
+                                                            };
+                                                            // Call API to update module
+                                                            fetch(`${currentAPIurl}/admin/updateModule`, {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    module: updatedModule,
+                                                                    User: window.user,
+                                                                }),
                                                             })
-                                                            .catch((error) => {
-                                                                console.error('Error updating module:', error);
-                                                                alert('Error updating module: ' + error.message);
-                                                            });
-                                                    });
+                                                                .then((response) => response.json())
+                                                                .then((data) => {
+                                                                    if (data.success) {
+                                                                        bootstrap.Modal.getInstance(document.getElementById('editModuleModal')).hide();
+                                                                        // Refresh the module table
+                                                                        $('#loadPageBtn').click();
+                                                                    } else {
+                                                                        alert('Error updating module: ' + (data.error || 'Unknown error'));
+                                                                    }
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error('Error updating module:', error);
+                                                                    alert('Error updating module: ' + error.message);
+                                                                });
+                                                        });
                                                     // Live preview and content separation
-                                                    $('#editModuleContent').off('input').on('input', function () {
-                                                        parseSeparateContentInModal($(this).val());
-                                                    });
+                                                    $('#editModuleContent')
+                                                        .off('input')
+                                                        .on('input', function () {
+                                                            parseSeparateContentInModal($(this).val());
+                                                        });
                                                 })
                                         ),
                                         $('<td>').text(module.UserAccessLevel || '0'),
                                         // Placeholder column
                                         (function () {
-                                          // Accept both <!--moduleX--> and <!--moduleName-->
-                                          const placeholderTag = `<!--module${module.ID}-->`;
-                                          const placeholderNameTag = module.Name ? `<!--${module.Name}-->` : '';
-                                          const found = mainContent.includes(placeholderTag) || (placeholderNameTag && mainContent.includes(placeholderNameTag));
-                                          return $('<td>').html(found ? '✅' : '❌');
+                                            // Accept both <!--moduleX--> and <!--moduleName-->
+                                            const placeholderTag = `<!--module${module.ID}-->`;
+                                            const placeholderNameTag = module.Name ? `<!--${module.Name}-->` : '';
+                                            const found = mainContent.includes(placeholderTag) || (placeholderNameTag && mainContent.includes(placeholderNameTag));
+                                            return $('<td>').html(found ? '✅' : '❌');
                                         })()
                                     );
                                     moduleBody.append(moduleRow);
@@ -952,19 +952,30 @@ function getEventFormData(form) {
         eventObj[el.name] = el.value;
     }
     // Parse booleans
-    [
-        'allDay', 'interactive', 'editable', 'startEditable',
-        'durationEditable', 'resourceEditable', 'overlap'
-    ].forEach(k => {
-        if (k in eventObj && eventObj[k] !== "") eventObj[k] = eventObj[k] === 'true';
-        else if (eventObj[k] === "") delete eventObj[k];
+    ['allDay', 'interactive', 'editable', 'startEditable', 'durationEditable', 'resourceEditable', 'overlap'].forEach((k) => {
+        if (k in eventObj && eventObj[k] !== '') eventObj[k] = eventObj[k] === 'true';
+        else if (eventObj[k] === '') delete eventObj[k];
     });
     // Parse arrays
-    if (eventObj.classNames) eventObj.classNames = eventObj.classNames.split(',').map(s => s.trim()).filter(Boolean);
-    if (eventObj.resourceIds) eventObj.resourceIds = eventObj.resourceIds.split(',').map(s => s.trim()).filter(Boolean);
-    if (eventObj.daysOfWeek) eventObj.daysOfWeek = eventObj.daysOfWeek.split(',').map(Number).filter(n => !isNaN(n));
+    if (eventObj.classNames)
+        eventObj.classNames = eventObj.classNames
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+    if (eventObj.resourceIds)
+        eventObj.resourceIds = eventObj.resourceIds
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+    if (eventObj.daysOfWeek)
+        eventObj.daysOfWeek = eventObj.daysOfWeek
+            .split(',')
+            .map(Number)
+            .filter((n) => !isNaN(n));
     // Remove empty optional fields
-    Object.keys(eventObj).forEach(k => { if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k]; });
+    Object.keys(eventObj).forEach((k) => {
+        if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k];
+    });
     // FullCalendar event parsing compliance
     // https://fullcalendar.io/docs/event-parsing
     if (eventObj.start) eventObj.start = new Date(eventObj.start).toISOString();
@@ -990,7 +1001,7 @@ async function submitEventForm(form, onSuccess, onError) {
         const res = await fetch('https://api.pioneerrocketry.com/calendar/addEvent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
         });
         const result = await res.json();
         if (res.ok && result.success) {
@@ -1034,37 +1045,43 @@ function parseSeparateContentInModal(content) {
         }
     });
     // Individual content edit modal logic
-    $(document).off('click', '.edit-content-btn').on('click', '.edit-content-btn', function () {
-        const index = $(this).data('index');
-        const className = $(this).data('class');
-        const content = $(this).closest('.card-body').find('.content-preview').html();
-        $('#individualContent').val(content);
-        $('#livePreview').html(content);
-        $('#individualContent').off('input').on('input', function () {
-            const content = $(this).val();
+    $(document)
+        .off('click', '.edit-content-btn')
+        .on('click', '.edit-content-btn', function () {
+            const index = $(this).data('index');
+            const className = $(this).data('class');
+            const content = $(this).closest('.card-body').find('.content-preview').html();
+            $('#individualContent').val(content);
             $('#livePreview').html(content);
-            try {
-                const parser = new DOMParser();
-                parser.parseFromString(content, 'text/html');
-            } catch (error) {
-                console.error('Error parsing HTML:', error);
-                $('#livePreview').html('<div class="alert alert-danger">Invalid HTML content</div>');
-            }
+            $('#individualContent')
+                .off('input')
+                .on('input', function () {
+                    const content = $(this).val();
+                    $('#livePreview').html(content);
+                    try {
+                        const parser = new DOMParser();
+                        parser.parseFromString(content, 'text/html');
+                    } catch (error) {
+                        console.error('Error parsing HTML:', error);
+                        $('#livePreview').html('<div class="alert alert-danger">Invalid HTML content</div>');
+                    }
+                });
+            const individualModal = new bootstrap.Modal(document.getElementById('individualContentModal'));
+            $('#saveIndividualContent')
+                .off('click')
+                .on('click', function () {
+                    const newContent = $('#individualContent').val();
+                    const mainContent = $('#editModuleContent').val();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(mainContent, 'text/html');
+                    const elements = doc.querySelectorAll(`[class="${className}"]`);
+                    if (elements[index]) {
+                        elements[index].innerHTML = newContent;
+                        $('#editModuleContent').val(doc.body.innerHTML);
+                        parseSeparateContentInModal(doc.body.innerHTML);
+                    }
+                    individualModal.hide();
+                });
+            individualModal.show();
         });
-        const individualModal = new bootstrap.Modal(document.getElementById('individualContentModal'));
-        $('#saveIndividualContent').off('click').on('click', function () {
-            const newContent = $('#individualContent').val();
-            const mainContent = $('#editModuleContent').val();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(mainContent, 'text/html');
-            const elements = doc.querySelectorAll(`[class="${className}"]`);
-            if (elements[index]) {
-                elements[index].innerHTML = newContent;
-                $('#editModuleContent').val(doc.body.innerHTML);
-                parseSeparateContentInModal(doc.body.innerHTML);
-            }
-            individualModal.hide();
-        });
-        individualModal.show();
-    });
 }
