@@ -40,7 +40,7 @@ function setAPIurl() {
     window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (window.location.hostname === 'dev.pioneerrocketry.com') {
         window.currentAPIurl = devAPIurl;
     } else {
         window.currentAPIurl = productionAPIurl;
@@ -66,9 +66,7 @@ async function asyncSetAPIurl() {
     window.currentAPIurl = null;
 
     // Set initial API URL based on hostname
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        window.currentAPIurl = window.devAPIurl;
-    } else if (window.location.hostname === 'dev.pioneerrocketry.com') {
+    if (window.location.hostname === 'dev.pioneerrocketry.com') {
         window.currentAPIurl = window.devAPIurl;
     } else {
         window.currentAPIurl = window.productionAPIurl;
