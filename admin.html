@@ -1,410 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Administration</title>
-    <link rel="icon" type="image/png" href="images/favicon.png" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./scripts/tools.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Administration</title>
+        <link rel="icon" type="image/png" href="images/favicon.png" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="assets/css/main.css" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="./scripts/tools.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
+        <script src="https://accounts.google.com/gsi/client" async></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/jquery.dropotron.min.js"></script>
-    <script src="assets/js/browser.min.js"></script>
-    <script src="assets/js/breakpoints.min.js"></script>
-    <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js"></script>
-    <script src="/scripts/auth.js"></script>
-    <script src="/scripts/tools.js"></script>
-  </head>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.dropotron.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+        <script src="/scripts/auth.js"></script>
+        <script src="/scripts/tools.js"></script>
+    </head>
 
-  <body data-bs-theme="dark">
-    <div
-      id="g_id_onload"
-      data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
-      data-context="signin"
-      data-include-granted_scopes="true"
-      data-ux_mode="popup"
-      data-callback="onTokenResponse"
-      data-auto_select="true"
-      data-itp_support="true"></div>
-    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-    <div class="card loginRequired">
-      <div class="card-header">
-        <h1 class="card-title loginRequired">User Management</h1>
-      </div>
-      <div class="card-body">
-        <div class="loginRequired" id="users"></div>
-      </div>
-    </div>
-
-    <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">Load Users</button>
-
-    <div class="card">
-      <div class="card-header">
-        <h1 class="card-title loginRequired">Event Manager</h1>
-      </div>
-      <div class="card-body">
-        <div class="loginRequired" id="events"></div>
-      </div>
-      <button class="triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">Load Events</button>
-    </div>
-    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true" data-bs-theme="dark">
-      <div class="modal-dialog" data-bs-theme="dark">
-        <div class="modal-content" data-bs-theme="dark">
-          <!-- Modal Header -->
-          <div class="modal-header" data-bs-theme="dark">
-            <h1 class="modal-title fs-5" id="exampleModalLabel" data-bs-theme="dark">Create New Event</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-bs-theme="dark"></button>
-          </div>
-
-          <!-- Modal Body -->
-          <div class="modal-body" data-bs-theme="dark">
-            <form id="createEventForm" data-bs-theme="dark">
-              <!-- Event Title -->
-              <div class="form-group">
-                <label for="eventTitle">Title</label>
-                <input type="text" class="form-control" id="eventTitle" name="eventTitle" required />
-              </div>
-
-              <!-- Event Start Date -->
-              <div class="form-group">
-                <label for="eventStartDate">Start Date/Time</label>
-                <input type="datetime-local" class="form-control" id="eventStartDate" name="eventStartDate" required />
-              </div>
-
-              <!-- Event End Date -->
-              <div class="form-group">
-                <label for="eventEndDate">End Date/Time</label>
-                <input type="datetime-local" class="form-control" id="eventEndDate" name="eventEndDate" required />
-              </div>
-
-              <!-- Event Description -->
-              <div class="form-group">
-                <label for="eventDescription">Description</label>
-                <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3"></textarea>
-              </div>
-
-              <!-- Advanced Settings Dropdown -->
-              <div class="form-group">
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSettingsCollapse" aria-expanded="false" aria-controls="advancedSettingsCollapse">Advanced Settings</button>
-              </div>
-
-              <!-- Collapsible Advanced Settings -->
-              <div class="collapse" id="advancedSettingsCollapse">
-                <div class="card card-body">
-                  <!-- Advanced Settings Fields -->
-                  <div class="form-group">
-                    <label for="eventId">Event ID</label>
-                    <input type="text" class="form-control" id="eventId" name="eventId" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventGroupId">Group ID</label>
-                    <input type="text" class="form-control" id="eventGroupId" name="eventGroupId" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventAllDay">All Day</label>
-                    <select class="form-control" id="eventAllDay" name="eventAllDay">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventDaysOfWeek">Select Days of the Week</label>
-                    <div id="daysOfWeekButtons" class="btn-group btn-group-toggle" data-bs-toggle="buttons">
-                      <input type="checkbox" id="eventDaysOfWeekSun" class="btn-check" value="0" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekSun"> Sun </label>
-                      <input type="checkbox" id="eventDaysOfWeekMon" class="btn-check" value="1" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekMon"> Mon </label>
-                      <input type="checkbox" id="eventDaysOfWeekTue" class="btn-check" value="2" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekTue"> Tue </label>
-                      <input type="checkbox" id="eventDaysOfWeekWed" class="btn-check" value="3" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekWed"> Wed </label>
-                      <input type="checkbox" id="eventDaysOfWeekThu" class="btn-check" value="4" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekThu"> Thu </label>
-                      <input type="checkbox" id="eventDaysOfWeekFri" class="btn-check" value="5" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekFri"> Fri </label>
-                      <input type="checkbox" id="eventDaysOfWeekSat" class="btn-check" value="6" />
-                      <label class="btn btn-outline-primary" for="eventDaysOfWeekSat"> Sat </label>
-                    </div>
-                    <input type="hidden" id="eventDaysOfWeek" name="eventDaysOfWeek" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventStartTime">Start Time</label>
-                    <input type="time" class="form-control" id="eventStartTime" name="eventStartTime" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventEndTime">End Time</label>
-                    <input type="time" class="form-control" id="eventEndTime" name="eventEndTime" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventStartRecur">Start Recurrence</label>
-                    <input type="datetime-local" class="form-control" id="eventStartRecur" name="eventStartRecur" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventEndRecur">End Recurrence</label>
-                    <input type="datetime-local" class="form-control" id="eventEndRecur" name="eventEndRecur" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventUrl">URL</label>
-                    <input type="url" class="form-control" id="eventUrl" name="eventUrl" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventInteractive">Interactive</label>
-                    <select class="form-control" id="eventInteractive" name="eventInteractive">
-                      <option value="true">True</option>
-                      <option value="false">False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventClassName">Class Name (Or Class Names)</label>
-                    <input type="text" class="form-control" id="eventClassName" name="eventClassName" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventClassNames">Class Names ([ 'myclass1', myclass2' ])</label>
-                    <input type="text" class="form-control" id="eventClassNames" name="eventClassNames" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventEditable">Editable</label>
-                    <select class="form-control" id="eventEditable" name="eventEditable">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventStartEditable">Start Editable</label>
-                    <select class="form-control" id="eventStartEditable" name="eventStartEditable">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventDurationEditable">Duration Editable</label>
-                    <select class="form-control" id="eventDurationEditable" name="eventDurationEditable">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventResourceEditable">Resource Editable</label>
-                    <select class="form-control" id="eventResourceEditable" name="eventResourceEditable">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventResourceId">Resource ID</label>
-                    <input type="text" class="form-control" id="eventResourceId" name="eventResourceId" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventResourceIds">Resource IDs (JSON Array)</label>
-                    <input type="text" class="form-control" id="eventResourceIds" name="eventResourceIds" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventDisplay">Display</label>
-                    <input type="text" class="form-control" id="eventDisplay" name="eventDisplay" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventOverlap">Overlap</label>
-                    <select class="form-control" id="eventOverlap" name="eventOverlap">
-                      <option value="true">True</option>
-                      <option value="false" selected>False</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventConstraint">Constraint</label>
-                    <input type="text" class="form-control" id="eventConstraint" name="eventConstraint" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventColor">Color</label>
-                    <input type="color" class="form-control" id="eventColor" name="eventColor" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventBackgroundColor">Background Color</label>
-                    <input type="color" class="form-control" id="eventBackgroundColor" name="eventBackgroundColor" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventBorderColor">Border Color</label>
-                    <input type="color" class="form-control" id="eventBorderColor" name="eventBorderColor" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventTextColor">Text Color</label>
-                    <input type="color" class="form-control" id="eventTextColor" name="eventTextColor" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventRrule">RRule</label>
-                    <input type="text" class="form-control" id="eventRrule" name="eventRrule" />
-                  </div>
-
-                  <div class="form-group">
-                    <label for="eventDuration">Duration</label>
-                    <input type="text" class="form-control" id="eventDuration" name="eventDuration" />
-                  </div>
+    <body data-bs-theme="dark">
+        <div>
+            <div
+                id="g_id_onload"
+                data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
+                data-context="signin"
+                data-include-granted_scopes="true"
+                data-ux_mode="popup"
+                data-callback="onTokenResponse"
+                data-auto_select="true"
+                data-button_auto_select="true"
+                data-use_fedcm_for_button="true"
+                data-use_fedcm_for_prompt="true"
+                data-itp_support="true"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
+            <div class="card loginRequired">
+                <div class="card-header">
+                    <h1 class="card-title loginRequired">User Management</h1>
                 </div>
-              </div>
-
-              <div class="form-group">
-                <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-              </div>
-
-              <!-- Submit Button -->
-            </form>
-          </div>
-
-          <!-- Modal Footer (optional) -->
-          <div class="modal-footer">
-            <button type="submit" id="createEventSubmit" class="btn btn-primary">Create Event</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card loginRequired">
-      <div class="card-header">
-        <h1 class="card-title loginRequired">Image Upload</h1>
-      </div>
-      <div class="card-body">
-        <div class="loginRequired" id="events"></div>
-      </div>
-
-      <form id="imageUploadForm" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="imageFile">Image File</label>
-          <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
-        </div>
-        <div class="form-group">
-          <label for="imageName">Image Name</label>
-          <input type="text" class="form-control" id="imageName" name="imageName" />
+                <div class="card-body">
+                    <div class="loginRequired" id="users"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" id="imageUploadBtn" class="btn btn-primary">Upload Image</button>
+        <!-- Backup For userLoad -->
+        <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">Load Users</button>
 
-        <div class="loginRequired" id="imageChanger">
-          <div clas="card">
+        <!-- Event Manager -->
+        <div class="card">
             <div class="card-header">
-              <h1 class="card-title loginRequired">Index</h1>
+                <h1 class="card-title loginRequired">Event Manager</h1>
             </div>
             <div class="card-body">
-              <div id="indexSplashImage">
-                <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto" />
-                <input type="file" class="form-control" id="indexSplashImageFile" name="indexSplashImageFile" accept="image/*" />
-                <button class="btn btn-primary" id="indexSplashImageUploadBtn" disabled>Upload Image</button>
-                <script>
-                  $("#indexSplashImageFile").on("change", function () {
-                    $("#indexSplashImageUploadBtn").addClass("btn-danger").removeClass("btn-primary").prop("disabled", false);
-                  });
-                  $("#indexSplashImageUploadBtn").on("click", function () {
-                    const formData = new FormData();
-                    const file = $("#indexSplashImageFile").prop("files")[0];
-
-                    if (!file) {
-                      alert("Please select a file before uploading.");
-                      return;
-                    }
-
-                    formData.append("file", file); // Append the file to the form data
-                    formData.append("name", "home2.jpg");
-                    // Include any additional data if needed
-                    formData.append("user", window.user);
-                    
-                    // Make the AJAX request
-                    $.ajax({
-                      type: "POST",
-                      url: "https://api.pioneerrocketry.com/image/replace/home2.jpg",
-                      data: formData,
-                      processData: false, // Required for FormData
-                      contentType: false, // Required for FormData
-                      
-                      success: function (response) {
-                        alert("Image uploaded successfully!");
-                        console.log(response);
-                      },
-                      error: function (error) {
-                        alert("Error uploading image.");
-                        console.error(error);
-                      },
-                    });
-                  });
-                </script>
-              </div>
+                <div class="loginRequired" id="events"></div>
+                <!-- Add Event Modal Button -->
+                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                    <i class="fas fa-plus"></i>
+                    Add Event
+                </button>
             </div>
-          </div>
+            <button class="triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">Load Events</button>
         </div>
+
+        <!-- Event Creation -->
+        <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true" data-bs-theme="dark">
+            <div class="modal-dialog" data-bs-theme="dark">
+                <div class="modal-content" data-bs-theme="dark">
+                    <!-- Modal Header -->
+                    <div class="modal-header" data-bs-theme="dark">
+                        <h1 class="modal-title fs-5" id="createEventModalLabel" data-bs-theme="dark">Create New Event</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-bs-theme="dark"></button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body" data-bs-theme="dark">
+                        <form id="createEventForm" data-bs-theme="dark">
+                            <!-- Simple Fields -->
+                            <input type="hidden" id="eventId" name="id" />
+                            <div class="form-group mb-2">
+                                <label for="eventTitle">
+                                    Title
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="eventTitle" name="title" required />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventDescription">
+                                    Description
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" id="eventDescription" name="description" rows="2" required></textarea>
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventStart">
+                                    Start
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="datetime-local" class="form-control" id="eventStart" name="start" required />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventEnd">End</label>
+                                <input type="datetime-local" class="form-control" id="eventEnd" name="end" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventAllDay">All Day</label>
+                                <select class="form-control" id="eventAllDay" name="allDay">
+                                    <option value="false" selected>No</option>
+                                    <option value="true">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventColor">Event Color</label>
+                                <input type="color" class="form-control form-control-color" id="eventColor" name="color" value="#3788d8" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventUrl">Event URL</label>
+                                <input type="url" class="form-control" id="eventUrl" name="url" />
+                            </div>
+
+                            <!-- Advanced Settings Dropdown -->
+                            <div class="form-group mb-2">
+                                <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSettingsCollapse" aria-expanded="false" aria-controls="advancedSettingsCollapse">Show Advanced Fields</button>
+                            </div>
+
+                            <!-- Collapsible Advanced Settings -->
+                            <div class="collapse" id="advancedSettingsCollapse">
+                                <div class="card card-body">
+                                    <div class="form-group mb-2">
+                                        <label for="eventGroupId">Group ID</label>
+                                        <input type="text" class="form-control" id="eventGroupId" name="groupId" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label>Select Days of the Week</label>
+                                        <div id="daysOfWeekButtons" class="btn-group btn-group-toggle mb-2" data-bs-toggle="buttons">
+                                            <input type="checkbox" id="eventDaysOfWeekSun" class="btn-check" value="0" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekSun">Sun</label>
+                                            <input type="checkbox" id="eventDaysOfWeekMon" class="btn-check" value="1" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekMon">Mon</label>
+                                            <input type="checkbox" id="eventDaysOfWeekTue" class="btn-check" value="2" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekTue">Tue</label>
+                                            <input type="checkbox" id="eventDaysOfWeekWed" class="btn-check" value="3" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekWed">Wed</label>
+                                            <input type="checkbox" id="eventDaysOfWeekThu" class="btn-check" value="4" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekThu">Thu</label>
+                                            <input type="checkbox" id="eventDaysOfWeekFri" class="btn-check" value="5" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekFri">Fri</label>
+                                            <input type="checkbox" id="eventDaysOfWeekSat" class="btn-check" value="6" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" for="eventDaysOfWeekSat">Sat</label>
+                                        </div>
+                                        <input type="hidden" id="eventDaysOfWeek" name="daysOfWeek" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventStartTime">Start Time</label>
+                                        <input type="time" class="form-control" id="eventStartTime" name="startTime" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventEndTime">End Time</label>
+                                        <input type="time" class="form-control" id="eventEndTime" name="endTime" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventStartRecur">Recurrence Start</label>
+                                        <input type="datetime-local" class="form-control" id="eventStartRecur" name="startRecur" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventEndRecur">Recurrence End</label>
+                                        <input type="datetime-local" class="form-control" id="eventEndRecur" name="endRecur" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventInteractive">Interactive</label>
+                                        <select class="form-control" id="eventInteractive" name="interactive">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventClassName">Class Name</label>
+                                        <input type="text" class="form-control" id="eventClassName" name="className" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventClassNames">Class Names (comma separated)</label>
+                                        <input type="text" class="form-control" id="eventClassNames" name="classNames" placeholder="e.g. myclass1,myclass2" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventEditable">Editable</label>
+                                        <select class="form-control" id="eventEditable" name="editable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventStartEditable">Start Editable</label>
+                                        <select class="form-control" id="eventStartEditable" name="startEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventDurationEditable">Duration Editable</label>
+                                        <select class="form-control" id="eventDurationEditable" name="durationEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventResourceEditable">Resource Editable</label>
+                                        <select class="form-control" id="eventResourceEditable" name="resourceEditable">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventResourceId">Resource ID</label>
+                                        <input type="text" class="form-control" id="eventResourceId" name="resourceId" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventResourceIds">Resource IDs (comma separated)</label>
+                                        <input type="text" class="form-control" id="eventResourceIds" name="resourceIds" placeholder="e.g. id1,id2" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventDisplay">Display</label>
+                                        <input type="text" class="form-control" id="eventDisplay" name="display" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventOverlap">Overlap</label>
+                                        <select class="form-control" id="eventOverlap" name="overlap">
+                                            <option value="">--</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventConstraint">Constraint</label>
+                                        <input type="text" class="form-control" id="eventConstraint" name="constraint" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventRrule">RRule</label>
+                                        <input type="text" class="form-control" id="eventRrule" name="rrule" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventDuration">Duration</label>
+                                        <input type="text" class="form-control" id="eventDuration" name="duration" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventBackgroundColor">Background Color</label>
+                                        <input type="color" class="form-control" id="eventBackgroundColor" name="backgroundColor" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventBorderColor">Border Color</label>
+                                        <input type="color" class="form-control" id="eventBorderColor" name="borderColor" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label for="eventTextColor">Text Color</label>
+                                        <input type="color" class="form-control" id="eventTextColor" name="textColor" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                        </form>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" form="createEventForm" id="createEventSubmit" class="btn btn-primary">Create Event</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
-          document.getElementById("imageUploadForm").addEventListener("submit", function (event) {
-            event.preventDefault();
+            // Days of week checkboxes to hidden input
+            $(function () {
+                $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
+                    const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
+                        .map(function () {
+                            return this.value;
+                        })
+                        .get();
+                    $('#eventDaysOfWeek').val(selected.join(','));
+                });
+            });
 
-            const imageName = document.getElementById("imageName").value;
-            const imageFile = document.getElementById("imageFile").files[0];
-
-            // Create a new FormData object to hold the form data
-            const formData = new FormData();
-            formData.append("imageFile", imageFile);
-
-            // Define the headers you want to include
-            const headers = {
-              token: window.user.getToken(),
-              name: window.user.getName(),
-              email: window.user.getEmail(),
-              id: window.user.getId(),
-            };
-
-            // Create a new XMLHttpRequest to send the form data
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", `https://api.pioneerrocketry.com/image/upload/${encodeURIComponent(imageName)}`, true);
-
-            // Set custom headers
-            for (const key in headers) {
-              xhr.setRequestHeader(key, headers[key]);
-            }
-
-            // Handle the response
-            xhr.onload = function () {
-              if (xhr.status === 200) {
-                alert("Image uploaded successfully!");
-              } else {
-                alert("Upload failed.\nStatus: " + xhr.status + "\nError: " + JSON.parse(xhr.response)["error"]);
-              }
-            };
-
-            // Send the form data
-            xhr.send(formData);
-          });
+            // Event form submission
+            document.getElementById('createEventForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const form = event.target;
+                submitEventForm(
+                    form,
+                    function (result) {
+                        alert('Event created successfully!');
+                        if (typeof loadEvents === 'function') loadEvents();
+                        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
+                        modal.hide();
+                        form.reset();
+                    },
+                    function (error) {
+                        alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+                    }
+                );
+            });
         </script>
-      </form>
-    </div>
-  </body>
+
+        <!-- Image Upload -->
+        <div class="card loginRequired">
+            <div class="card-header">
+                <h1 class="card-title loginRequired">Image Upload</h1>
+            </div>
+            <div class="card-body">
+                <form id="imageUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="imageFile">Image File</label>
+                        <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
+                    </div>
+                    <div class="form-group">
+                        <label for="imageName">Image Name</label>
+                        <input type="text" class="form-control" id="imageName" name="imageName" />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="imageUploadBtn" class="btn btn-primary">Upload Image</button>
+
+                    <div class="loginRequired" id="imageChanger">
+                        <div clas="card">
+                            <div class="card-header">
+                                <h1 class="card-title loginRequired">Index</h1>
+                            </div>
+                            <div class="card-body">
+                                <div id="indexSplashImage">
+                                    <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto" />
+                                    <input type="file" class="form-control" id="indexSplashImageFile" name="indexSplashImageFile" accept="image/*" />
+                                    <button class="btn btn-primary" id="indexSplashImageUploadBtn" disabled>Upload Image</button>
+                                    <script>
+                                        $('#indexSplashImageFile').on('change', function () {
+                                            $('#indexSplashImageUploadBtn').addClass('btn-danger').removeClass('btn-primary').prop('disabled', false);
+                                        });
+                                        $('#indexSplashImageUploadBtn').on('click', function () {
+                                            const formData = new FormData();
+                                            const file = $('#indexSplashImageFile').prop('files')[0];
+
+                                            if (!file) {
+                                                alert('Please select a file before uploading.');
+                                                return;
+                                            }
+
+                                            formData.append('file', file); // Append the file to the form data
+                                            formData.append('name', 'home2.jpg');
+                                            // Include any additional data if needed
+                                            formData.append('user', window.user);
+
+                                            // Make the AJAX request
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: 'https://api.pioneerrocketry.com/image/replace/home2.jpg',
+                                                data: formData,
+                                                processData: false, // Required for FormData
+                                                contentType: false, // Required for FormData
+
+                                                success: function (response) {
+                                                    alert('Image uploaded successfully!');
+                                                    console.log(response);
+                                                },
+                                                error: function (error) {
+                                                    alert('Error uploading image.');
+                                                    console.error(error);
+                                                },
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        document.getElementById('imageUploadForm').addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            const imageName = document.getElementById('imageName').value;
+                            const imageFile = document.getElementById('imageFile').files[0];
+
+                            // Create a new FormData object to hold the form data
+                            const formData = new FormData();
+                            formData.append('imageFile', imageFile);
+
+                            // Define the headers you want to include
+                            const headers = {
+                                token: window.user.getToken(),
+                                name: window.user.getName(),
+                                email: window.user.getEmail(),
+                                id: window.user.getId(),
+                            };
+
+                            // Create a new XMLHttpRequest to send the form data
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('POST', `https://api.pioneerrocketry.com/image/upload/${encodeURIComponent(imageName)}`, true);
+
+                            // Set custom headers
+                            for (const key in headers) {
+                                xhr.setRequestHeader(key, headers[key]);
+                            }
+
+                            // Handle the response
+                            xhr.onload = function () {
+                                if (xhr.status === 200) {
+                                    alert('Image uploaded successfully!');
+                                } else {
+                                    alert('Upload failed.\nStatus: ' + xhr.status + '\nError: ' + JSON.parse(xhr.response)['error']);
+                                }
+                            };
+
+                            // Send the form data
+                            xhr.send(formData);
+                        });
+                    </script>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page Editor -->
+        <div class="card loginRequired">
+            <div class="card-header">
+                <h1 class="card-title loginRequired">Page Editor</h1>
+            </div>
+            <div class="card-body">
+                <div id="">
+                    <div class="form-group">
+                        <label for="pageName">Page Name</label>
+                        <input type="text" class="form-control" id="pageName" name="pageName" />
+                    </div>
+                    <button type="button" id="loadPageBtn" class="btn btn-primary">Load Page</button>
+                    <table id="pageData" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Page Content</th>
+                                <th>User Access Level</th>
+                                <th>Modules</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="pageDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                // Initialize the page editor functionality
+                initializePageEditor();
+            </script>
+        </div>
+
+        <!-- Edit Module Modal (moved from tools.js) -->
+        <div class="modal fade" id="editModuleModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Module Content</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editModuleForm">
+                            <!-- Module ID -->
+                            <div class="mb-3">
+                                <label class="form-label">Module ID</label>
+                                <input type="text" class="form-control" id="editModuleId" disabled />
+                            </div>
+                            <!-- Module Name -->
+                            <div class="mb-3">
+                                <label for="editModuleName" class="form-label">Module Name</label>
+                                <input type="text" class="form-control" id="editModuleName" />
+                            </div>
+                            <!-- Module Access Level -->
+                            <div class="mb-3">
+                                <label for="editModuleAccessLevel" class="form-label">Access Level</label>
+                                <input type="number" class="form-control" id="editModuleAccessLevel" />
+                            </div>
+                            <!-- Module Raw Content -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-12">
+                                        <label for="editModuleContent" class="form-label">Raw HTML Content</label>
+                                        <textarea class="form-control" id="editModuleContent" rows="10"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Module Parsed Content Preview -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-12">
+                                        <label class="form-label">Parsed Content Preview</label>
+                                        <div id="separatedContent" class="border rounded p-3" style="min-height: 233px; overflow-y: auto"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveModuleChanges">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Event Modal -->
+        <div class="modal fade" id="deleteEventModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Event</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this event?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

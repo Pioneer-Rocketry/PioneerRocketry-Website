@@ -1,29 +1,4 @@
-//if local use localhost
-window.localAPIurl = "http://localhost:8787";
-window.remoteAPIurl = "https://api.pioneerrocketry.com";
-window.currentAPIurl = null;
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    window.currentAPIurl = localAPIurl;
-}else{
-    window.currentAPIurl = remoteAPIurl;
-}
 
-//check if the currentAPIurl is valid by calling the api
-fetch(`${currentAPIurl}/calendar/getAllEvents`, {
-    method: 'GET',
-    headers: {
-    },
-})
-    .then((response) => {})
-    .catch((error) => {
-        //if local use remote
-        //if remote use local
-        if (window.currentAPIurl === window.localAPIurl) {
-            window.currentAPIurl = window.remoteAPIurl;
-        } else {
-            window.currentAPIurl = window.localAPIurl;
-        }
-    })
 
 function repairEvent(event) {
     // List of keys to check for removal
