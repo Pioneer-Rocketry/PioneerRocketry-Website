@@ -532,5 +532,111 @@
                 </div>
             </div>
         </div>
+
+        <!-- CSS Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header">
+                <h1 class="card-title">CSS Manager</h1>
+            </div>
+            <div class="card-body">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
+                    <i class="fas fa-plus"></i> Add CSS
+                </button>
+                <table class="table" id="cssTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Script Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header">
+                <h1 class="card-title">Script Manager</h1>
+            </div>
+            <div class="card-body">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
+                    <i class="fas fa-plus"></i> Add Script
+                </button>
+                <table class="table" id="scriptTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Create/Edit CSS Modal -->
+        <div class="modal fade" id="createCssModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create/Edit CSS</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="cssForm">
+                            <input type="hidden" id="cssId" />
+                            <div class="mb-3">
+                                <label for="cssName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="cssName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="cssFile" class="form-label">CSS File</label>
+                                <input type="file" class="form-control" id="cssFile" accept=".css,text/css" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="cssAccess" class="form-label">User Access Level</label>
+                                <input type="number" class="form-control" id="cssAccess" min="0" max="5" value="0" />
+                            </div>
+                            <button id="cssSubmitBtn" type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create/Edit Script Modal -->
+        <div class="modal fade" id="createScriptModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create/Edit Script</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="scriptForm">
+                            <input type="hidden" id="scriptId" />
+                            <div class="mb-3">
+                                <label for="scriptName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="scriptName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="scriptFile" class="form-label">Script File</label>
+                                <input type="file" class="form-control" id="scriptFile" accept=".js,application/javascript,text/javascript" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="scriptAccess" class="form-label">User Access Level</label>
+                                <input type="number" class="form-control" id="scriptAccess" min="0" max="5" value="0" />
+                            </div>
+                            <button id="scriptSubmitBtn" type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

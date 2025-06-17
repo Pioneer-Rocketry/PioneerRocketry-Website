@@ -167,6 +167,8 @@ function handleCredentialResponse(response) {
                 $('.loginRequired').show();
                 $('.triggerChangeOnLogin').trigger('change');
                 $('.triggerClickOnLogin').trigger('click');
+                loadCssList();
+                loadScriptList();
             }
             $('#g_id_signin').hide();
             //create popper toast for success
