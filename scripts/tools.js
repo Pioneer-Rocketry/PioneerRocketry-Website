@@ -1082,3 +1082,169 @@ function parseSeparateContentInModal(content) {
             individualModal.show();
         });
 }
+
+async function loadCssList() {
+    await asyncSetAPIurl();
+    if (window.user != null && window.user != undefined) {
+        try {
+            const response = await fetch(`${currentAPIurl}/modules/getCss`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: window.user.getToken() })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Clear existing table
+                $('#cssTable tbody').empty();
+
+                // Create table rows for each CSS entry
+                data.result.css.forEach(css => {
+                    const row = $('<tr>');
+                    row.append(
+                        $('<td>').text(css.ID),
+                        $('<td>').text(css.Name),
+                        $('<td>').text(css.UserAccessLevel),
+                        $('<td>').append(
+                            $('<button>')
+                                .addClass('btn btn-primary me-2')
+                                .text('Edit')
+                                .click(() => openCssModal(css)),
+                            $('<button>')
+                                .addClass('btn btn-danger')
+                                .text('Delete')
+                                .click(() => {
+                                    if (confirm('Are you sure you want to delete this CSS?')) {
+                                        deleteCss(css.ID);
+                                    }
+                                })
+                        )
+                    );
+                    $('#cssTable tbody').append(row);
+                });
+            } else {
+                console.error('Failed to load CSS list:', await response.text());
+            }
+        } catch (error) {
+            console.error('Error loading CSS list:', error);
+            $('#cssTable tbody').html('<tr><td colspan="4" class="text-danger">Error loading CSS list</td></tr>');
+        }
+    }
+}
+function openCssModal(css) {
+    if (css) {
+        // Editing existing CSS
+        $('#cssId').val(css.ID);
+        $('#cssName').val(css.Name);
+        $('#cssContent').val(css.Content);
+        $('#cssAccess').val(css.UserAccessLevel);
+        $('#cssSubmitBtn').text('Update');
+    } else {
+        // Creating new CSS
+        $('#cssForm')[0].reset();
+        $('#cssId').val('');
+        $('#cssSubmitBtn').text('Create');
+    }
+    $('#createCssModal').modal('show');
+}
+$('#cssForm').on('submit', async function (e) {
+    e.preventDefault();
+    const cssFileInput = document.getElementById('cssFile');
+    let cssContent = '';
+    if (cssFileInput.files && cssFileInput.files[0]) {
+        cssContent = await cssFileInput.files[0].text();
+    } else {
+        alert('Please select a CSS file.');
+        return;
+    }
+    const cssData = {
+        ID: $('#cssId').val(),
+        Name: $('#cssName').val(),
+        Content: cssContent,
+        UserAccessLevel: $('#cssAccess').val()
+    };
+    try {
+        const response = await fetch(`${currentAPIurl}/modules/createCss`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                css: cssData,
+                token: window.user.getToken()
+            })
+        });
+        const data = await response.json();
+        if (data.success) {
+            $('#createCssModal').modal('hide');
+            loadCssList(); // Refresh the CSS list
+        } else {
+            alert('Error updating CSS: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error saving CSS:', error);
+        alert('Error saving CSS: ' + error.message);
+    }
+});
+// --- Script Manager Functions ---
+function loadScriptList() {
+    // TODO: Replace with actual API call
+    $('#scriptTable tbody').empty();
+}
+
+function openScriptModal(script) {
+    if (script) {
+        $('#scriptId').val(script.id);
+        $('#scriptName').val(script.name);
+        $('#scriptContent').val(script.content);
+        $('#scriptAccess').val(script.access);
+        $('#scriptSubmitBtn').html('Update');
+    } else {
+        $('#scriptForm')[0].reset();
+        $('#scriptId').val('');
+        $('#scriptSubmitBtn').html('Create');
+    }
+    $('#createScriptModal').modal('show');
+}
+$('#scriptForm').on('submit', async function (e) {
+    e.preventDefault();
+    const scriptFileInput = document.getElementById('scriptFile');
+    let scriptContent = '';
+    if (scriptFileInput.files && scriptFileInput.files[0]) {
+        scriptContent = await scriptFileInput.files[0].text();
+    } else {
+        alert('Please select a script file.');
+        return;
+    }
+    const scriptData = {
+        ID: $('#scriptId').val(),
+        Name: $('#scriptName').val(),
+        Content: scriptContent,
+        UserAccessLevel: $('#scriptAccess').val()
+    };
+    try {
+        const response = await fetch(`${currentAPIurl}/modules/createScript`, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                script: scriptData,
+                token: window.user.getToken()
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            $('#createScriptModal').modal('hide');
+            loadScriptList(); // Refresh the script list
+        } else {
+            alert('Error updating script: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error saving script:', error);
+        alert('Error saving script: ' + error.message);
+    }
+});
