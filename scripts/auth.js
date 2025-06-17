@@ -88,7 +88,7 @@ $(document).ready(function () {
             contentType: 'application/json',
         })
             .done(function (data) {
-                data = JSON.parse(data).result;
+                //data = JSON.parse(data).result;
                 let flags = JSON.parse(data).flags;
                 if (parseFloat(flags) >= 2.0) {
                     $('#createEventBtn').show();
@@ -156,7 +156,7 @@ function handleCredentialResponse(response) {
     })
         .done(function (data) {
             //data is within data.results
-            data = JSON.parse(data).result;
+            //data = JSON.parse(data).result;
             let flags = JSON.parse(data).flags;
             let sub = JSON.parse(data).email;
             localStorage.setItem('lastUserEmail', sub);
