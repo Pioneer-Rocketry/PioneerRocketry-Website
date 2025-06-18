@@ -192,13 +192,13 @@ function formatDateForInput(dateString, timeString) {
 async function loadUsers() {
     // ensure the currentAPIurl is set
     await asyncSetAPIurl();
-    if (window.user != null || window.user != undefined || window.user != '') {
+    if (localStorage.getItem('JWT') != null) {
         const settings = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: window.user.getToken() }),
+            body: JSON.stringify({ token: localStorage.getItem('JWT') || ''}),
         };
         let response = await fetch(`${currentAPIurl}/admin/getAllUsers`, settings);
         if (response.ok) {
@@ -227,7 +227,7 @@ async function changeUser(id, flags, name, email) {
                     name: name,
                     email: email,
                 },
-                token: window.user.getToken(),
+                token: localStorage.getItem('JWT') || '',
             }),
         });
 
@@ -364,7 +364,7 @@ function createEventTable(response) {
                 fetch(`${currentAPIurl}/calendar/removeEvent`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: eventId, token: window.user.getToken() }),
+                    body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
                 })
                     .then((res) => res.json())
                     .then((data) => {
@@ -413,7 +413,7 @@ function updatePage(pageName, config) {
                 UserAccessLevel: config.UserAccessLevel,
                 Modules: config.Modules,
             },
-            token: window.user.getToken(),
+            token: localStorage.getItem('JWT') || '',
         }),
     })
         .then((response) => response.json())
@@ -795,7 +795,7 @@ function createPageDataRow(item) {
                                                                 },
                                                                 body: JSON.stringify({
                                                                     module: updatedModule,
-                                                                    token: window.user.getToken(),
+                                                                    token: localStorage.getItem('JWT') || '',
                                                                 }),
                                                             })
                                                                 .then((response) => response.json())
@@ -991,8 +991,12 @@ function getEventFormData(form) {
 async function submitEventForm(form, onSuccess, onError) {
     const eventObj = getEventFormData(form);
     const payload = { event: eventObj };
-    if (window.user && window.user.getToken) {
-        payload.token = window.user.getToken();
+    if (localStorage.getItem('JWT')) {
+        payload.token = localStorage.getItem('JWT');
+    } else {
+        console.error('No JWT found in localStorage');
+        if (typeof onError === 'function') onError(new Error('No JWT found'));
+        return;
     }
     try {
         const res = await fetch('https://api.pioneerrocketry.com/calendar/addEvent', {
@@ -1085,14 +1089,14 @@ function parseSeparateContentInModal(content) {
 
 async function loadCssList() {
     await asyncSetAPIurl();
-    if (window.user != null && window.user != undefined) {
+    if (localStorage.getItem('JWT')) {
         try {
             const response = await fetch(`${currentAPIurl}/modules/getCss`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ token: window.user.getToken() })
+                body: JSON.stringify({ token: localStorage.getItem('JWT') || '' })
             });
 
             if (response.ok) {
@@ -1173,7 +1177,7 @@ $('#cssForm').on('submit', async function (e) {
             },
             body: JSON.stringify({
                 css: cssData,
-                token: window.user.getToken()
+                token: localStorage.getItem('JWT') || ''
             })
         });
         const data = await response.json();
@@ -1232,7 +1236,7 @@ $('#scriptForm').on('submit', async function (e) {
             },
             body: JSON.stringify({
                 script: scriptData,
-                token: window.user.getToken()
+                token: localStorage.getItem('JWT') || ''
             })
         });
 
