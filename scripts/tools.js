@@ -188,6 +188,7 @@ function loadImages() {
             const tbody = $('#imageTable tbody');
             tbody.empty();
             (data.images || []).forEach(function (img) {
+                console.log('Image:', JSON.stringify(img));
                 const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
                 const row = `
                     <tr>
