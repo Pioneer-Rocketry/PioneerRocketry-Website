@@ -279,151 +279,93 @@
             </div>
         </div>
 
-        <script>
-            // Days of week checkboxes to hidden input
-            $(function () {
-                $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
-                    const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
-                        .map(function () {
-                            return this.value;
-                        })
-                        .get();
-                    $('#eventDaysOfWeek').val(selected.join(','));
-                });
-            });
-
-            // Event form submission
-            document.getElementById('createEventForm').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                const form = event.target;
-                submitEventForm(
-                    form,
-                    function (result) {
-                        alert('Event created successfully!');
-                        if (typeof loadEvents === 'function') loadEvents();
-                        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
-                        modal.hide();
-                        form.reset();
-                    },
-                    function (error) {
-                        alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
-                    }
-                );
-            });
-        </script>
-
         <!-- Image Upload -->
         <div class="card loginRequired">
-            <div class="card-header">
-                <h1 class="card-title loginRequired">Image Upload</h1>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="card-title loginRequired mb-0">Image Manager</h1>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createImageModal">
+                    <i class="fas fa-plus"></i>
+                    Upload Image
+                </button>
             </div>
             <div class="card-body">
-                <form id="imageUploadForm" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="imageFile">Image File</label>
-                        <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" />
-                    </div>
-                    <div class="form-group">
-                        <label for="imageName">Image Name</label>
-                        <input type="text" class="form-control" id="imageName" name="imageName" />
-                    </div>
+                <table class="table table-striped" id="imageTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>URL</th>
+                            <th>Preview</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Images will be loaded here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" id="imageUploadBtn" class="btn btn-primary">Upload Image</button>
-
-                    <div class="loginRequired" id="imageChanger">
-                        <div clas="card">
-                            <div class="card-header">
-                                <h1 class="card-title loginRequired">Index</h1>
+        <!-- Create Image Modal -->
+        <div class="modal fade" id="createImageModal" tabindex="-1" aria-labelledby="createImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="createImageForm" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createImageModalLabel">Create Image</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="newImageName" class="form-label">Image Name</label>
+                                <input type="text" class="form-control" id="newImageName" name="imageName" required />
                             </div>
-                            <div class="card-body">
-                                <div id="indexSplashImage">
-                                    <img src="https://api.pioneerrocketry.com/image/home2.jpg" class="img-fluid img-small rounded mx-auto" />
-                                    <input type="file" class="form-control" id="indexSplashImageFile" name="indexSplashImageFile" accept="image/*" />
-                                    <button class="btn btn-primary" id="indexSplashImageUploadBtn" disabled>Upload Image</button>
-                                    <script>
-                                        $('#indexSplashImageFile').on('change', function () {
-                                            $('#indexSplashImageUploadBtn').addClass('btn-danger').removeClass('btn-primary').prop('disabled', false);
-                                        });
-                                        $('#indexSplashImageUploadBtn').on('click', function () {
-                                            const formData = new FormData();
-                                            const file = $('#indexSplashImageFile').prop('files')[0];
+                            <div class="mb-3">
+                                <label for="newImageFile" class="form-label">Image File</label>
+                                <input type="file" class="form-control" id="newImageFile" name="imageFile" accept="image/*" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Upload Image</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-                                            if (!file) {
-                                                alert('Please select a file before uploading.');
-                                                return;
-                                            }
-
-                                            formData.append('file', file); // Append the file to the form data
-                                            formData.append('name', 'home2.jpg');
-                                            // Include any additional data if needed
-                                            formData.append('user', window.user);
-
-                                            // Make the AJAX request
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: 'https://api.pioneerrocketry.com/image/replace/home2.jpg',
-                                                data: formData,
-                                                processData: false, // Required for FormData
-                                                contentType: false, // Required for FormData
-
-                                                success: function (response) {
-                                                    alert('Image uploaded successfully!');
-                                                    console.log(response);
-                                                },
-                                                error: function (error) {
-                                                    alert('Error uploading image.');
-                                                    console.error(error);
-                                                },
-                                            });
-                                        });
-                                    </script>
+        
+        <!-- Image Replace Modal -->
+        <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="replaceImageForm" enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="replaceImageModalLabel">Replace Image</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="replaceImageId" name="imageId" />
+                            <div class="mb-3">
+                                <label for="replaceImageName" class="form-label">Image Name</label>
+                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="replaceImageFile" class="form-label">New Image File</label>
+                                <input type="file" class="form-control" id="replaceImageFile" name="imageFile" accept="image/*" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Current Image Preview</label>
+                                <div>
+                                    <img id="replaceImagePreview" src="#" alt="Current Image" style="max-width: 100%; height: auto;" />
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <script>
-                        document.getElementById('imageUploadForm').addEventListener('submit', function (event) {
-                            event.preventDefault();
-
-                            const imageName = document.getElementById('imageName').value;
-                            const imageFile = document.getElementById('imageFile').files[0];
-
-                            // Create a new FormData object to hold the form data
-                            const formData = new FormData();
-                            formData.append('imageFile', imageFile);
-
-                            // Define the headers you want to include
-                            const headers = {
-                                token: window.user.getToken(),
-                                name: window.user.getName(),
-                                email: window.user.getEmail(),
-                                id: window.user.getId(),
-                            };
-
-                            // Create a new XMLHttpRequest to send the form data
-                            const xhr = new XMLHttpRequest();
-                            xhr.open('POST', `https://api.pioneerrocketry.com/image/upload/${encodeURIComponent(imageName)}`, true);
-
-                            // Set custom headers
-                            for (const key in headers) {
-                                xhr.setRequestHeader(key, headers[key]);
-                            }
-
-                            // Handle the response
-                            xhr.onload = function () {
-                                if (xhr.status === 200) {
-                                    alert('Image uploaded successfully!');
-                                } else {
-                                    alert('Upload failed.\nStatus: ' + xhr.status + '\nError: ' + JSON.parse(xhr.response)['error']);
-                                }
-                            };
-
-                            // Send the form data
-                            xhr.send(formData);
-                        });
-                    </script>
-                </form>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Replace Image</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -539,7 +481,8 @@
             </div>
             <div class="card-body">
                 <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
-                    <i class="fas fa-plus"></i> Add CSS
+                    <i class="fas fa-plus"></i>
+                    Add CSS
                 </button>
                 <table class="table" id="cssTable">
                     <thead>
@@ -562,7 +505,8 @@
             </div>
             <div class="card-body">
                 <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
-                    <i class="fas fa-plus"></i> Add Script
+                    <i class="fas fa-plus"></i>
+                    Add Script
                 </button>
                 <table class="table" id="scriptTable">
                     <thead>

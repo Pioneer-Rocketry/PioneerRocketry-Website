@@ -34,6 +34,34 @@ $(document).ready(function () {
             },
         });
     });
+
+    // Days of week checkboxes to hidden input
+    $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
+        const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
+            .map(function () {
+                return this.value;
+            })
+            .get();
+        $('#eventDaysOfWeek').val(selected.join(','));
+    });
+
+    document.getElementById('createEventForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const form = event.target;
+        submitEventForm(
+            form,
+            function (result) {
+                alert('Event created successfully!');
+                if (typeof loadEvents === 'function') loadEvents();
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
+                modal.hide();
+                form.reset();
+            },
+            function (error) {
+                alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+            }
+        );
+    });
 });
 
 function setAPIurl() {
@@ -129,6 +157,151 @@ async function getHeader() {
     });
 }
 
+// Fetch and display all images in the table
+function loadImages() {
+    $.ajax({
+        url: 'https://api.pioneerrocketry.com/images',
+        method: 'GET',
+        headers: {
+            token: window.user.getToken(),
+            name: window.user.getName(),
+            email: window.user.getEmail(),
+            id: window.user.getId(),
+        },
+        success: function (data) {
+            const tbody = $('#imageTable tbody');
+            tbody.empty();
+            (data.images || []).forEach(function (img) {
+                const url = `https://api.pioneerrocketry.com/image/${encodeURIComponent(img.key)}`;
+                const row = `
+                    <tr>
+                        <td>${img.key}</td>
+                        <td><a href="${url}" target="_blank">${url}</a></td>
+                        <td><img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded" /></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary edit-image-btn" data-name="${img.key}">Edit</button>
+                            <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
+                            <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+            $(document).on('click', '.edit-image-btn', function () {
+                const imageId = $(this).data('image-id');
+                const imageUrl = $(this).data('image-url');
+                openReplaceImageModal(imageId, imageUrl);
+            });
+
+            // Replace Image Button Click Handler
+            $(document).on('click', '.replace-image-btn', function () {
+                const imageName = $(this).data('name');
+                const imageUrl = `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`;
+                // Fill modal fields
+                $('#replaceImageId').val(imageName);
+                $('#replaceImagePreview').attr('src', imageUrl);
+                $('#replaceImageModal').modal('show');
+                $('#replaceImageFile').val('');
+            });
+
+            // Delete Image Button Click Handler
+            $(document).on('click', '.delete-image-btn', function () {
+                const imageName = $(this).data('name');
+                // Show confirm modal using Bootstrap
+                const confirmModal = $(`
+                    <div class="modal fade" id="confirmDeleteImageModal" tabindex="-1" aria-labelledby="confirmDeleteImageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteImageModalLabel">Confirm Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete "<strong>${imageName}</strong>"?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" id="confirmDeleteImageBtn">Delete</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                // Remove any existing confirm modal to avoid duplicates
+                $('#confirmDeleteImageModal').remove();
+                $('body').append(confirmModal);
+
+                const modalInstance = new bootstrap.Modal(document.getElementById('confirmDeleteImageModal'));
+                modalInstance.show();
+
+                $('#confirmDeleteImageBtn')
+                    .off('click')
+                    .on('click', function () {
+                        $.ajax({
+                            url: `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`,
+                            type: 'DELETE',
+                            headers: {
+                                token: window.user.getToken && window.user.getToken(),
+                            },
+                            success: function () {
+                                alert('Image deleted successfully.');
+                                loadImages();
+                            },
+                            error: function () {
+                                alert('Failed to delete image.');
+                            },
+                            complete: function () {
+                                modalInstance.hide();
+                            },
+                        });
+                    });
+
+                // Clean up modal from DOM after it's hidden
+                $('#confirmDeleteImageModal').on('hidden.bs.modal', function () {
+                    $(this).remove();
+                });
+            });
+        },
+        error: function (err) {
+            alert('Failed to load images.');
+        },
+    });
+}
+
+// Call this function when the user clicks the "Edit" button for an image
+function openReplaceImageModal(imageId, imageUrl) {
+    $('#replaceImageId').val(imageId);
+    $('#replaceImagePreview').attr('src', imageUrl);
+    $('#replaceImageModal').modal('show');
+    // Optionally clear the file input
+    $('#replaceImageFile').val('');
+}
+
+// Handle the form submission
+$('#replaceImageForm').on('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    $.ajax({
+        url: '/api/images/replace', // Change to your actual endpoint
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            // Handle success (e.g., close modal, refresh image table)
+            $('#replaceImageModal').modal('hide');
+            // Optionally reload images
+            loadImages();
+        },
+        error: function (xhr) {
+            // Handle error
+            alert('Failed to replace image.');
+        },
+    });
+});
+
 async function getFooter() {
     return new Promise((resolve, reject) => {
         fetch('./template.html')
@@ -198,7 +371,7 @@ async function loadUsers() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: localStorage.getItem('JWT') || ''}),
+            body: JSON.stringify({ token: localStorage.getItem('JWT') || '' }),
         };
         let response = await fetch(`${currentAPIurl}/admin/getAllUsers`, settings);
         if (response.ok) {
@@ -1094,9 +1267,9 @@ async function loadCssList() {
             const response = await fetch(`${currentAPIurl}/modules/getCss`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ token: localStorage.getItem('JWT') || '' })
+                body: JSON.stringify({ token: localStorage.getItem('JWT') || '' }),
             });
 
             if (response.ok) {
@@ -1105,7 +1278,7 @@ async function loadCssList() {
                 $('#cssTable tbody').empty();
 
                 // Create table rows for each CSS entry
-                data.result.css.forEach(css => {
+                data.result.css.forEach((css) => {
                     const row = $('<tr>');
                     row.append(
                         $('<td>').text(css.ID),
@@ -1167,18 +1340,18 @@ $('#cssForm').on('submit', async function (e) {
         ID: $('#cssId').val(),
         Name: $('#cssName').val(),
         Content: cssContent,
-        UserAccessLevel: $('#cssAccess').val()
+        UserAccessLevel: $('#cssAccess').val(),
     };
     try {
         const response = await fetch(`${currentAPIurl}/modules/createCss`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 css: cssData,
-                token: localStorage.getItem('JWT') || ''
-            })
+                token: localStorage.getItem('JWT') || '',
+            }),
         });
         const data = await response.json();
         if (data.success) {
@@ -1226,18 +1399,18 @@ $('#scriptForm').on('submit', async function (e) {
         ID: $('#scriptId').val(),
         Name: $('#scriptName').val(),
         Content: scriptContent,
-        UserAccessLevel: $('#scriptAccess').val()
+        UserAccessLevel: $('#scriptAccess').val(),
     };
     try {
         const response = await fetch(`${currentAPIurl}/modules/createScript`, {
-            method: 'POST', 
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 script: scriptData,
-                token: localStorage.getItem('JWT') || ''
-            })
+                token: localStorage.getItem('JWT') || '',
+            }),
         });
 
         const data = await response.json();
