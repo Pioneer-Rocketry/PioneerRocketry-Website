@@ -283,16 +283,12 @@ function loadImages() {
 
             // Animate image preview on hover, disable pointer events
             $('.hoverPreview')
-                .css('pointer-events', 'none')
                 .hover(
                     function () {
                         $(this).stop().animate({ width: '200px', height: '200px' }, 200);
                     },
                     function () {
                         $(this).stop().animate({ width: '80px', height: '80px' }, 200);
-                        setTimeout(() => {
-                            $(this).css('pointer-events', 'auto');
-                        }, 500);
                     }
                 );
         },
