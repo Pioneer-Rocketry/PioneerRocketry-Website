@@ -38,18 +38,30 @@
                 data-use_fedcm_for_prompt="true"
                 data-itp_support="true"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
-            <div class="card loginRequired">
-                <div class="card-header">
-                    <h1 class="card-title loginRequired">User Management</h1>
-                </div>
-                <div class="card-body">
-                    <div class="loginRequired" id="users"></div>
-                </div>
-            </div>
+        </div>
+        
+        <!-- Change API URL Dropdown -->
+        <div class="d-flex justify-content-center">
+            <label for="apiUrlSelector" class="form-label">Select API URL:</label>
+            <select id="apiUrlSelector" class="form-select mb-3">
+                <option value="https://api.pioneerrocketry.com" selected>Production API</option>
+                <option value="https://dev-api.pioneerrocketry.com">Development API</option>
+            </select>
         </div>
 
+        <!-- User Manager -->
+        <div class="card loginRequired">
+            <div class="card-header">
+                <h1 class="card-title loginRequired">User Management</h1>
+            </div>
+            <div class="card-body">
+                <div class="" id="users"></div>
+            </div>
+        </div>
         <!-- Backup For userLoad -->
         <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">Load Users</button>
+
+        
 
         <!-- Event Manager -->
         <div class="card">
@@ -333,7 +345,6 @@
             </div>
         </div>
 
-        
         <!-- Image Replace Modal -->
         <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -356,7 +367,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Current Image Preview</label>
                                 <div>
-                                    <img id="replaceImagePreview" src="#" alt="Current Image" style="max-width: 100%; height: auto;" />
+                                    <img id="replaceImagePreview" src="#" alt="Current Image" style="max-width: 100%; height: auto" />
                                 </div>
                             </div>
                         </div>

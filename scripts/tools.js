@@ -35,6 +35,12 @@ $(document).ready(function () {
         });
     });
 
+    $('#apiUrlSelector').on('change', function () {
+        const selectedUrl = $(this).val();
+        window.currentAPIurl = selectedUrl;
+        console.log('API URL changed to:', selectedUrl);
+    });
+
     // Days of week checkboxes to hidden input
     $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
         const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
