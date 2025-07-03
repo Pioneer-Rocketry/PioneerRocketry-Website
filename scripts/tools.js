@@ -166,24 +166,18 @@ async function getHeader() {
 // Fetch and display all images in the table
 function loadImages() {
     $.ajax({
-        url: 'https://api.pioneerrocketry.com/images',
+        url: `${window.currentAPIurl}/images`,
         method: 'GET',
-        headers: {
-            token: window.user.getToken(),
-            name: window.user.getName(),
-            email: window.user.getEmail(),
-            id: window.user.getId(),
-        },
         success: function (data) {
             const tbody = $('#imageTable tbody');
             tbody.empty();
             (data.images || []).forEach(function (img) {
-                const url = `https://api.pioneerrocketry.com/image/${encodeURIComponent(img.key)}`;
+                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
                 const row = `
                     <tr>
                         <td>${img.key}</td>
                         <td><a href="${url}" target="_blank">${url}</a></td>
-                        <td><img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded" /></td>
+                        <td><img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded hoverPreview" /></td>
                         <td>
                             <button class="btn btn-sm btn-primary edit-image-btn" data-name="${img.key}">Edit</button>
                             <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
@@ -268,6 +262,25 @@ function loadImages() {
                     $(this).remove();
                 });
             });
+
+            // Animate image preview on hover, disable pointer events
+            $('.hoverPreview')
+                .css('pointer-events', 'none')
+                .hover(
+                    function () {
+                        $(this)
+                            .stop()
+                            .animate({ width: '200px', height: '200px' }, 200);
+                    },
+                    function () {
+                        $(this)
+                            .stop()
+                            .animate({ width: '80px', height: '80px' }, 200);
+                        setTimeout(() => {
+                            $(this).css('pointer-events', 'auto');
+                        }, 500);
+                    }
+                );
         },
         error: function (err) {
             alert('Failed to load images.');
