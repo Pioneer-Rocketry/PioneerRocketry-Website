@@ -19,10 +19,6 @@ $(document).ready(function () {
         loadEvents();
     }
     $('#reRunOnload').on('click', function () {
-        $('#createEventBtn').show();
-        $('.loginRequired').show();
-        $('.triggerChangeOnLogin').trigger('change');
-        $('.triggerClickOnLogin').trigger('click');
         loadCssList();
         loadScriptList();
         loadImages();
@@ -298,7 +294,7 @@ function loadImages() {
                 );
         },
         error: function (err) {
-            alert('Failed to load images.');
+            console.warn('Failed to load images.');
         },
     });
 }
