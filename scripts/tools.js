@@ -53,6 +53,7 @@ $(document).ready(function () {
     $('#apiUrlSelector').on('input', function () {
         const selectedUrl = $(this).val();
         window.currentAPIurl = selectedUrl;
+        currentAPIurl = selectedUrl;
         console.log('API URL changed to:', selectedUrl);
     });
 
@@ -410,7 +411,6 @@ async function loadUsers() {
     }
 }
 async function loadEvents() {
-    await asyncSetAPIurl();
     let data = await fetch(`${currentAPIurl}/calendar/getAllEvents`, {
         method: 'GET',
     });
@@ -1291,7 +1291,6 @@ function parseSeparateContentInModal(content) {
 }
 
 async function loadCssList() {
-    await asyncSetAPIurl();
     if (localStorage.getItem('JWT')) {
         try {
             const response = await fetch(`${currentAPIurl}/modules/getCss`, {
