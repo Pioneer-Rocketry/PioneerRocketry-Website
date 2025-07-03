@@ -8,7 +8,26 @@ $(document).ready(function () {
         $('.loginRequired').show();
         $('.triggerChangeOnLogin').trigger('change');
         $('.triggerClickOnLogin').trigger('click');
+
+        $('#createEventBtn').show();
+        $('.loginRequired').show();
+        $('.triggerChangeOnLogin').trigger('change');
+        $('.triggerClickOnLogin').trigger('click');
+        loadCssList();
+        loadScriptList();
+        loadImages();
+        loadEvents();
     }
+    $('#reRunOnload').on('click', function () {
+        $('#createEventBtn').show();
+        $('.loginRequired').show();
+        $('.triggerChangeOnLogin').trigger('change');
+        $('.triggerClickOnLogin').trigger('click');
+        loadCssList();
+        loadScriptList();
+        loadImages();
+        loadEvents();
+    });
 
     $('#loadPageBtn').on('click', function () {
         const pageName = document.getElementById('pageName').value;
@@ -35,7 +54,7 @@ $(document).ready(function () {
         });
     });
 
-    $('#apiUrlSelector').on('change', function () {
+    $('#apiUrlSelector').on('input', function () {
         const selectedUrl = $(this).val();
         window.currentAPIurl = selectedUrl;
         console.log('API URL changed to:', selectedUrl);
@@ -268,14 +287,10 @@ function loadImages() {
                 .css('pointer-events', 'none')
                 .hover(
                     function () {
-                        $(this)
-                            .stop()
-                            .animate({ width: '200px', height: '200px' }, 200);
+                        $(this).stop().animate({ width: '200px', height: '200px' }, 200);
                     },
                     function () {
-                        $(this)
-                            .stop()
-                            .animate({ width: '80px', height: '80px' }, 200);
+                        $(this).stop().animate({ width: '80px', height: '80px' }, 200);
                         setTimeout(() => {
                             $(this).css('pointer-events', 'auto');
                         }, 500);

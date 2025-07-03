@@ -44,6 +44,9 @@ function handleCredentialResponse(response) {
                 $('.triggerClickOnLogin').trigger('click');
                 loadCssList();
                 loadScriptList();
+                loadImages();
+                loadEvents();
+                loadUserData();
             }
             $('#g_id_signin').hide();
             //create popper toast for success
