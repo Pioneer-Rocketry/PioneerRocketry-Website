@@ -285,10 +285,10 @@ function loadImages() {
             $('.hoverPreview')
                 .hover(
                     function () {
-                        $(this).stop().animate({ width: '200px', height: '200px' }, 200);
+                        $(this).stop().animate({ maxWidth: '800px', maxHeight: '800px' }, 200);
                     },
                     function () {
-                        $(this).stop().animate({ width: '80px', height: '80px' }, 200);
+                        $(this).stop().animate({ maxWidth: '80px', maxHeight: '80px' }, 200);
                     }
                 );
         },
