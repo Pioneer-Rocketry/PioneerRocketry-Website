@@ -1,59 +1,25 @@
 $(document).ready(function () {
     setAPIurl();
     $('.loginRequired').hide();
-    //if the url consist of only numbers the show.
-    if (location.host.match(/^[0-9.:]+$/)) {
-        $('.loginRequired').show();
-        $('#createEventBtn').show();
-        $('.loginRequired').show();
-        $('.triggerChangeOnLogin').trigger('change');
-        $('.triggerClickOnLogin').trigger('click');
 
-        $('#createEventBtn').show();
-        $('.loginRequired').show();
-        $('.triggerChangeOnLogin').trigger('change');
-        $('.triggerClickOnLogin').trigger('click');
-        loadCssList();
-        loadScriptList();
-        loadImages();
-        loadEvents();
+    if (location.host.match(/^[0-9.:]+$/)) {
+        onload();
     }
     $('#reRunOnload').on('click', function () {
-        loadCssList();
-        loadScriptList();
-        loadImages();
-        loadEvents();
+        onload();
     });
 
     $('#loadPageBtn').on('click', function () {
         const pageName = document.getElementById('pageName').value;
-        $.ajax({
-            type: 'POST',
-            url: `${window.currentAPIurl}/admin/getPage`,
-            data: {
-                page: pageName,
-            },
-            success: function (response) {
-                console.log('Raw response:', response);
-                const parsedResponse = JSON.parse(response);
-                console.log('Parsed response:', parsedResponse);
-
-                if (parsedResponse.success === false) {
-                    alert('Error: ' + parsedResponse.error);
-                    return;
-                }
-                displayPageData(parsedResponse);
-            },
-            error: function (error) {
-                console.error('AJAX error:', error);
-            },
-        });
+        loadPageData(pageName);
     });
 
+    $('#apiUrlSelector').val(window.currentAPIurl);
     $('#apiUrlSelector').on('input', function () {
         const selectedUrl = $(this).val();
         window.currentAPIurl = selectedUrl;
         currentAPIurl = selectedUrl;
+        localStorage.setItem('currentAPIurl', selectedUrl);
         console.log('API URL changed to:', selectedUrl);
     });
 
@@ -73,7 +39,6 @@ $(document).ready(function () {
         submitEventForm(
             form,
             function (result) {
-                alert('Event created successfully!');
                 if (typeof loadEvents === 'function') loadEvents();
                 const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
                 modal.hide();
@@ -86,63 +51,84 @@ $(document).ready(function () {
     });
 });
 
+//AUTH Functions
+
+function onTokenResponse(googleUser) {
+    handleCredentialResponse(googleUser);
+}
+
+function onErrorCallback(error) {
+    console.log('Login Error: ', error);
+}
+
+function handleCredentialResponse(response) {
+    $.ajax({
+        type: 'POST',
+        url: `${currentAPIurl}/googleAuth`,
+        data: JSON.stringify({ token: response.credential }),
+        contentType: 'application/json',
+    })
+        .done(function (data) {
+            let flags = JSON.parse(data).flags;
+            let sub = JSON.parse(data).email;
+            console.log('User Access Leve: ' + flags);
+            if (parseFloat(flags) >= 2.0) {
+                localStorage.setItem('JWT', response.credential);
+                onload();
+            }
+            $('#g_id_signin').hide();
+            return true;
+        })
+        .fail(function (data) {
+            console.log('Error: ' + data);
+            return false;
+        });
+}
+
+function onLoad() {
+    $('#createEventBtn').show();
+    $('.loginRequired').show();
+    loadUsers();
+    loadCssList();
+    loadScriptList();
+    loadImages();
+    loadEvents();
+    loadUserData();
+}
+
+function sessionLogin() {
+    console.log('Checking for Local Session');
+    if (localStorage.getItem('JWT') != null) {
+        console.log('JWT found');
+        try {
+            localJWTSession = localStorage.getItem('JWT');
+        } catch (e) {
+            console.log(e);
+        }
+        handleCredentialResponse({ credential: localJWTSession });
+        setTimeout(function () {
+            $('#credential_picker_container').hide();
+        }, 1000);
+    } else {
+        console.log('No Session Found, Skipping.');
+    }
+}
+
+//Other Functions
+
 function setAPIurl() {
     window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
-    if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = devAPIurl;
+    if (localStorage.getItem('currentAPIurl') != null) {
+        window.currentAPIurl = localStorage.getItem('currentAPIurl');
     } else {
-        window.currentAPIurl = productionAPIurl;
-    }
-    try {
-        //check if the currentAPIurl is valid by calling the api
-        fetch(`${currentAPIurl}/calendar/getAllEvents`, {
-            method: 'GET',
-            headers: {},
-        })
-            .then((response) => {})
-            .catch((error) => {
-                window.currentAPIurl = window.productionAPIurl;
-            });
-    } catch (error) {
-        window.currentAPIurl = window.productionAPIurl;
-    }
-}
-
-async function asyncSetAPIurl() {
-    window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
-    window.productionAPIurl = 'https://api.pioneerrocketry.com';
-    window.currentAPIurl = null;
-
-    // Set initial API URL based on hostname
-    if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = window.devAPIurl;
-    } else {
-        window.currentAPIurl = window.productionAPIurl;
-    }
-
-    // Return a promise that resolves with the validated API URL
-    return new Promise(async (resolve, reject) => {
-        try {
-            // Test if the current API URL is valid
-            const response = await fetch(`${window.currentAPIurl}/calendar/getAllEvents`, {
-                method: 'GET',
-            });
-
-            if (response.ok) {
-                resolve(window.currentAPIurl);
-            } else {
-                // If primary URL fails, fallback to testing URL
-                window.currentAPIurl = window.devAPIurl;
-                resolve(window.currentAPIurl);
-            }
-        } catch (error) {
-            // If fetch fails, fallback to testing URL
-            window.currentAPIurl = window.devAPIurl;
-            resolve(window.currentAPIurl);
+        if (window.location.hostname === 'dev.pioneerrocketry.com') {
+            window.currentAPIurl = devAPIurl;
+        } else {
+            window.currentAPIurl = productionAPIurl;
         }
-    });
+    }
 }
 
 function getAllUsers() {
@@ -188,7 +174,7 @@ function loadImages() {
             const tbody = $('#imageTable tbody');
             tbody.empty();
             (data.images || []).forEach(function (img) {
-                img = img.image
+                img = img.image;
                 //console.log('Image:', JSON.stringify(img));
                 const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
                 const row = `
@@ -286,14 +272,14 @@ function loadImages() {
                 .css({
                     transition: 'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
                     transformOrigin: 'center center',
-                    display: 'inline-block'
+                    display: 'inline-block',
                 })
                 .hover(
                     function () {
-                        $(this).css('transform', 'scale(10)');
+                        $(this).css({ transform: 'scale(10)', zIndex: '1000' });
                     },
                     function () {
-                        $(this).css('transform', 'scale(1)');
+                        $(this).css({ transform: 'scale(1)', zIndex: '1' });
                     }
                 );
         },
@@ -641,6 +627,29 @@ function updatePage(pageName, config) {
 // Page Editor Functions
 function initializePageEditor() {
     $(document).ready(function () {});
+}
+
+function loadPageData(pageName) {
+    $.ajax({
+        type: 'POST',
+        url: `${window.currentAPIurl}/admin/getPage`,
+        data: {
+            page: pageName,
+        },
+        success: function (response) {
+            console.log('Raw response:', response);
+            const parsedResponse = JSON.parse(response);
+            console.log('Parsed response:', parsedResponse);
+            if (parsedResponse.success === false) {
+                alert('Error: ' + parsedResponse.error);
+                return;
+            }
+            displayPageData(parsedResponse);
+        },
+        error: function (error) {
+            console.error('AJAX error:', error);
+        },
+    });
 }
 
 function displayPageData(data) {
