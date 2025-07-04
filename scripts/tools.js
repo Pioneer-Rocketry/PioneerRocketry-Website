@@ -209,7 +209,7 @@ function loadImages() {
             // Replace Image Button Click Handler
             $(document).on('click', '.replace-image-btn', function () {
                 const imageName = $(this).data('name');
-                const imageUrl = `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`;
+                const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
                 // Fill modal fields
                 $('#replaceImageId').val(imageName);
                 $('#replaceImagePreview').attr('src', imageUrl);
@@ -276,7 +276,7 @@ function loadImages() {
                 });
             });
 
-            // Animate image preview on hover, disable pointer events
+            //Animate image preview on hover, disable pointer events
             $('.hoverPreview')
                 .css({
                     transition: 'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
@@ -285,12 +285,21 @@ function loadImages() {
                 })
                 .hover(
                     function () {
-                        $(this).css({ transform: 'scale(10)', zIndex: '1000' });
+                        $(this).css({ transform: 'scale(1.2)'});
                     },
                     function () {
                         $(this).css({ transform: 'scale(1)', zIndex: '1' });
                     }
                 );
+
+            $(document).on('mouseenter', '.hoverPreview', function () {
+                const src = $(this).attr('src');
+                $('#fullscreenImage').attr('src', src);
+                $('#imageFullscreenOverlay').fadeIn(100);
+            });
+            $(document).on('mouseleave', '.hoverPreview', function () {
+                $('#imageFullscreenOverlay').fadeOut(100);
+            });
         },
         error: function (err) {
             console.warn('Failed to load images.');

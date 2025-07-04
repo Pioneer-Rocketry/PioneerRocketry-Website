@@ -39,7 +39,7 @@
                 data-itp_support="true"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
         </div>
-        
+
         <!-- Change API URL Dropdown -->
         <div class="d-flex justify-content-center">
             <label for="apiUrlSelector" class="form-label">Select API URL:</label>
@@ -59,8 +59,6 @@
                 <div class="" id="users"></div>
             </div>
         </div>
-
-        
 
         <!-- Event Manager -->
         <div class="card">
@@ -356,7 +354,7 @@
                             <input type="hidden" id="replaceImageId" name="imageId" />
                             <div class="mb-3">
                                 <label for="replaceImageName" class="form-label">Image Name</label>
-                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required disabled/>
+                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required disabled />
                             </div>
                             <div class="mb-3">
                                 <label for="replaceImageFile" class="form-label">New Image File</label>
@@ -590,6 +588,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Fullscreen Image Overlay -->
+        <div id="imageFullscreenOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 99999; pointer-events: none;">
+            <img id="fullscreenImage" src="" style="max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 0 40px #000" />
         </div>
     </body>
 </html>
