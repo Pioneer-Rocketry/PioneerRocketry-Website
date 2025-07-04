@@ -287,6 +287,28 @@ function loadImages() {
             console.warn('Failed to load images.');
         },
     });
+    $('#replaceImageFile').on('change', function () {
+        //set the name input to the file name
+        const file = this.files[0];
+        if (file) {
+            const fileName = file.name;
+            $('#replaceImageId').val(fileName);
+            // Optionally, you can also set the preview image if needed
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#replaceImagePreview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#replaceImageId').val('');
+            $('#replaceImagePreview').attr('src', '');
+        }
+    });
+    $('#replaceImageModal').on('hidden.bs.modal', function () {
+        // Clear the file input and preview when the modal is closed
+        $('#replaceImageFile').val('');
+        $('#replaceImagePreview').attr('src', '');
+    });
 }
 
 // Call this function when the user clicks the "Edit" button for an image
@@ -1305,7 +1327,7 @@ function parseSeparateContentInModal(content) {
 async function loadCssList() {
     if (localStorage.getItem('JWT')) {
         try {
-            const response = await fetch(`${currentAPIurl}/modules/getCss`, {
+            const response = await fetch(`${currentAPIurl}/module/getCss`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1384,7 +1406,7 @@ $('#cssForm').on('submit', async function (e) {
         UserAccessLevel: $('#cssAccess').val(),
     };
     try {
-        const response = await fetch(`${currentAPIurl}/modules/createCss`, {
+        const response = await fetch(`${currentAPIurl}/module/createCss`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1443,7 +1465,7 @@ $('#scriptForm').on('submit', async function (e) {
         UserAccessLevel: $('#scriptAccess').val(),
     };
     try {
-        const response = await fetch(`${currentAPIurl}/modules/createScript`, {
+        const response = await fetch(`${currentAPIurl}/module/createScript`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
