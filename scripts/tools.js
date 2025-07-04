@@ -3,10 +3,10 @@ $(document).ready(function () {
     $('.loginRequired').hide();
 
     if (location.host.match(/^[0-9.:]+$/)) {
-        onload();
+        onLoad();
     }
     $('#reRunOnload').on('click', function () {
-        onload();
+        onLoad();
     });
 
     $('#loadPageBtn').on('click', function () {
@@ -74,7 +74,7 @@ function handleCredentialResponse(response) {
             console.log('User Access Leve: ' + flags);
             if (parseFloat(flags) >= 2.0) {
                 localStorage.setItem('JWT', response.credential);
-                onload();
+                onLoad();
             }
             $('#g_id_signin').hide();
             return true;
@@ -288,20 +288,18 @@ function loadImages() {
         },
     });
     $('#replaceImageFile').on('change', function () {
-        //set the name input to the file name
+        //set the name input to the file name that is being replaced
         const file = this.files[0];
         if (file) {
-            const fileName = file.name;
-            $('#replaceImageId').val(fileName);
-            // Optionally, you can also set the preview image if needed
             const reader = new FileReader();
             reader.onload = function (e) {
-                $('#replaceImagePreview').attr('src', e.target.result);
+                $('#replaceImageNewPreview').attr('src', e.target.result);
             };
             reader.readAsDataURL(file);
         } else {
             $('#replaceImageId').val('');
             $('#replaceImagePreview').attr('src', '');
+            $('#replaceImageNewPreview').attr('src', '');
         }
     });
     $('#replaceImageModal').on('hidden.bs.modal', function () {
