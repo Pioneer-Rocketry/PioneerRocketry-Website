@@ -70,8 +70,11 @@ function handleCredentialResponse(response) {
     })
         .done(function (data) {
             let flags = JSON.parse(data).flags;
-            let sub = JSON.parse(data).email;
-            console.log('User Access Leve: ' + flags);
+            //Remove After Updating the API
+            if (flags == null || flags == undefined || flags == '') {
+                flags = data.result.flags;
+            }
+            console.log('User Access Level: ' + flags);
             if (parseFloat(flags) >= 2.0) {
                 localStorage.setItem('JWT', response.credential);
                 onLoad();
