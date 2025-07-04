@@ -69,7 +69,13 @@ function handleCredentialResponse(response) {
         contentType: 'application/json',
     })
         .done(function (data) {
-            let flags = JSON.parse(data).flags;
+            let flags = null;
+            try {
+                flags = JSON.parse(data).flags;
+            } catch (e) {
+                console.log('Error parsing flags:', e);
+                console.log('Switching to new Handler');
+            }
             //Remove After Updating the API
             if (flags == null || flags == undefined || flags == '') {
                 flags = data.result.flags;
