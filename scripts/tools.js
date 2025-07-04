@@ -283,12 +283,17 @@ function loadImages() {
 
             // Animate image preview on hover, disable pointer events
             $('.hoverPreview')
+                .css({
+                    transition: 'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
+                    transformOrigin: 'center center',
+                    display: 'inline-block'
+                })
                 .hover(
                     function () {
-                        $(this).stop().animate({ maxWidth: '800px', maxHeight: '800px' }, 200);
+                        $(this).css('transform', 'scale(10)');
                     },
                     function () {
-                        $(this).stop().animate({ maxWidth: '80px', maxHeight: '80px' }, 200);
+                        $(this).css('transform', 'scale(1)');
                     }
                 );
         },
