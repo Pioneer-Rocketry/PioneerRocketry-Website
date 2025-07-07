@@ -1,3 +1,4 @@
+pageLoaded = false;
 $(document).ready(function () {
     setAPIurl();
     $('.loginRequired').hide();
@@ -5,10 +6,9 @@ $(document).ready(function () {
     if (location.host.match(/^[0-9.:]+$/)) {
         //set the user to a test user that only works on localhost
         localStorage.setItem('JWT', 'TestToken');
-        onLoad();
     }
     $('#reRunOnload').on('click', function () {
-        onLoad();
+        onLoad(true);
     });
 
     $('#loadPageBtn').on('click', function () {
@@ -35,7 +35,7 @@ $(document).ready(function () {
         $('#eventDaysOfWeek').val(selected.join(','));
     });
 
-    document.getElementById('createEventForm').addEventListener('submit', async function (event) {
+    $('#createEventForm').on('submit', async function (event) {
         event.preventDefault();
         const form = event.target;
         submitEventForm(
@@ -50,6 +50,141 @@ $(document).ready(function () {
                 console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
             }
         );
+    });
+
+    $(document).on('click', '.replace-image-btn', function () {
+        const imageName = $(this).data('name');
+        const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        $('#replaceImageName').val(imageName);
+        $('#replaceImagePreview').attr('src', imageUrl);
+        $('#replaceImageModal').modal('show');
+        $('#replaceImageFile').val('');
+    });
+
+    $(document).on('click', '.delete-image-btn', function () {
+        const imageName = $(this).data('name');
+        const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        $('#deleteImageName').text(imageName);
+        $('#deleteImage').attr('src', imageURL).attr('alt', imageName);
+        $('#confirmDeleteImageModal').modal('show');
+    });
+
+    $('#confirmDeleteImageBtn')
+        .off('click')
+        .on('click', function (e) {
+            e.preventDefault();
+            const imageName = $('#deleteImageName').text();
+            $.ajax({
+                url: `${currentAPIurl}/image/delete`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ token: localStorage.getItem('JWT') || '', imageName }),
+                success: function () {
+                    toastMessage('Image deleted successfully.', 'success');
+                    setTimeout(loadImages, 5000);
+                },
+                error: function () {
+                    toastMessage('Failed to delete image.', 'danger');
+                },
+            });
+        });
+
+    $('#replaceImageFile').on('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#replaceImageNewPreview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#replaceImagePreview').attr('src', '');
+            $('#replaceImageNewPreview').attr('src', '');
+        }
+    });
+
+    $('#replaceImageModal').on('hidden.bs.modal', function () {
+        $('#replaceImageFile').val('');
+        $('#replaceImagePreview').attr('src', '');
+    });
+
+    $('#replaceImageForm')
+        .off('submit')
+        .on('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('imageName', $('#replaceImageName').val());
+            formData.append('token', localStorage.getItem('JWT') || '');
+
+            $.ajax({
+                url: `${currentAPIurl}/image/replace`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    $('#replaceImageModal').modal('hide');
+                    setTimeout(loadImages, 500);
+                },
+                error: function () {
+                    toastMessage('Failed to replace image.', 'danger');
+                },
+            });
+        });
+
+    $('#newImageFile').on('input', function () {
+        const files = Array.from(this.files);
+        $('#newImageSubmit').prop('disabled', files.length === 0);
+
+        if (files.length > 0) {
+            $('#newImageName').val(files.map((f) => f.name).join(', '));
+            const reader = new FileReader();
+            reader.onload = (e) => $('#newImagePreview').attr('src', e.target.result);
+            reader.readAsDataURL(files[0]);
+        } else {
+            $('#newImageName').val('');
+            $('#newImagePreview').attr('src', '');
+        }
+    });
+
+    $('#createImageForm')
+        .off('submit')
+        .on('submit', function (e) {
+            e.preventDefault();
+            const files = $('#newImageFile')[0].files;
+            if (files.length === 0) return toastMessage('Please select at least one image.', 'warning');
+
+            const formData = new FormData();
+            formData.append('token', localStorage.getItem('JWT') || '');
+            for (const file of files) formData.append('imageFile', file);
+
+            $.ajax({
+                url: `${window.currentAPIurl}/image/upload`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#newImageModal').modal('hide');
+                    loadImages();
+                    $('#newImageFile').val('');
+                    $('#newImageName').val('');
+                    $('#newImagePreview').attr('src', '');
+                    handleUploadSummary(data);
+                },
+                error: function () {
+                    toastMessage('Failed to upload images.', 'danger');
+                },
+            });
+        });
+    $(document).on('mouseenter', '.hoverPreview', function () {
+        const src = $(this).attr('src');
+        $('#fullscreenImage').attr('src', src);
+        $('#imageFullscreenOverlay').removeClass('hide').addClass('show');
+    });
+
+    $(document).on('mouseleave', '.hoverPreview', function () {
+        $('#imageFullscreenOverlay').addClass('hide').removeClass('show');
     });
 });
 
@@ -96,15 +231,18 @@ function handleCredentialResponse(response) {
         });
 }
 
-function onLoad() {
-    $('#createEventBtn').show();
-    $('.loginRequired').show();
-    loadUsers();
-    loadCssList();
-    loadScriptList();
-    loadImages();
-    loadEvents();
-    loadUserData();
+function onLoad(force = false) {
+    if (!force && !pageLoaded) {
+        pageLoaded = true;
+        $('#createEventBtn').show();
+        $('.loginRequired').show();
+        loadUsers();
+        loadCssList();
+        loadScriptList();
+        loadImages();
+        loadEvents();
+        loadUserData();
+    }
 }
 
 function sessionLogin() {
@@ -128,34 +266,57 @@ function sessionLogin() {
 //Other Functions
 
 function toastMessage(message, type = 'info') {
-    // type: 'info', 'success', 'warning', 'danger'
-    const toast = $('#messageToast');
-    const toastHeader = $('#toastTitle');
-    const toastBody = $('#toastBody');
-    const toastIcon = $('#toastIcon');
-    const toastTime = $('#toastTime');
+    const toastContainer = $('#toastContainer');
 
-    $('#messageToast').removeClass('bg-info bg-success bg-warning bg-danger');
+    // Determine icon color based on type
+    let iconColor;
+    let bgClass;
+
     switch (type) {
         case 'success':
-            toastIcon.css('color', '#198754');
+            iconColor = '#198754';
+            bgClass = 'bg-success';
             break;
         case 'warning':
-            toastIcon.css('color', '#ffc107');
+            iconColor = '#ffc107';
+            bgClass = 'bg-warning';
             break;
         case 'danger':
-            toastIcon.css('color', '#dc3545');
+            iconColor = '#dc3545';
+            bgClass = 'bg-danger';
             break;
         default:
-            toastIcon.css('color', '#0d6efd');
+            iconColor = '#0d6efd';
+            bgClass = 'bg-info';
             break;
     }
 
-    toastHeader.text(type.charAt(0).toUpperCase() + type.slice(1));
-    toastBody.text(message);
-    toastTime.text(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    // Create Toast DOM structure
+    const toast = $(`
+        <div class="toast  text-white border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 300px;">
+            <div class="toast-header">
+                <i class="fa-solid fa-circle me-2" style="color: ${iconColor};"></i>
+                <strong class="me-auto text-capitalize">${type}</strong>
+                <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `);
 
-    bootstrap.Toast.getOrCreateInstance(toast).show();
+    // Append to container
+    toastContainer.append(toast);
+
+    // Show toast using Bootstrap's API
+    const bsToast = new bootstrap.Toast(toast[0], { delay: 5000 });
+    bsToast.show();
+
+    // Remove from DOM after hidden
+    toast.on('hidden.bs.toast', function () {
+        $(this).remove();
+    });
 }
 
 function setAPIurl() {
@@ -217,200 +378,57 @@ function loadImages() {
         url: `${window.currentAPIurl}/images`,
         method: 'GET',
         success: function (data) {
-            const tbody = $('#imageTable tbody');
-            tbody.empty();
-            (data.images || []).forEach(function (img) {
-                img = img.image;
-                //console.log('Image:', JSON.stringify(img));
+            const tbody = $('#imageTable tbody').empty();
+
+            (data.images || []).forEach(({ image: img }) => {
                 const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
+
+                // Trim and truncate long names
+                const trimmedName = img.key.length > 30 ? img.key.slice(0, 27) + '...' : img.key;
+                const trimmedURL = url.length > 40 ? url.slice(0, 37) + '...' : url;
+
                 const row = `
-                <tr>
-                    <td class="align-middle">${img.key}</td>
-                    <td class="align-middle"><a href="${url}" target="_blank">${url}</a></td>
-                    <td class="align-middle">
-                        <img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded hoverPreview" />
-                    </td>
-                    <td class="align-middle">
-                        <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
-                        <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="align-middle text-truncate" title="${img.key}">${trimmedName}</td>
+                        <td class="align-middle text-truncate" style="max-width: 300px;" title="${url}">
+                            <a href="${url}" target="_blank">${trimmedURL}</a>
+                        </td>
+                        <td class="align-middle">
+                            <img src="${url}" alt="${img.key}" style="max-width:80px; max-height:80px;" class="rounded hoverPreview" />
+                        </td>
+                        <td class="align-middle">
+                            <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
+                            <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
+                        </td>
+                    </tr>
                 `;
+
                 tbody.append(row);
             });
-            // Replace Image Button Click Handler
-            $(document).on('click', '.replace-image-btn', function () {
-                const imageName = $(this).data('name');
-                const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
-                // Fill modal fields
-                $('#replaceImageName').val(imageName);
-                $('#replaceImagePreview').attr('src', imageUrl);
-                $('#replaceImageModal').modal('show');
-                $('#replaceImageFile').val('');
-            });
-
-            // Delete Image Button Click Handler
-            $(document).on('click', '.delete-image-btn', function () {
-                const imageName = $(this).data('name');
-                const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
-
-                $('#deleteImageName').text(imageName);
-                $('#deleteImage').attr('src', imageURL);
-                $('#deleteImage').attr('alt', imageName);
-                // Show confirm modal using Bootstrap
-                const confirmModal = $('#confirmDeleteImageModal');
-                confirmModal.modal('show');
-
-                $('#confirmDeleteImageBtn')
-                    .off('click') // Remove any previous click handlers
-                    .on('click', function () {
-                        $.ajax({
-                            url: `${currentAPIurl}/image/delete`,
-                            type: 'POST',
-                            contentType: 'application/json',
-                            data: JSON.stringify({
-                                token: localStorage.getItem('JWT') || '',
-                                imageName: imageName, // encodeURI only needed if backend expects it
-                            }),
-                            success: function () {
-                                toastMessage('Image deleted successfully.', 'success');
-                                setTimeout(() => {
-                                    loadImages();
-                                }, 500);
-                            },
-                            error: function () {
-                                toastMessage('Failed to delete image.', 'danger');
-                            },
-                        });
-                    });
-            });
-
-            //Animate image preview on hover, disable pointer events
-            $('.hoverPreview')
-                .css({
-                    transition: 'transform 0.2s cubic-bezier(0.4,0,0.2,1)',
-                    transformOrigin: 'center center',
-                    display: 'inline-block',
-                })
-                .hover(
-                    function () {
-                        $(this).css({ transform: 'scale(1.2)' });
-                    },
-                    function () {
-                        $(this).css({ transform: 'scale(1)', zIndex: '1' });
-                    }
-                );
-
-            $(document).on('mouseenter', '.hoverPreview', function () {
-                const src = $(this).attr('src');
-                $('#fullscreenImage').attr('src', src);
-                $('#imageFullscreenOverlay').removeClass('hide').addClass('show');
-            });
-
-            $(document).on('mouseleave', '.hoverPreview', function () {
-                $('#imageFullscreenOverlay').addClass('hide').removeClass('show');
-            });
         },
-        error: function (err) {
+        error: function () {
             toastMessage('No Images to load.', 'warning');
+            $('#imageTable tbody').empty();
         },
     });
-    //image replacement events
-    $('#replaceImageFile').on('change', function () {
-        //set the name input to the file name that is being replaced
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $('#replaceImageNewPreview').attr('src', e.target.result);
-            };
-            reader.readAsDataURL(file);
+}
+
+function handleUploadSummary(ajaxData) {
+    let successCount = 0,
+        failureCount = 0;
+    const failedImages = [];
+    (ajaxData.results || []).forEach((result) => {
+        if (result.error) {
+            failureCount++;
+            failedImages.push(result.imageName);
         } else {
-            $('#replaceImageId').val('');
-            $('#replaceImagePreview').attr('src', '');
-            $('#replaceImageNewPreview').attr('src', '');
-        }
-    });
-    $('#replaceImageModal').on('hidden.bs.modal', function () {
-        // Clear the file input and preview when the modal is closed
-        $('#replaceImageFile').val('');
-        $('#replaceImagePreview').attr('src', '');
-    });
-    $('#replaceImageForm').on('submit', function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        formData.append('imageName', $('#replaceImageName').val());
-        formData.append('token', localStorage.getItem('JWT') || '');
-
-        $.ajax({
-            url: `${currentAPIurl}/image/replace`, // Change to your actual endpoint
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                // Handle success (e.g., close modal, refresh image table)
-                $('#replaceImageModal').modal('hide');
-                // Optionally reload images
-                setTimeout(() => {
-                    $('#replaceImageFile').val(''); // Clear the file input
-                    $('#replaceImagePreview').attr('src', ''); // Clear the preview
-                    loadImages();
-                }, 500); // Delay to ensure modal closes before clearing
-            },
-            error: function (xhr) {
-                // Handle error
-                console.log('Failed to replace image.');
-                toastMessage('Failed to replace image.', 'danger');
-            },
-        });
-    });
-
-    //image upload events
-    $('#createImageForm').on('submit', function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        formData.append('imageName', $('#newImageName').val());
-        formData.append('token', localStorage.getItem('JWT') || '');
-        $.ajax({
-            url: `${window.currentAPIurl}/image/upload`,
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                $('#newImageModal').modal('hide');
-                console.log('Image uploaded successfully:', data);
-                loadImages();
-            },
-            error: function (err) {
-                console.error('Failed to upload image:', err);
-            },
-        });
-    });
-    $('#newImageFile').on('input', function () {
-        const files = Array.from(this.files);
-        if (files.length > 0) {
-            // Build comma-separated list of all file names
-            const names = files.map((f) => f.name).join(', ');
-            $('#newImageName').val(names);
-
-            // (Optionally) preview the first image only
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $('#newImagePreview').attr('src', e.target.result);
-            };
-            reader.readAsDataURL(files[0]);
-        } else {
-            $('#newImagePreview').attr('src', '');
-            $('#newImageName').val('');
+            successCount++;
         }
     });
 
-    //image remove events
-    $('#deleteImageForm').on('submit', function (e) {
-        e.preventDefault();
-    });
+    if (successCount && !failureCount) toastMessage(`Uploaded ${successCount} images successfully.`, 'success');
+    else if (successCount && failureCount) toastMessage(`Uploaded ${successCount} images with ${failureCount} failures.`, 'warning');
+    else if (failureCount) toastMessage(`All ${failureCount} images failed to upload.`, 'danger');
 }
 
 // Call this function when the user clicks the "Edit" button for an image
@@ -727,10 +745,6 @@ function updatePage(pageName, config) {
 }
 
 // Page Editor Functions
-function initializePageEditor() {
-    $(document).ready(function () {});
-}
-
 function loadPageData(pageName) {
     $.ajax({
         type: 'POST',
