@@ -3,6 +3,8 @@ $(document).ready(function () {
     $('.loginRequired').hide();
 
     if (location.host.match(/^[0-9.:]+$/)) {
+        //set the user to a test user that only works on localhost
+        localStorage.setItem('JWT', 'TestToken');
         onLoad();
     }
     $('#reRunOnload').on('click', function () {
@@ -45,7 +47,7 @@ $(document).ready(function () {
                 form.reset();
             },
             function (error) {
-                alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+                console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
             }
         );
     });
@@ -125,6 +127,37 @@ function sessionLogin() {
 
 //Other Functions
 
+function toastMessage(message, type = 'info') {
+    // type: 'info', 'success', 'warning', 'danger'
+    const toast = $('#messageToast');
+    const toastHeader = $('#toastTitle');
+    const toastBody = $('#toastBody');
+    const toastIcon = $('#toastIcon');
+    const toastTime = $('#toastTime');
+
+    $('#messageToast').removeClass('bg-info bg-success bg-warning bg-danger');
+    switch (type) {
+        case 'success':
+            toastIcon.css('color', '#198754');
+            break;
+        case 'warning':
+            toastIcon.css('color', '#ffc107');
+            break;
+        case 'danger':
+            toastIcon.css('color', '#dc3545');
+            break;
+        default:
+            toastIcon.css('color', '#0d6efd');
+            break;
+    }
+
+    toastHeader.text(type.charAt(0).toUpperCase() + type.slice(1));
+    toastBody.text(message);
+    toastTime.text(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+    bootstrap.Toast.getOrCreateInstance(toast).show();
+}
+
 function setAPIurl() {
     window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.productionAPIurl = 'https://api.pioneerrocketry.com';
@@ -137,6 +170,10 @@ function setAPIurl() {
         } else {
             window.currentAPIurl = productionAPIurl;
         }
+    }
+    if (window.location.hostname === 'localhost') {
+        window.currentAPIurl = 'http://localhost:8787';
+        handleCredentialResponse({ credential: 'TestToken' });
     }
 }
 
@@ -187,31 +224,26 @@ function loadImages() {
                 //console.log('Image:', JSON.stringify(img));
                 const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
                 const row = `
-                    <tr>
-                        <td>${img.key}</td>
-                        <td><a href="${url}" target="_blank">${url}</a></td>
-                        <td><img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded hoverPreview" /></td>
-                        <td>
-                            <button class="btn btn-sm btn-primary edit-image-btn" data-name="${img.key}">Edit</button>
-                            <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
-                            <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="align-middle">${img.key}</td>
+                    <td class="align-middle"><a href="${url}" target="_blank">${url}</a></td>
+                    <td class="align-middle">
+                        <img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded hoverPreview" />
+                    </td>
+                    <td class="align-middle">
+                        <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
+                        <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
+                    </td>
+                </tr>
                 `;
                 tbody.append(row);
             });
-            $(document).on('click', '.edit-image-btn', function () {
-                const imageId = $(this).data('image-id');
-                const imageUrl = $(this).data('image-url');
-                openReplaceImageModal(imageId, imageUrl);
-            });
-
             // Replace Image Button Click Handler
             $(document).on('click', '.replace-image-btn', function () {
                 const imageName = $(this).data('name');
                 const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
                 // Fill modal fields
-                $('#replaceImageId').val(imageName);
+                $('#replaceImageName').val(imageName);
                 $('#replaceImagePreview').attr('src', imageUrl);
                 $('#replaceImageModal').modal('show');
                 $('#replaceImageFile').val('');
@@ -220,60 +252,37 @@ function loadImages() {
             // Delete Image Button Click Handler
             $(document).on('click', '.delete-image-btn', function () {
                 const imageName = $(this).data('name');
+                const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+
+                $('#deleteImageName').text(imageName);
+                $('#deleteImage').attr('src', imageURL);
+                $('#deleteImage').attr('alt', imageName);
                 // Show confirm modal using Bootstrap
-                const confirmModal = $(`
-                    <div class="modal fade" id="confirmDeleteImageModal" tabindex="-1" aria-labelledby="confirmDeleteImageModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmDeleteImageModalLabel">Confirm Delete</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete "<strong>${imageName}</strong>"?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" id="confirmDeleteImageBtn">Delete</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `);
-
-                // Remove any existing confirm modal to avoid duplicates
-                $('#confirmDeleteImageModal').remove();
-                $('body').append(confirmModal);
-
-                const modalInstance = new bootstrap.Modal(document.getElementById('confirmDeleteImageModal'));
-                modalInstance.show();
+                const confirmModal = $('#confirmDeleteImageModal');
+                confirmModal.modal('show');
 
                 $('#confirmDeleteImageBtn')
-                    .off('click')
+                    .off('click') // Remove any previous click handlers
                     .on('click', function () {
                         $.ajax({
-                            url: `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`,
-                            type: 'DELETE',
-                            headers: {
-                                token: window.user.getToken && window.user.getToken(),
-                            },
+                            url: `${currentAPIurl}/image/delete`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                token: localStorage.getItem('JWT') || '',
+                                imageName: imageName, // encodeURI only needed if backend expects it
+                            }),
                             success: function () {
-                                alert('Image deleted successfully.');
-                                loadImages();
+                                toastMessage('Image deleted successfully.', 'success');
+                                setTimeout(() => {
+                                    loadImages();
+                                }, 500);
                             },
                             error: function () {
-                                alert('Failed to delete image.');
-                            },
-                            complete: function () {
-                                modalInstance.hide();
+                                toastMessage('Failed to delete image.', 'danger');
                             },
                         });
                     });
-
-                // Clean up modal from DOM after it's hidden
-                $('#confirmDeleteImageModal').on('hidden.bs.modal', function () {
-                    $(this).remove();
-                });
             });
 
             //Animate image preview on hover, disable pointer events
@@ -285,7 +294,7 @@ function loadImages() {
                 })
                 .hover(
                     function () {
-                        $(this).css({ transform: 'scale(1.2)'});
+                        $(this).css({ transform: 'scale(1.2)' });
                     },
                     function () {
                         $(this).css({ transform: 'scale(1)', zIndex: '1' });
@@ -295,16 +304,18 @@ function loadImages() {
             $(document).on('mouseenter', '.hoverPreview', function () {
                 const src = $(this).attr('src');
                 $('#fullscreenImage').attr('src', src);
-                $('#imageFullscreenOverlay').fadeIn(100);
+                $('#imageFullscreenOverlay').removeClass('hide').addClass('show');
             });
+
             $(document).on('mouseleave', '.hoverPreview', function () {
-                $('#imageFullscreenOverlay').fadeOut(100);
+                $('#imageFullscreenOverlay').addClass('hide').removeClass('show');
             });
         },
         error: function (err) {
-            console.warn('Failed to load images.');
+            toastMessage('No Images to load.', 'warning');
         },
     });
+    //image replacement events
     $('#replaceImageFile').on('change', function () {
         //set the name input to the file name that is being replaced
         const file = this.files[0];
@@ -325,6 +336,81 @@ function loadImages() {
         $('#replaceImageFile').val('');
         $('#replaceImagePreview').attr('src', '');
     });
+    $('#replaceImageForm').on('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append('imageName', $('#replaceImageName').val());
+        formData.append('token', localStorage.getItem('JWT') || '');
+
+        $.ajax({
+            url: `${currentAPIurl}/image/replace`, // Change to your actual endpoint
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                // Handle success (e.g., close modal, refresh image table)
+                $('#replaceImageModal').modal('hide');
+                // Optionally reload images
+                setTimeout(() => {
+                    $('#replaceImageFile').val(''); // Clear the file input
+                    $('#replaceImagePreview').attr('src', ''); // Clear the preview
+                    loadImages();
+                }, 500); // Delay to ensure modal closes before clearing
+            },
+            error: function (xhr) {
+                // Handle error
+                console.log('Failed to replace image.');
+                toastMessage('Failed to replace image.', 'danger');
+            },
+        });
+    });
+
+    //image upload events
+    $('#createImageForm').on('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append('imageName', $('#newImageName').val());
+        formData.append('token', localStorage.getItem('JWT') || '');
+        $.ajax({
+            url: `${window.currentAPIurl}/image/upload`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#newImageModal').modal('hide');
+                console.log('Image uploaded successfully:', data);
+                loadImages();
+            },
+            error: function (err) {
+                console.error('Failed to upload image:', err);
+            },
+        });
+    });
+    $('#newImageFile').on('input', function () {
+        const files = Array.from(this.files);
+        if (files.length > 0) {
+            // Build comma-separated list of all file names
+            const names = files.map((f) => f.name).join(', ');
+            $('#newImageName').val(names);
+
+            // (Optionally) preview the first image only
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#newImagePreview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(files[0]);
+        } else {
+            $('#newImagePreview').attr('src', '');
+            $('#newImageName').val('');
+        }
+    });
+
+    //image remove events
+    $('#deleteImageForm').on('submit', function (e) {
+        e.preventDefault();
+    });
 }
 
 // Call this function when the user clicks the "Edit" button for an image
@@ -337,28 +423,6 @@ function openReplaceImageModal(imageId, imageUrl) {
 }
 
 // Handle the form submission
-$('#replaceImageForm').on('submit', function (e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-
-    $.ajax({
-        url: '/api/images/replace', // Change to your actual endpoint
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            // Handle success (e.g., close modal, refresh image table)
-            $('#replaceImageModal').modal('hide');
-            // Optionally reload images
-            loadImages();
-        },
-        error: function (xhr) {
-            // Handle error
-            alert('Failed to replace image.');
-        },
-    });
-});
 
 async function getFooter() {
     return new Promise((resolve, reject) => {
