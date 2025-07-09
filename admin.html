@@ -10,7 +10,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.dropotron/1.4.3/jquery.dropotron.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="./scripts/tools.js"></script>
+        <script src="./js/main.js" type="Module"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
         <script src="https://accounts.google.com/gsi/client" async></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -20,10 +20,14 @@
         <script src="./assets/js/breakpoints.min.js"></script>
         <script src="./assets/js/util.js"></script>
         <script src="./assets/js/main.js"></script>
-        <script src="./scripts/tools.js"></script>
     </head>
 
     <body data-bs-theme="dark">
+        <script>
+            $(document).on('ready', function () {
+                onReady.onReady();
+            });
+        </script>
         <div>
             <div
                 id="g_id_onload"
@@ -428,10 +432,6 @@
                     </table>
                 </div>
             </div>
-            <script>
-                // Initialize the page editor functionality
-                initializePageEditor();
-            </script>
         </div>
 
         <!-- Edit Module Modal (moved from tools.js) -->
