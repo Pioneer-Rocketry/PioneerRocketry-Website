@@ -29,8 +29,6 @@ export async function loadUsers() {
 export function createUserTable(response) {
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
 
-    console.log(response);
-
     for (const user of response.users.results) {
         let row = $('<tr>').appendTo(table);
         let cellName = $('<td>').text(user.name).appendTo(row);
