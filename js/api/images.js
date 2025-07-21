@@ -9,24 +9,24 @@ export function loadImages() {
             const tbody = $('#imageTable tbody').empty();
 
             (data.images || []).forEach(({ image: img }) => {
-                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
+                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key.replace("images/", ""))}`;
 
                 // Trim and truncate long names
-                const trimmedName = img.key.length > 30 ? img.key.slice(0, 27) + '...' : img.key;
+                const trimmedName = img.key.replace("images/", "").length > 30 ? img.key.replace("images/", "").slice(0, 27) + '...' : img.key.replace("images/", "");
                 const trimmedURL = url.length > 40 ? url.slice(0, 37) + '...' : url;
 
                 const row = `
                     <tr>
-                        <td class="align-middle text-truncate" title="${img.key}">${trimmedName}</td>
+                        <td class="align-middle text-truncate" title="${img.key.replace("images/", "")}">${trimmedName}</td>
                         <td class="align-middle text-truncate" style="max-width: 300px;" title="${url}">
                             <a href="${url}" target="_blank">${trimmedURL}</a>
                         </td>
                         <td class="align-middle">
-                            <img src="${url}" alt="${img.key}" style="max-width:80px; max-height:80px;" class="rounded hoverPreview" />
+                            <img src="${url}" alt="${img.key.replace("images/", "")}" style="max-width:80px; max-height:80px;" class="rounded hoverPreview" />
                         </td>
                         <td class="align-middle">
-                            <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
-                            <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
+                            <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key.replace("images/", "")}">Replace</button>
+                            <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key.replace("images/", "")}">Delete</button>
                         </td>
                     </tr>
                 `;
