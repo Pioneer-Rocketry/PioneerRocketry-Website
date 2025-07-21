@@ -1978,6 +1978,9 @@ input, select, textarea {
 	}
 
 /* Header */
+#header:not(.smaller){
+	height: 24em;
+}
 
 	#header {
 		display: -moz-flex;
@@ -1993,7 +1996,7 @@ input, select, textarea {
 		-ms-justify-content: center;
 		justify-content: center;
 		position: relative;
-		height: 24em;
+		
 		background: url("../../images/banner.jpg") center center;
 		background-size: cover;
 		padding: 0;
@@ -2009,9 +2012,15 @@ input, select, textarea {
 			
 		}
 
-		.homepage #header {
+		.homepage #header:not(.smaller){
 			height: 75em;
 		}
+
+		.homepage #header.smaller{
+			height: 15em;
+		}
+
+
 
 /* Logo */
 

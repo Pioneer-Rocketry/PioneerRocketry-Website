@@ -27,15 +27,12 @@ export async function loadUsers() {
 }
 
 export function createUserTable(response) {
-    const viewerFlag = 0;
-    const helperFlag = 5;
-    const manageImagesFlag = 10;
-    const manageEventsFlag = 10;
-    const managePagesFlag = 10;
-    const manageUsersFlag = 15;
-    const manageRocketsFlag = 10;
-    const adminFlag = 20;
-    const superAdminFlag = 25;
+    const viewerFlag = 0.0;
+    const helperFlag = 5.0;
+    const managerFlag = 10.0;
+    const manageUsersFlag = 15.0;
+    const adminFlag = 20.0;
+    const superAdminFlag = 25.0;
 
     // Create the table structure
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
@@ -43,27 +40,27 @@ export function createUserTable(response) {
     for (const user of response.users.results) {
         console.log(user);
         let row = $('<tr>').appendTo(table);
-        let cellName = $('<td>').text(user.name).appendTo(row);
-        let cellEmail = $('<td>').text(user.email).appendTo(row);
-        let cellId = $('<td>').text(user.id).appendTo(row);
+        let cellName = $('<td>').text(user.name);
+        let cellEmail = $('<td>').text(user.email);
+        let cellId = $('<td>').text(user.id);
+        row.append(cellName, cellEmail, cellId);
 
         // Create the dropdown for flags
         let flagSelect = $('<select>').attr('id', `${user.id}flag`).addClass('form-select')
         
         let viewer = $('<option>').text('Viewer').val(viewerFlag)
-        let helper = $('<option>').text('Member').val(helperFlag)
-        let manageImages = $('<option>').text('Manage Images').val(manageImagesFlag)
-        let manageEvents = $('<option>').text('Manage Events').val(manageEventsFlag)
-        let managePages = $('<option>').text('Manage Pages').val(managePagesFlag)
+        let member = $('<option>').text('Member').val(helperFlag)
+        let helper = $('<option>').text('Helper').val(managerFlag)
         let manageUsers = $('<option>').text('Manage Users').val(manageUsersFlag)
-        let manageRockets = $('<option>').text('Manage Rockets').val(manageRocketsFlag)
         let admin = $('<option>').text('Admin').val(adminFlag)
         let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag)
         
-        flagSelect.append(viewer, helper, manageImages, manageEvents, managePages, manageUsers, manageRockets, admin, superAdmin);
+        flagSelect.append(viewer, member, helper , manageUsers, admin, superAdmin);
+        flagSelect.attr('data-flags', user.flags);
         flagSelect.find(`option[value="${user.flags}"]`).prop('selected', true);
-        let cellFlags = $('<td>').append(flagSelect).appendTo(row);
-
+        let cellFlags = $('<td>').append(flagSelect);
+        row.append(cellFlags);
+        
         // Create the Change User button
         let changeButton = $('<button>')
             .attr('id', `${user.id}button`)
