@@ -60,7 +60,7 @@ export function createUserTable(response) {
         let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag)
         
         flagSelect.append(viewer, helper, manageImages, manageEvents, managePages, manageUsers, manageRockets, admin, superAdmin);
-        flagSelect.val(user.flags);
+        flagSelect.find(`option[value="${user.flags}"]`).prop('selected', true);
         let cellFlags = $('<td>').append(flagSelect).appendTo(row);
 
         // Create the Change User button
