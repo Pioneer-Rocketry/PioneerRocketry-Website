@@ -1,6 +1,6 @@
 import { toastMessage } from "../ui/toasts.js";
 
-export async function submitEventForm(form, onSuccess, onError) {
+export function submitEventForm(form, onSuccess, onError) {
     const eventObj = getEventFormData(form);
     const payload = { event: eventObj };
     if (localStorage.getItem('JWT')) {
@@ -10,21 +10,23 @@ export async function submitEventForm(form, onSuccess, onError) {
         if (typeof onError === 'function') onError(new Error('No JWT found'));
         return;
     }
-    try {
-        const res = await fetch('https://api.pioneerrocketry.com/calendar/addEvent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        const result = await res.json();
-        if (res.ok && result.success) {
-            if (typeof onSuccess === 'function') onSuccess(result);
-        } else {
-            if (typeof onError === 'function') onError(result);
+    $.ajax({
+        url: `${window.currentAPIurl}/calendar/createEvent`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        dataType: 'json',
+        success: function(result, textStatus, jqXHR) {
+            if (jqXHR.status === 200 && result.success) {
+                if (typeof onSuccess === 'function') onSuccess(result);
+            } else {
+                if (typeof onError === 'function') onError(result);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (typeof onError === 'function') onError(new Error(textStatus + ': ' + errorThrown));
         }
-    } catch (err) {
-        if (typeof onError === 'function') onError(err);
-    }
+    });
 }
 
 export function getEventFormData(form) {
@@ -88,107 +90,70 @@ export function loadEvents() {
 
 export function createEventTable(response) {
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
+    let thead = $('<thead>').appendTo(table);
+    let headerRow = $('<tr>').appendTo(thead);
+    headerRow.append(
+        $('<th>').text('Title'),
+        $('<th>').text('Start'),
+        $('<th>').text('End'),
+        $('<th>').text('Actions')
+    );
     //there needs to be a form for editing an event.
 
     for (const event of response.result.events) {
-        let row = $('<tr>').appendTo(table);
+        const row = $('<tr>').appendTo(table);
+        const titleCell = $('<td>').text(event.title).appendTo(row);
+        const startCell = $('<td>').text(new Date(event.start).toLocaleString()).appendTo(row);
+        const endCell = $('<td>').text(event.end ? new Date(event.end).toLocaleString() : 'N/A').appendTo(row);
+        const buttonCell = $('<td>').appendTo(row);
 
-        let cellName = $('<td>').text(event.title).appendTo(row);
-        let cellDescription = $('<td>').text(event.description).appendTo(row);
-        let cellStart = $('<td>').text(event.start).appendTo(row);
-        let cellEnd = $('<td>').text(event.end).appendTo(row);
-        let buttonCell = $('<td>').appendTo(row);
+        const viewDetailsButton = $('<button>').attr('id', `${event.id}viewButton`).addClass('btn btn-primary').text('View Details').appendTo(buttonCell);
 
-        //   let editButton = $("<button>").attr("id", `${event.id}button`).addClass("btn btn-primary").text("Edit Event").appendTo(buttonCell);
-        //   editButton.click(function () {
-        //     update = true;
-        //     // Get the event object (assuming it's passed to this function)
+        viewDetailsButton.off('click').on('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+            // for now append the data to the modal body
+        });
 
-        //     // Set the modal fields with the event data
-        //     $("#eventTitle").val(event.title || "");
-        //     $("#eventDescription").val(event.description || "");
-        //     //$("#eventStartDate").val(event.start ? formatDateForInput(event.start, event.startTime) : "");
-        //     $("#eventStartDate").val(event.start ? UTCToLocalDateTime(event.start) : "");
-        //     $("#eventEndDate").val(event.end ? UTCToLocalDateTime(event.end) : "");
-        //     $("#eventId").val(event.id || "");
-        //     $("#eventGroupId").val(event.groupId || "");
-        //     $("#eventAllDay").val(event.allDay !== null ? event.allDay.toString() : "false");
 
-        //     // Set days of the week checkboxes
-        //     $("#daysOfWeekButtons input[type=checkbox]").prop("checked", false);
-        //     if (event.daysOfWeek) {
-        //       event.daysOfWeek.forEach(function (day) {
-        //         $(`#daysOfWeekButtons input[value="${day}"]`).prop("checked", true);
-        //       });
-        //     }
-        //     $("#eventDaysOfWeek").val(event.daysOfWeek ? event.daysOfWeek.join(",") : "");
 
-        //     $("#eventStartTime").val(event.startTime || "");
-        //     $("#eventEndTime").val(event.endTime || "");
-        //     $("#eventStartRecur").val(event.startRecur ? UTCToLocalDateTime(event.startRecur) : "");
-        //     $("#eventEndRecur").val(event.endRecur ? UTCToLocalDateTime(event.endRecur) : "");
-        //     $("#eventUrl").val(event.url || "");
-        //     $("#eventInteractive").val(event.interactive !== null ? event.interactive.toString() : "false");
-        //     $("#eventClassName").val(event.className || "");
-        //     $("#eventClassNames").val(event.classNames ? event.classNames.join(", ") : "");
-        //     $("#eventEditable").val(event.editable !== null ? event.editable.toString() : "false");
-        //     $("#eventStartEditable").val(event.startEditable !== null ? event.startEditable.toString() : "false");
-        //     $("#eventDurationEditable").val(event.durationEditable !== null ? event.durationEditable.toString() : "false");
-        //     $("#eventResourceEditable").val(event.resourceEditable !== null ? event.resourceEditable.toString() : "false");
-        //     $("#eventResourceId").val(event.resourceId || "");
-        //     $("#eventResourceIds").val(event.resourceIds ? event.resourceIds.join(", ") : "");
-        //     $("#eventDisplay").val(event.display || "");
-        //     $("#eventOverlap").val(event.overlap !== null ? event.overlap.toString() : "false");
-        //     $("#eventConstraint").val(event.constraint || "");
-        //     $("#eventColor").val(event.color || "");
-        //     $("#eventBackgroundColor").val(event.backgroundColor || "");
-        //     $("#eventBorderColor").val(event.borderColor || "");
-        //     $("#eventTextColor").val(event.textColor || "");
-        //     $("#eventRrule").val(event.rrule || "");
-        //     $("#eventDuration").val(event.duration || "");
+        // Delete button
+        const deleteButton = $('<button>')
+            .attr('id', `${event.id}button`)
+            .addClass('btn btn-danger')
+            .text('Delete Event')
+            .appendTo(buttonCell);
 
-        //     // Change the submit button text
-        //     $("#createEventSubmit").text("Update Event");
-
-        //     // Show the modal
-        //     $("#createEventModal").modal("show");
-        //   });
-
-        let deleteButton = $('<button>').attr('id', `${event.id}button`).addClass('btn btn-danger').text('Delete Event').appendTo(buttonCell);
-        deleteButton.click(function () {
-            // Store event id in modal data
+        deleteButton.off('click').on('click', function () {
             $('#deleteEventModal').data('eventId', event.id);
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteEventModal'));
             deleteModal.show();
         });
-
-        // Only bind once
-        $(document)
-            .off('click', '#confirmDeleteEventBtn')
-            .on('click', '#confirmDeleteEventBtn', function () {
-                const eventId = $('#deleteEventModal').data('eventId');
-                fetch(`${currentAPIurl}/calendar/removeEvent`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
-                })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                        if (data.success) {
-                            alert('Event deleted successfully!');
-                            if (typeof loadEvents === 'function') loadEvents();
-                        } else {
-                            alert('Error deleting event: ' + (data.error || 'Unknown error'));
-                        }
-                        deleteModal.hide();
-                    })
-                    .catch((err) => {
-                        alert('Error deleting event: ' + err.message);
-                        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                        deleteModal.hide();
-                    });
-            });
     }
+
+    // Bind confirm delete button once
+    $(document).off('click', '#confirmDeleteEventBtn').on('click', '#confirmDeleteEventBtn', function () {
+        const eventId = $('#deleteEventModal').data('eventId');
+        fetch(`${currentAPIurl}/calendar/removeEvent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                if (data.success) {
+                    toastMessage('Event deleted successfully!');
+                    if (typeof loadEvents === 'function') loadEvents();
+                } else {
+                    toastMessage('Error deleting event: ' + (data.error || 'Unknown error'));
+                }
+                deleteModal.hide();
+            })
+            .catch((err) => {
+                toastMessage('Error deleting event: ' + err.message);
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                deleteModal.hide();
+            });
+    });
     $('#events').empty().append(table);
 }
