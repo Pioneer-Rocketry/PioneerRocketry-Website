@@ -35,7 +35,10 @@ import * as onReady from './ui/onReady.js';
 window.auth = auth;
 window.onTokenResponse = auth.onTokenResponse;
 window.onErrorCallback = auth.onErrorCallback;
-// window.handleCredentialResponse = auth.handleCredentialResponse;
+window.handleCredentialResponse = auth.handleCredentialResponse;
+function onTokenResponse(googleUser){
+    auth.handleCredentialResponse(googleUser);
+}
 // window.sessionLogin = auth.sessionLogin;
 
 // window.css = css;
