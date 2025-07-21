@@ -47,17 +47,11 @@ jobs:
           --exclude=wrangler.jsonc \
           ./ worker-repo/static/
 
-      - name: Display File Structure
-        run:  tree -a -L 3
-
 
       - name: Install dependencies
         working-directory: worker-repo
         run: npm install 
 
-      # Install Worker Dependencies
-      - name: Install Worker Dependencies
-        run: npm install
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
