@@ -52,6 +52,7 @@ jobs:
 
 
       - name: Install wrangler
+        working-directory: worker-repo
         run: npm install -g wrangler
 
       # Install Worker Dependencies
