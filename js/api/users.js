@@ -27,6 +27,17 @@ export async function loadUsers() {
 }
 
 export function createUserTable(response) {
+    const viewerFlag = 0;
+    const helperFlag = 5;
+    const manageImagesFlag = 10;
+    const manageEventsFlag = 10;
+    const managePagesFlag = 10;
+    const manageUsersFlag = 15;
+    const manageRocketsFlag = 10;
+    const adminFlag = 20;
+    const superAdminFlag = 25;
+
+    // Create the table structure
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
 
     for (const user of response.users.results) {
@@ -36,8 +47,20 @@ export function createUserTable(response) {
         let cellId = $('<td>').text(user.id).appendTo(row);
 
         // Create the dropdown for flags
-        let flagSelect = $('<select>').attr('id', `${user.id}flag`).addClass('form-select').append($('<option>').text('Viewer').val(0), $('<option>').text('Member').val(1), $('<option>').text('Helper').val(2), $('<option>').text('Admin').val(3)).val(user.flags); // Set the selected option based on the user's current flag
-
+        let flagSelect = $('<select>').attr('id', `${user.id}flag`).addClass('form-select')
+        
+        let viewer = $('<option>').text('Viewer').val(viewerFlag)
+        let helper = $('<option>').text('Member').val(helperFlag)
+        let manageImages = $('<option>').text('Manage Images').val(manageImagesFlag)
+        let manageEvents = $('<option>').text('Manage Events').val(manageEventsFlag)
+        let managePages = $('<option>').text('Manage Pages').val(managePagesFlag)
+        let manageUsers = $('<option>').text('Manage Users').val(manageUsersFlag)
+        let manageRockets = $('<option>').text('Manage Rockets').val(manageRocketsFlag)
+        let admin = $('<option>').text('Admin').val(adminFlag)
+        let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag)
+        
+        flagSelect.append(viewer, helper, manageImages, manageEvents, managePages, manageUsers, manageRockets, admin, superAdmin);
+        flagSelect.val(user.flags);
         let cellFlags = $('<td>').append(flagSelect).appendTo(row);
 
         // Create the Change User button
