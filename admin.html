@@ -19,21 +19,27 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
         <!-- Google Sign-In -->
-        <script src="https://accounts.google.com/gsi/client" async></script>
+        <script src="https://accounts.google.com/gsi/client" ></script>
 
         <!-- Font Awesome -->
-        <script src="https://kit.fontawesome.com/8f084d997c.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/8f084d997c.js"></script>
     </head>
 
     <body data-bs-theme="dark">
         <div>
+            <script type="module">
+                import * as auth from './js/api/auth.js';
+                function onGlobalTokenResponse(googleUser){
+                    auth.handleCredentialResponse(googleUser);
+                }
+            </script>
             <div
                 id="g_id_onload"
                 data-client_id="663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com"
                 data-context="signin"
                 data-include-granted_scopes="true"
                 data-ux_mode="popup"
-                data-callback="onTokenResponse"
+                data-callback="onGlobalTokenResponse"
                 data-auto_select="true"
                 data-button_auto_select="true"
                 data-use_fedcm_for_button="true"

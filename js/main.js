@@ -33,12 +33,9 @@ import * as onReady from './ui/onReady.js';
 // import * as time from './utils/time.js';
 
 window.auth = auth;
-window.onTokenResponse = auth.onTokenResponse;
-window.onErrorCallback = auth.onErrorCallback;
-window.handleCredentialResponse = auth.handleCredentialResponse;
-function onTokenResponse(googleUser){
-    auth.handleCredentialResponse(googleUser);
-}
+// window.onTokenResponse = auth.onTokenResponse;
+// window.onErrorCallback = auth.onErrorCallback;
+// window.handleCredentialResponse = auth.handleCredentialResponse;
 // window.sessionLogin = auth.sessionLogin;
 
 // window.css = css;
