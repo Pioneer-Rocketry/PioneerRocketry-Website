@@ -35,7 +35,7 @@ jobs:
       # Copy new static files into the worker repo
       - name: Copy static files
         run: |
-          cp -r ./* worker-repo/static/
+          rsync -av --exclude=worker-repo ./ worker-repo/static/
 
       # Install wrangler CLI
       - name: Install Wrangler
