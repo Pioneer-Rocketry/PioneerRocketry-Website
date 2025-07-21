@@ -45,7 +45,11 @@ jobs:
           --exclude=package.json \
           --exclude=wrangler.toml \
           --exclude=wrangler.jsonc \
+          --exclude=README.md \
+          --exclude=.gitignore \
+          --exclude=CNAME \
           ./ worker-repo/static/
+
 
 
       - name: Install dependencies
@@ -58,5 +62,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4.15.2"
           workingDirectory: "worker-repo"

@@ -7,7 +7,7 @@ export function setAPIurl() {
     } else {
         if (window.location.hostname === 'pioneerrocketry.com') {
             window.currentAPIurl = window.productionAPIurl;
-        } 
+        }
     }
     if (window.location.hostname === 'localhost') {
         window.currentAPIurl = 'http://localhost:8787';
@@ -16,7 +16,7 @@ export function setAPIurl() {
 }
 
 // From js/api
-// import * as auth from './api/auth.js';
+import * as auth from './api/auth.js';
 // import * as css from './api/css.js';
 // import * as events from './api/events.js';
 // import * as images from './api/images.js';
@@ -32,11 +32,11 @@ import * as onReady from './ui/onReady.js';
 // From js/utils
 // import * as time from './utils/time.js';
 
-// window.auth = auth;
-    // window.onTokenResponse = auth.onTokenResponse;
-    // window.onErrorCallback = auth.onErrorCallback;
-    // window.handleCredentialResponse = auth.handleCredentialResponse;
-    // window.sessionLogin = auth.sessionLogin;
+window.auth = auth;
+window.onTokenResponse = auth.onTokenResponse;
+window.onErrorCallback = auth.onErrorCallback;
+// window.handleCredentialResponse = auth.handleCredentialResponse;
+// window.sessionLogin = auth.sessionLogin;
 
 // window.css = css;
 // window.events = events;
@@ -48,7 +48,6 @@ import * as onReady from './ui/onReady.js';
 // window.onReady = onReady;
 // window.toasts = toasts;
 // window.time = time;
-
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => onReady.onReady());
