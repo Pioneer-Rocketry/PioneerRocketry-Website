@@ -1,4 +1,2 @@
 .vscode/settings.json
-node_modules
 .vscode
-.wrangler

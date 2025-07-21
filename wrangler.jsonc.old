@@ -1,9 +1,0 @@
-{
-    "name": "pioneerrocketry-website",
-    "compatibility_date": "2025-05-30",
-    "main": "./worker/index.ts",
-    "assets": {
-        "directory": "./",
-        "not_found_handling": "404-page"
-    }
-}
