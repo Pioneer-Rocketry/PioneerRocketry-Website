@@ -1,11 +1,13 @@
-name: Deploy Cloudflare Worker
+name: Deploy Cloudflare Worker on Push and Pull Request
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [production]
-
+  workflow_call:
+  workflow_dispatch:
+    
 jobs:
   deploy:
     runs-on: ubuntu-latest
