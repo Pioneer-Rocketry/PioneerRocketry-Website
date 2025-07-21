@@ -2,6 +2,8 @@ name: Deploy Cloudflare Worker
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [production]
 
 jobs:
