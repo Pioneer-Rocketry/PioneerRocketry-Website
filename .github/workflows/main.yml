@@ -51,14 +51,13 @@ jobs:
         run:  tree -a -L 3
 
 
-      - name: Install wrangler
-        working-directory: worker-repo
-        run: npm install -g wrangler
+      #- name: Install wrangler
+      #  working-directory: worker-repo
+       # run: npm install -g wrangler
 
       # Install Worker Dependencies
       - name: Install Worker Dependencies
-        working-directory: worker-repo
-        run: npm install 
+        run: npm install -g
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
