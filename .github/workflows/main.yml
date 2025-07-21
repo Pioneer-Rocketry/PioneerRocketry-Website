@@ -37,9 +37,10 @@ jobs:
         run: |
           rsync -av --exclude=worker-repo ./ worker-repo/static/
 
-      # Install wrangler CLI
-      - name: Install Wrangler
-        run: npm install -g wrangler
+      # Install Wrangler and Worker Dependencies
+      - name: Install Worker Dependencies
+        working-directory: worker-repo
+        run: npm install
 
       # Deploy the Cloudflare Worker
       - name: Deploy Worker
