@@ -35,7 +35,21 @@ jobs:
       # Copy new static files into the worker repo
       - name: Copy static files
         run: |
-          rsync -av --exclude=worker-repo ./ worker-repo/static/
+          rsync -av \
+          --exclude=worker-repo \
+          --exclude=worker \
+          --exclude=.git \
+          --exclude=.github \
+          --exclude=node_modules \
+          --exclude=package-lock.json \
+          --exclude=package.json \
+          --exclude=wrangler.toml \
+          --exclude=wrangler.jsonc \
+          ./ worker-repo/static/
+
+      - name: Display File Structure
+        run:  tree -a -L 3
+
 
       - name: Install wrangler
         run: npm install -g wrangler
@@ -43,7 +57,7 @@ jobs:
       # Install Worker Dependencies
       - name: Install Worker Dependencies
         working-directory: worker-repo
-        run: npm install
+        run: npm install 
 
       # Deploy the Cloudflare Worker
       - name: Deploy Worker
