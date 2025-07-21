@@ -37,7 +37,10 @@ jobs:
         run: |
           rsync -av --exclude=worker-repo ./ worker-repo/static/
 
-      # Install Wrangler and Worker Dependencies
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      # Install Worker Dependencies
       - name: Install Worker Dependencies
         working-directory: worker-repo
         run: npm install
