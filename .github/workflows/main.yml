@@ -12,7 +12,7 @@ jobs:
 
     steps:
       # Checkout the current repo (source of static files)
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Set up SSH using the deploy key
       - name: Set up SSH
