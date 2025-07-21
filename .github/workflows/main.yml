@@ -60,10 +60,8 @@ jobs:
         working-directory: worker-repo
         run: npm install 
 
-      # Deploy the Cloudflare Worker
-      - name: Deploy Worker
-        working-directory: worker-repo
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: wrangler deploy
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          workingDirectory: worker-repo
