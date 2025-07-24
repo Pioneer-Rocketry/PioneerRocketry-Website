@@ -60,6 +60,7 @@ export function onReady() {
                 console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
             }
         );
+        $("#createEventSubmit").text('Create Event');
     });
 
     $(document).on('click', '.replace-image-btn', function () {

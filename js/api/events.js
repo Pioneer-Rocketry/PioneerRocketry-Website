@@ -1,4 +1,5 @@
-import { toastMessage } from "../ui/toasts.js";
+import { toastMessage } from '../ui/toasts.js';
+import { formatForDatetimeLocal } from '../utils/time.js';
 
 export function submitEventForm(form, onSuccess, onError) {
     const eventObj = getEventFormData(form);
@@ -16,57 +17,98 @@ export function submitEventForm(form, onSuccess, onError) {
         contentType: 'application/json',
         data: JSON.stringify(payload),
         dataType: 'json',
-        success: function(result, textStatus, jqXHR) {
+        success: function (result, textStatus, jqXHR) {
             if (jqXHR.status === 200 && result.success) {
                 if (typeof onSuccess === 'function') onSuccess(result);
             } else {
                 if (typeof onError === 'function') onError(result);
             }
         },
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             if (typeof onError === 'function') onError(new Error(textStatus + ': ' + errorThrown));
-        }
+        },
     });
 }
 
 export function getEventFormData(form) {
     const eventObj = {};
+
+    // Gather basic form data
     for (const el of form.elements) {
         if (!el.name) continue;
         if (el.type === 'checkbox' || el.type === 'radio') continue;
         eventObj[el.name] = el.value;
     }
+
     // Parse booleans
     ['allDay', 'interactive', 'editable', 'startEditable', 'durationEditable', 'resourceEditable', 'overlap'].forEach((k) => {
-        if (k in eventObj && eventObj[k] !== '') eventObj[k] = eventObj[k] === 'true';
-        else if (eventObj[k] === '') delete eventObj[k];
+        if (k in eventObj && eventObj[k] !== '') {
+            eventObj[k] = eventObj[k] === 'true';
+        } else if (eventObj[k] === '') {
+            delete eventObj[k];
+        }
     });
-    // Parse arrays
-    if (eventObj.classNames)
-        eventObj.classNames = eventObj.classNames
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    if (eventObj.resourceIds)
-        eventObj.resourceIds = eventObj.resourceIds
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    if (eventObj.daysOfWeek)
-        eventObj.daysOfWeek = eventObj.daysOfWeek
+
+    // Parse classNames (space-separated or JSON array)
+    if (eventObj.classNames) {
+        try {
+            const parsed = JSON.parse(eventObj.classNames);
+            if (Array.isArray(parsed)) {
+                eventObj.classNames = JSON.stringify(parsed.map(String).filter(Boolean));
+            } else {
+                throw new Error();
+            }
+        } catch {
+            const array = eventObj.classNames
+                .split(/\s+/)
+                .map((s) => s.trim())
+                .filter(Boolean);
+            eventObj.classNames = JSON.stringify(array);
+        }
+    }
+
+    // Parse resourceIds (comma-separated or JSON array)
+    if (eventObj.resourceIds) {
+        try {
+            const parsed = JSON.parse(eventObj.resourceIds);
+            if (Array.isArray(parsed)) {
+                eventObj.resourceIds = JSON.stringify(parsed.map(String).filter(Boolean));
+            } else {
+                throw new Error();
+            }
+        } catch {
+            const array = eventObj.resourceIds
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
+            eventObj.resourceIds = JSON.stringify(array);
+        }
+    }
+
+    // Parse daysOfWeek as array of numbers
+    if (eventObj.daysOfWeek) {
+        const numbers = eventObj.daysOfWeek
             .split(',')
             .map(Number)
             .filter((n) => !isNaN(n));
+        eventObj.daysOfWeek = JSON.stringify(numbers);
+    }
+
     // Remove empty optional fields
     Object.keys(eventObj).forEach((k) => {
         if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k];
     });
-    // FullCalendar event parsing compliance
-    // https://fullcalendar.io/docs/event-parsing
-    if (eventObj.start) eventObj.start = new Date(eventObj.start).toISOString();
-    if (eventObj.end) eventObj.end = new Date(eventObj.end).toISOString();
-    if (eventObj.startRecur) eventObj.startRecur = new Date(eventObj.startRecur).toISOString();
-    if (eventObj.endRecur) eventObj.endRecur = new Date(eventObj.endRecur).toISOString();
+
+    // Format date fields
+    ['start', 'end', 'startRecur', 'endRecur'].forEach((k) => {
+        if (eventObj[k]) {
+            const date = new Date(eventObj[k]);
+            if (!isNaN(date)) {
+                eventObj[k] = date.toISOString();
+            }
+        }
+    });
+
     return eventObj;
 }
 
@@ -78,6 +120,7 @@ export function loadEvents() {
         success: function (data) {
             if (data.success == false) {
                 toastMessage('No Events Found', 'warning');
+                $('#events').empty();
             } else {
                 createEventTable(data);
             }
@@ -92,36 +135,25 @@ export function createEventTable(response) {
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
     let thead = $('<thead>').appendTo(table);
     let headerRow = $('<tr>').appendTo(thead);
-    headerRow.append(
-        $('<th>').text('Title'),
-        $('<th>').text('Start'),
-        $('<th>').text('End'),
-        $('<th>').text('Actions')
-    );
+    headerRow.append($('<th>').text('Title'), $('<th>').text('Start'), $('<th>').text('End'), $('<th>').text('Actions'));
     //there needs to be a form for editing an event.
 
     for (const event of response.result.events) {
         const row = $('<tr>').appendTo(table);
-        const titleCell = $('<td>').text(event.title).appendTo(row);
-        const startCell = $('<td>').text(new Date(event.start).toLocaleString()).appendTo(row);
-        const endCell = $('<td>').text(event.end ? new Date(event.end).toLocaleString() : 'N/A').appendTo(row);
-        const buttonCell = $('<td>').appendTo(row);
+        const titleCell = $('<td>').text(event.title);
+        const startCell = $('<td>').text(new Date(event.start).toLocaleString());
+        const endCell = $('<td>').text(event.end ? new Date(event.end).toLocaleString() : 'N/A');
+        const buttonCell = $('<td>');
+        row.append(titleCell, startCell, endCell, buttonCell);
 
-        const viewDetailsButton = $('<button>').attr('id', `${event.id}viewButton`).addClass('btn btn-primary').text('View Details').appendTo(buttonCell);
+        const editEventButton = $('<button>').attr('id', `${event.id}editButton`).addClass('btn btn-primary').text('Edit Event').appendTo(buttonCell);
 
-        viewDetailsButton.off('click').on('click', function () {
-            const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
-            // for now append the data to the modal body
+        editEventButton.off('click').on('click', function () {
+            editEvent(event);
         });
 
-
-
         // Delete button
-        const deleteButton = $('<button>')
-            .attr('id', `${event.id}button`)
-            .addClass('btn btn-danger')
-            .text('Delete Event')
-            .appendTo(buttonCell);
+        const deleteButton = $('<button>').attr('id', `${event.id}button`).addClass('btn btn-danger').text('Delete Event').appendTo(buttonCell);
 
         deleteButton.off('click').on('click', function () {
             $('#deleteEventModal').data('eventId', event.id);
@@ -131,29 +163,104 @@ export function createEventTable(response) {
     }
 
     // Bind confirm delete button once
-    $(document).off('click', '#confirmDeleteEventBtn').on('click', '#confirmDeleteEventBtn', function () {
-        const eventId = $('#deleteEventModal').data('eventId');
-        fetch(`${currentAPIurl}/calendar/removeEvent`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                if (data.success) {
-                    toastMessage('Event deleted successfully!');
-                    if (typeof loadEvents === 'function') loadEvents();
-                } else {
-                    toastMessage('Error deleting event: ' + (data.error || 'Unknown error'));
-                }
-                deleteModal.hide();
+    $(document)
+        .off('click', '#confirmDeleteEventBtn')
+        .on('click', '#confirmDeleteEventBtn', function () {
+            const eventId = $('#deleteEventModal').data('eventId');
+            fetch(`${currentAPIurl}/calendar/removeEvent`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
             })
-            .catch((err) => {
-                toastMessage('Error deleting event: ' + err.message);
-                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
-                deleteModal.hide();
-            });
-    });
+                .then((res) => res.json())
+                .then((data) => {
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                    if (data.success) {
+                        toastMessage('Event deleted successfully!');
+                        if (typeof loadEvents === 'function') loadEvents();
+                    } else {
+                        toastMessage('Error deleting event: ' + (data.error || 'Unknown error'));
+                    }
+                    deleteModal.hide();
+                })
+                .catch((err) => {
+                    toastMessage('Error deleting event: ' + err.message);
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEventModal'));
+                    deleteModal.hide();
+                });
+        });
     $('#events').empty().append(table);
+}
+
+export function editEvent(event) {
+    const form = $('#createEventForm')[0];
+    const datetimeKeys = new Set(['start', 'end', 'startTime', 'endTime', 'startRecur', 'endRecur']);
+    const booleanKeys = new Set(['allDay', 'interactive', 'editable', 'startEditable', 'durationEditable', 'resourceEditable', 'overlap']);
+    const arrayKeys = new Set(['daysOfWeek']);
+
+    for (const key in event) {
+        if (event[key] === null) continue;
+        if (!form.elements[key]) continue;
+        if (datetimeKeys.has(key)) {
+            console.log(`Setting ${key} to ${event[key]}`);
+
+            form.elements[key].value = formatForDatetimeLocal(event[key]);
+        } else if (booleanKeys.has(key)) {
+            if (event[key] === '0' || event[key] === 0) {
+                form.elements[key].value = 'false';
+            } else if (event[key] === '1' || event[key] === 1) form.elements[key].value = 'true';
+            else {
+                continue;
+            }
+        } else if (arrayKeys.has(key)) {
+            let daysOfWeek = event[key];
+            if (typeof daysOfWeek === 'string') {
+                daysOfWeek = daysOfWeek
+                    .split(',')
+                    .map(Number)
+                    .filter((n) => !isNaN(n));
+            }
+            if (Array.isArray(daysOfWeek)) {
+                //for some reason the days are numbers 0-6, so we need to map them to the checkboxes
+                daysOfWeek = daysOfWeek.map(String);
+                console.log(daysOfWeek);
+                for (let day of daysOfWeek) {
+                    switch (day) {
+                        case '0':
+                            day = 'Sun';
+                            break;
+                        case '1':
+                            day = 'Mon';
+                            break;
+                        case '2':
+                            day = 'Tue';
+                            break;
+                        case '3':
+                            day = 'Wed';
+                            break;
+                        case '4':
+                            day = 'Thu';
+                            break;
+                        case '5':
+                            day = 'Fri';
+                            break;
+                        case '6':
+                            day = 'Sat';
+                            break;
+                        default:
+                            console.warn(`Unknown day of week: ${day}`);
+                            continue; // Skip unknown days
+                    }
+                    $(`#eventDaysOfWeek${day}`).prop('checked', true);
+                }
+            }
+        } else {
+            form.elements[key].value = event[key];
+        }
+    }
+    // Set the form to edit mode
+    form.dataset.mode = 'edit';
+    form.dataset.eventId = event.id;
+    $('#createEventSubmit').text('Update Event');
+    $('#createEventModal').modal('show');
 }

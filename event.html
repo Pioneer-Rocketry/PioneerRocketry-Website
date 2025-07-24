@@ -100,8 +100,9 @@
 												<div class="col-sm-4 text-muted fs-4">Start:</div>
 												<div id="start" class="col-sm-8 fs-4"></div>
 												<script>
-													let humanDate = new Date(`{{start}}`);
-													let options = {
+													let humanStartDate = new Date(`{{start}}`);
+													
+													let startOptions = {
 														year: "numeric",
 														month: "long",
 														day: "numeric",
@@ -110,13 +111,27 @@
 														timeZoneName: "long",
 													};
 													$("#start").text(
-														humanDate.toLocaleString("en-US", options)
+														humanDate.toLocaleString("en-US", startOptions)
 													);
 												</script>
 											</div>
 											<div class="row mb-2">
 												<div class="col-sm-4 text-muted fs-4">End:</div>
-												<div class="col-sm-8 fs-4">{{end}}</div>
+												<div class="col-sm-8 fs-4"></div>
+												<script>
+													let humanEndDate = new Date(`{{end}}`);
+													let endOptions = {
+														year: "numeric",
+														month: "long",
+														day: "numeric",
+														hour: "2-digit",
+														minute: "2-digit",
+														timeZoneName: "long",
+													};
+													$("#end").text(
+														humanEndDate.toLocaleString("en-US", endOptions)
+													);
+												</script>
 											</div>
 											<div class="row mb-2">
 												<div class="col-sm-4 text-muted fs-4">All Day:</div>

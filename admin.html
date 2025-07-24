@@ -70,16 +70,15 @@
 
         <!-- Event Manager -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h1 class="card-title loginRequired">Event Manager</h1>
-            </div>
-            <div class="card-body">
-                <div class="loginRequired" id="events"></div>
-                <!-- Add Event Modal Button -->
-                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal" onclick="$('#createEventSubmit').text('Create Event'); createEventForm.reset();">
                     <i class="fas fa-plus"></i>
                     Add Event
                 </button>
+            </div>
+            <div class="card-body">
+                <div class="loginRequired" id="events"></div>
             </div>
         </div>
 
@@ -114,14 +113,26 @@
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventStart">
-                                    Start
+                                    Start Date
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="datetime-local" class="form-control" id="eventStart" name="start" required />
+                                <input type="date" class="form-control" id="eventStart" name="start" required />
                             </div>
                             <div class="form-group mb-2">
-                                <label for="eventEnd">End</label>
-                                <input type="datetime-local" class="form-control" id="eventEnd" name="end" />
+                                <label for="eventStartTime">
+                                    Start Time
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="eventStartTime" name="startTime" required />
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label for="eventEnd">End Date</label>
+                                <input type="date" class="form-control" id="eventEnd" name="end" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventEndTime">End Time</label>
+                                <input type="time" class="form-control" id="eventEndTime" name="endTime" />
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventAllDay">All Day</label>
@@ -170,14 +181,6 @@
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekSat">Sat</label>
                                         </div>
                                         <input type="hidden" id="eventDaysOfWeek" name="daysOfWeek" />
-                                    </div>
-                                    <div class="form-group mb-2">
-                                        <label for="eventStartTime">Start Time</label>
-                                        <input type="time" class="form-control" id="eventStartTime" name="startTime" />
-                                    </div>
-                                    <div class="form-group mb-2">
-                                        <label for="eventEndTime">End Time</label>
-                                        <input type="time" class="form-control" id="eventEndTime" name="endTime" />
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventStartRecur">Recurrence Start</label>
