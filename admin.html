@@ -60,25 +60,130 @@
 
         <!-- User Manager -->
         <div class="card loginRequired">
-            <div class="card-header">
+            <div class="card-header overflow-auto">
                 <h1 class="card-title loginRequired">User Management</h1>
             </div>
-            <div class="card-body">
+            <div class="card-body overflow-auto">
                 <div class="" id="users"></div>
             </div>
         </div>
 
         <!-- Event Manager -->
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center overflow-auto">
                 <h1 class="card-title loginRequired">Event Manager</h1>
                 <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal" onclick="$('#createEventSubmit').text('Create Event'); createEventForm.reset();">
                     <i class="fas fa-plus"></i>
                     Add Event
                 </button>
             </div>
-            <div class="card-body">
+            <div class="card-body overflow-auto">
                 <div class="loginRequired" id="events"></div>
+            </div>
+        </div>
+
+        <!-- Image Manager -->
+        <div class="card loginRequired">
+            <div class="card-header d-flex justify-content-between align-items-center overflow-auto">
+                <h1 class="card-title loginRequired mb-0">Image Manager</h1>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createImageModal">
+                    <i class="fas fa-plus"></i>
+                    Upload Image
+                </button>
+            </div>
+            <div class="card-body overflow-auto">
+                <div class="container-fluid mt-3">
+                    <div class="table-responsive" style="max-height: 80vh; overflow-y: auto">
+                        <table class="table table-bordered table-hover align-middle" id="imageTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="max-width: 250px">Image Name</th>
+                                    <th style="max-width: 300px">URL</th>
+                                    <th>Preview</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Editor -->
+        <div class="card loginRequired">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title loginRequired">Page Editor</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <div id="">
+                    <div class="form-group">
+                        <label for="pageName">Page Name</label>
+                        <input type="text" class="form-control" id="pageName" name="pageName" />
+                    </div>
+                    <button type="button" id="loadPageBtn" class="btn btn-primary">Load Page</button>
+                    <table id="pageData" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Page Content</th>
+                                <th>User Access Level</th>
+                                <th>Modules</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="pageDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title">CSS Manager</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
+                    <i class="fas fa-plus"></i>
+                    Add CSS
+                </button>
+                <table class="table" id="cssTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Script Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title">Script Manager</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
+                    <i class="fas fa-plus"></i>
+                    Add Script
+                </button>
+                <table class="table" id="scriptTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
 
@@ -298,34 +403,6 @@
             </div>
         </div>
 
-        <!-- Image Manager -->
-        <div class="card loginRequired">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h1 class="card-title loginRequired mb-0">Image Manager</h1>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createImageModal">
-                    <i class="fas fa-plus"></i>
-                    Upload Image
-                </button>
-            </div>
-            <div class="card-body">
-                <div class="container-fluid mt-3">
-                    <div class="table-responsive" style="max-height: 80vh; overflow-y: auto">
-                        <table class="table table-bordered table-hover align-middle" id="imageTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="max-width: 250px">Image Name</th>
-                                    <th style="max-width: 300px">URL</th>
-                                    <th>Preview</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Create Image Modal -->
         <div class="modal fade" id="createImageModal" tabindex="-1" aria-labelledby="createImageModalLabel">
             <div class="modal-dialog">
@@ -411,35 +488,6 @@
             </div>
         </div>
 
-        <!-- Page Editor -->
-        <div class="card loginRequired">
-            <div class="card-header">
-                <h1 class="card-title loginRequired">Page Editor</h1>
-            </div>
-            <div class="card-body">
-                <div id="">
-                    <div class="form-group">
-                        <label for="pageName">Page Name</label>
-                        <input type="text" class="form-control" id="pageName" name="pageName" />
-                    </div>
-                    <button type="button" id="loadPageBtn" class="btn btn-primary">Load Page</button>
-                    <table id="pageData" class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Page Content</th>
-                                <th>User Access Level</th>
-                                <th>Modules</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="pageDataBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- Edit Module Modal (moved from tools.js) -->
         <div class="modal fade" id="editModuleModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -509,54 +557,6 @@
                         <button type="button" class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- CSS Manager -->
-        <div class="card loginRequired mt-4">
-            <div class="card-header">
-                <h1 class="card-title">CSS Manager</h1>
-            </div>
-            <div class="card-body">
-                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
-                    <i class="fas fa-plus"></i>
-                    Add CSS
-                </button>
-                <table class="table" id="cssTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>User Access</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Script Manager -->
-        <div class="card loginRequired mt-4">
-            <div class="card-header">
-                <h1 class="card-title">Script Manager</h1>
-            </div>
-            <div class="card-body">
-                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
-                    <i class="fas fa-plus"></i>
-                    Add Script
-                </button>
-                <table class="table" id="scriptTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>User Access</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
             </div>
         </div>
 

@@ -1,0 +1,17 @@
+name: Trigger Worker Deployment on Merge to production
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  trigger-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Worker repo deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ github.token }}       # built-in token for this workflow run
+          repository: Pioneer-Rocketry/Dev-Website-API  # repository to dispatch the event to
+          event-type: deploy-production # custom event type to trigger the deployment
