@@ -10,16 +10,20 @@ jobs:
   trigger-worker:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate GitHub App token
+      - name: Generate GitHub App token for Worker repo
         id: generate-token
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE }}
+          owner: Pioneer-Rocketry
+          repositories: Dev-Website-API    # Target repo for the dispatch
 
       - name: Trigger Worker repo deployment
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          repository: Pioneer-Rocketry/Dev-Website-API
-          event-type: deploy-production
+        run: |
+          gh api \
+            repos/Pioneer-Rocketry/Dev-Website-API/dispatches \
+            -X POST \
+            -F event_type=deploy-production
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
