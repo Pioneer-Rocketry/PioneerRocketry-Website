@@ -10,9 +10,16 @@ jobs:
   trigger-worker:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE }}
+
       - name: Trigger Worker repo deployment
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ github.token }}       # built-in token for this workflow run
-          repository: Pioneer-Rocketry/Dev-Website-API  # repository to dispatch the event to
-          event-type: deploy-production # custom event type to trigger the deployment
+          token: ${{ steps.generate-token.outputs.token }}
+          repository: Pioneer-Rocketry/Dev-Website-API
+          event-type: deploy-production
