@@ -5,22 +5,30 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Administration</title>
         <link rel="icon" type="image/png" href="images/favicon.png" />
+
+        <script>
+            globalThis.onGlobalTokenResponse = function (googleUser) {
+                auth.handleCredentialResponse(googleUser);
+            };
+        </script>
+
+        <!-- Main JS -->
+        <script src="./js/main.js" type="module"></script>
+
+        <!-- Bootstrap CSS v5.3.3 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="assets/css/main.css" />
+
+        <!-- jQuery v3.6.0 -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.dropotron/1.4.3/jquery.dropotron.min.js"></script>
+
+        <!-- Bootstrap Bundle (includes Popper.js) v5.3.3 -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="./scripts/tools.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
-        <script src="https://accounts.google.com/gsi/client" async></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-        <script src="./assets/js/browser.min.js"></script>
-        <script src="./assets/js/breakpoints.min.js"></script>
-        <script src="./assets/js/util.js"></script>
-        <script src="./assets/js/main.js"></script>
-        <script src="./scripts/auth.js"></script>
-        <script src="./scripts/tools.js"></script>
+
+        <!-- Google Sign-In -->
+        <script src="https://accounts.google.com/gsi/client"></script>
+
+        <!-- Font Awesome -->
+        <script src="https://kit.fontawesome.com/8f084d997c.js"></script>
     </head>
 
     <body data-bs-theme="dark">
@@ -31,7 +39,7 @@
                 data-context="signin"
                 data-include-granted_scopes="true"
                 data-ux_mode="popup"
-                data-callback="onTokenResponse"
+                data-callback="onGlobalTokenResponse"
                 data-auto_select="true"
                 data-button_auto_select="true"
                 data-use_fedcm_for_button="true"
@@ -39,48 +47,148 @@
                 data-itp_support="true"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
         </div>
-        
+
         <!-- Change API URL Dropdown -->
         <div class="d-flex justify-content-center">
             <label for="apiUrlSelector" class="form-label">Select API URL:</label>
             <select id="apiUrlSelector" class="form-select mb-3">
-                <option value="https://api.pioneerrocketry.com" selected>Production API</option>
-                <option value="https://dev-api.pioneerrocketry.com">Development API</option>
+                <option value="https://pioneerrocketry.com" selected>Production API</option>
+                <option value="http://localhost:8787">Local API</option>
             </select>
+            <button id="reRunOnload" class="btn btn-primary mb-3">Run Onload</button>
         </div>
 
         <!-- User Manager -->
         <div class="card loginRequired">
-            <div class="card-header">
+            <div class="card-header overflow-auto">
                 <h1 class="card-title loginRequired">User Management</h1>
             </div>
-            <div class="card-body">
+            <div class="card-body overflow-auto">
                 <div class="" id="users"></div>
             </div>
         </div>
-        <!-- Backup For userLoad -->
-        <button class="d-none triggerClickOnLogin btn btn-primary hide loginRequired" onclick="loadUsers()">Load Users</button>
-
-        
 
         <!-- Event Manager -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center overflow-auto">
                 <h1 class="card-title loginRequired">Event Manager</h1>
-            </div>
-            <div class="card-body">
-                <div class="loginRequired" id="events"></div>
-                <!-- Add Event Modal Button -->
-                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                <button type="button" class="btn btn-success loginRequired mt-3" data-bs-toggle="modal" data-bs-target="#createEventModal" onclick="$('#createEventSubmit').text('Create Event'); createEventForm.reset();">
                     <i class="fas fa-plus"></i>
                     Add Event
                 </button>
             </div>
-            <button class="triggerClickOnLogin btn btn-primary d-none loginRequired" onclick="loadEvents()">Load Events</button>
+            <div class="card-body overflow-auto">
+                <div class="loginRequired" id="events"></div>
+            </div>
+        </div>
+
+        <!-- Image Manager -->
+        <div class="card loginRequired">
+            <div class="card-header d-flex justify-content-between align-items-center overflow-auto">
+                <h1 class="card-title loginRequired mb-0">Image Manager</h1>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createImageModal">
+                    <i class="fas fa-plus"></i>
+                    Upload Image
+                </button>
+            </div>
+            <div class="card-body overflow-auto">
+                <div class="container-fluid mt-3">
+                    <div class="table-responsive" style="max-height: 80vh; overflow-y: auto">
+                        <table class="table table-bordered table-hover align-middle" id="imageTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="max-width: 250px">Image Name</th>
+                                    <th style="max-width: 300px">URL</th>
+                                    <th>Preview</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Editor -->
+        <div class="card loginRequired">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title loginRequired">Page Editor</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <div id="">
+                    <div class="form-group">
+                        <label for="pageName">Page Name</label>
+                        <input type="text" class="form-control" id="pageName" name="pageName" />
+                    </div>
+                    <button type="button" id="loadPageBtn" class="btn btn-primary">Load Page</button>
+                    <table id="pageData" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Page Content</th>
+                                <th>User Access Level</th>
+                                <th>Modules</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="pageDataBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title">CSS Manager</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
+                    <i class="fas fa-plus"></i>
+                    Add CSS
+                </button>
+                <table class="table" id="cssTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Script Manager -->
+        <div class="card loginRequired mt-4">
+            <div class="card-header overflow-auto">
+                <h1 class="card-title">Script Manager</h1>
+            </div>
+            <div class="card-body overflow-auto">
+                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
+                    <i class="fas fa-plus"></i>
+                    Add Script
+                </button>
+                <table class="table" id="scriptTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>User Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Event Creation -->
-        <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true" data-bs-theme="dark">
+        <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" data-bs-theme="dark">
             <div class="modal-dialog" data-bs-theme="dark">
                 <div class="modal-content" data-bs-theme="dark">
                     <!-- Modal Header -->
@@ -110,14 +218,26 @@
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventStart">
-                                    Start
+                                    Start Date
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="datetime-local" class="form-control" id="eventStart" name="start" required />
+                                <input type="date" class="form-control" id="eventStart" name="start" required />
                             </div>
                             <div class="form-group mb-2">
-                                <label for="eventEnd">End</label>
-                                <input type="datetime-local" class="form-control" id="eventEnd" name="end" />
+                                <label for="eventStartTime">
+                                    Start Time
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="eventStartTime" name="startTime" required />
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label for="eventEnd">End Date</label>
+                                <input type="date" class="form-control" id="eventEnd" name="end" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label for="eventEndTime">End Time</label>
+                                <input type="time" class="form-control" id="eventEndTime" name="endTime" />
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventAllDay">All Day</label>
@@ -166,14 +286,6 @@
                                             <label class="btn btn-outline-primary" for="eventDaysOfWeekSat">Sat</label>
                                         </div>
                                         <input type="hidden" id="eventDaysOfWeek" name="daysOfWeek" />
-                                    </div>
-                                    <div class="form-group mb-2">
-                                        <label for="eventStartTime">Start Time</label>
-                                        <input type="time" class="form-control" id="eventStartTime" name="startTime" />
-                                    </div>
-                                    <div class="form-group mb-2">
-                                        <label for="eventEndTime">End Time</label>
-                                        <input type="time" class="form-control" id="eventEndTime" name="endTime" />
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventStartRecur">Recurrence Start</label>
@@ -265,15 +377,15 @@
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventBackgroundColor">Background Color</label>
-                                        <input type="color" class="form-control" id="eventBackgroundColor" name="backgroundColor" />
+                                        <input type="color" class="form-control" id="eventBackgroundColor" name="backgroundColor" value="#3788d8" />
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventBorderColor">Border Color</label>
-                                        <input type="color" class="form-control" id="eventBorderColor" name="borderColor" />
+                                        <input type="color" class="form-control" id="eventBorderColor" name="borderColor" value="#0008ff" />
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventTextColor">Text Color</label>
-                                        <input type="color" class="form-control" id="eventTextColor" name="textColor" />
+                                        <input type="color" class="form-control" id="eventTextColor" name="textColor" value="#ffffff" />
                                     </div>
                                 </div>
                             </div>
@@ -291,34 +403,8 @@
             </div>
         </div>
 
-        <!-- Image Upload -->
-        <div class="card loginRequired">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h1 class="card-title loginRequired mb-0">Image Manager</h1>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createImageModal">
-                    <i class="fas fa-plus"></i>
-                    Upload Image
-                </button>
-            </div>
-            <div class="card-body">
-                <table class="table table-striped" id="imageTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>URL</th>
-                            <th>Preview</th>
-                            <th>Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Images will be loaded here dynamically -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <!-- Create Image Modal -->
-        <div class="modal fade" id="createImageModal" tabindex="-1" aria-labelledby="createImageModalLabel" aria-hidden="true">
+        <div class="modal fade" id="createImageModal" tabindex="-1" aria-labelledby="createImageModalLabel">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form id="createImageForm" enctype="multipart/form-data">
@@ -328,16 +414,16 @@
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label for="newImageName" class="form-label">Image Name</label>
-                                <input type="text" class="form-control" id="newImageName" name="imageName" required />
+                                <label for="newImageName" class="form-label">Image Name(s)</label>
+                                <input type="text" class="form-control" id="newImageName" name="imageName" required disabled />
                             </div>
                             <div class="mb-3">
-                                <label for="newImageFile" class="form-label">Image File</label>
-                                <input type="file" class="form-control" id="newImageFile" name="imageFile" accept="image/*" required />
+                                <label for="newImageFile" class="form-label">Image File(s)</label>
+                                <input type="file" class="form-control" id="newImageFile" name="imageFile" accept="image/*" required multiple />
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Upload Image</button>
+                            <button id="newImageSubmit" type="submit" class="btn btn-primary" data-bs-dismiss="modal" disabled>Upload Image(s)</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
                     </form>
@@ -346,7 +432,7 @@
         </div>
 
         <!-- Image Replace Modal -->
-        <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel" aria-hidden="true">
+        <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form id="replaceImageForm" enctype="multipart/form-data">
@@ -355,10 +441,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" id="replaceImageId" name="imageId" />
                             <div class="mb-3">
                                 <label for="replaceImageName" class="form-label">Image Name</label>
-                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required />
+                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required disabled />
                             </div>
                             <div class="mb-3">
                                 <label for="replaceImageFile" class="form-label">New Image File</label>
@@ -368,6 +453,7 @@
                                 <label class="form-label">Current Image Preview</label>
                                 <div>
                                     <img id="replaceImagePreview" src="#" alt="Current Image" style="max-width: 100%; height: auto" />
+                                    <img id="replaceImageNewPreview" src="#" alt="New Image" style="max-width: 100%; height: auto" />
                                 </div>
                             </div>
                         </div>
@@ -380,37 +466,26 @@
             </div>
         </div>
 
-        <!-- Page Editor -->
-        <div class="card loginRequired">
-            <div class="card-header">
-                <h1 class="card-title loginRequired">Page Editor</h1>
-            </div>
-            <div class="card-body">
-                <div id="">
-                    <div class="form-group">
-                        <label for="pageName">Page Name</label>
-                        <input type="text" class="form-control" id="pageName" name="pageName" />
+        <!-- Delete Image Modal -->
+        <div class="modal fade" id="confirmDeleteImageModal" tabindex="-1" aria-labelledby="confirmDeleteImageModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteImageModalLabel">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <button type="button" id="loadPageBtn" class="btn btn-primary">Load Page</button>
-                    <table id="pageData" class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Page Content</th>
-                                <th>User Access Level</th>
-                                <th>Modules</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="pageDataBody"></tbody>
-                    </table>
+                    <div class="modal-body">
+                        Are you sure you want to delete
+                        <strong id="deleteImageName">Name</strong>
+                        ?
+                        <img id="deleteImage" src="" alt="" class="img-fluid mt-2 hoverPreview" style="max-width: 100%; max-height: 200px" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmDeleteImageBtn">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
-            <script>
-                // Initialize the page editor functionality
-                initializePageEditor();
-            </script>
         </div>
 
         <!-- Edit Module Modal (moved from tools.js) -->
@@ -485,54 +560,6 @@
             </div>
         </div>
 
-        <!-- CSS Manager -->
-        <div class="card loginRequired mt-4">
-            <div class="card-header">
-                <h1 class="card-title">CSS Manager</h1>
-            </div>
-            <div class="card-body">
-                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createCssModal">
-                    <i class="fas fa-plus"></i>
-                    Add CSS
-                </button>
-                <table class="table" id="cssTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>User Access</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Script Manager -->
-        <div class="card loginRequired mt-4">
-            <div class="card-header">
-                <h1 class="card-title">Script Manager</h1>
-            </div>
-            <div class="card-body">
-                <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createScriptModal">
-                    <i class="fas fa-plus"></i>
-                    Add Script
-                </button>
-                <table class="table" id="scriptTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>User Access</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
         <!-- Create/Edit CSS Modal -->
         <div class="modal fade" id="createCssModal" tabindex="-1">
             <div class="modal-dialog">
@@ -592,5 +619,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- Fullscreen Image Overlay -->
+        <div id="imageFullscreenOverlay" class="hide position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center p-5 fade" style="z-index: 99999; pointer-events: none">
+            <div class="w-100 h-100 d-flex justify-content-center align-items-center" style="padding: 10%; box-sizing: border-box">
+                <img id="fullscreenImage" src="" class="rounded shadow" style="max-width: 100%; max-height: 100%; object-fit: contain; height: 100%" />
+            </div>
+        </div>
+
+        <!-- Toast container for stacking -->
+        <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055"></div>
     </body>
 </html>

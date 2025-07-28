@@ -1,43 +1,27 @@
+pageLoaded = false;
 $(document).ready(function () {
     setAPIurl();
     $('.loginRequired').hide();
-    //if the url consist of only numbers the show.
+
     if (location.host.match(/^[0-9.:]+$/)) {
-        $('.loginRequired').show();
-        $('#createEventBtn').show();
-        $('.loginRequired').show();
-        $('.triggerChangeOnLogin').trigger('change');
-        $('.triggerClickOnLogin').trigger('click');
+        //set the user to a test user that only works on localhost
+        localStorage.setItem('JWT', 'TestToken');
     }
+    $('#reRunOnload').on('click', function () {
+        onLoad(true);
+    });
 
     $('#loadPageBtn').on('click', function () {
         const pageName = document.getElementById('pageName').value;
-        $.ajax({
-            type: 'POST',
-            url: `${window.currentAPIurl}/admin/getPage`,
-            data: {
-                page: pageName,
-            },
-            success: function (response) {
-                console.log('Raw response:', response);
-                const parsedResponse = JSON.parse(response);
-                console.log('Parsed response:', parsedResponse);
-
-                if (parsedResponse.success === false) {
-                    alert('Error: ' + parsedResponse.error);
-                    return;
-                }
-                displayPageData(parsedResponse);
-            },
-            error: function (error) {
-                console.error('AJAX error:', error);
-            },
-        });
+        loadPageData(pageName);
     });
 
-    $('#apiUrlSelector').on('change', function () {
+    $('#apiUrlSelector').val(window.currentAPIurl);
+    $('#apiUrlSelector').on('input', function () {
         const selectedUrl = $(this).val();
         window.currentAPIurl = selectedUrl;
+        currentAPIurl = selectedUrl;
+        localStorage.setItem('currentAPIurl', selectedUrl);
         console.log('API URL changed to:', selectedUrl);
     });
 
@@ -51,82 +35,307 @@ $(document).ready(function () {
         $('#eventDaysOfWeek').val(selected.join(','));
     });
 
-    document.getElementById('createEventForm').addEventListener('submit', async function (event) {
+    $('#createEventForm').on('submit', async function (event) {
         event.preventDefault();
         const form = event.target;
         submitEventForm(
             form,
             function (result) {
-                alert('Event created successfully!');
                 if (typeof loadEvents === 'function') loadEvents();
                 const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
                 modal.hide();
                 form.reset();
             },
             function (error) {
-                alert('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+                console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
             }
         );
     });
+
+    $(document).on('click', '.replace-image-btn', function () {
+        const imageName = $(this).data('name');
+        const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        $('#replaceImageName').val(imageName);
+        $('#replaceImagePreview').attr('src', imageUrl);
+        $('#replaceImageModal').modal('show');
+        $('#replaceImageFile').val('');
+    });
+
+    $(document).on('click', '.delete-image-btn', function () {
+        const imageName = $(this).data('name');
+        const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        $('#deleteImageName').text(imageName);
+        $('#deleteImage').attr('src', imageURL).attr('alt', imageName);
+        $('#confirmDeleteImageModal').modal('show');
+    });
+
+    $('#confirmDeleteImageBtn')
+        .off('click')
+        .on('click', function (e) {
+            e.preventDefault();
+            const imageName = $('#deleteImageName').text();
+            $.ajax({
+                url: `${currentAPIurl}/image/delete`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ token: localStorage.getItem('JWT') || '', imageName }),
+                success: function () {
+                    toastMessage('Image deleted successfully.', 'success');
+                    setTimeout(loadImages, 5000);
+                },
+                error: function () {
+                    toastMessage('Failed to delete image.', 'danger');
+                },
+            });
+        });
+
+    $('#replaceImageFile').on('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#replaceImageNewPreview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#replaceImagePreview').attr('src', '');
+            $('#replaceImageNewPreview').attr('src', '');
+        }
+    });
+
+    $('#replaceImageModal').on('hidden.bs.modal', function () {
+        $('#replaceImageFile').val('');
+        $('#replaceImagePreview').attr('src', '');
+    });
+
+    $('#replaceImageForm')
+        .off('submit')
+        .on('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('imageName', $('#replaceImageName').val());
+            formData.append('token', localStorage.getItem('JWT') || '');
+
+            $.ajax({
+                url: `${currentAPIurl}/image/replace`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    $('#replaceImageModal').modal('hide');
+                    setTimeout(loadImages, 500);
+                },
+                error: function () {
+                    toastMessage('Failed to replace image.', 'danger');
+                },
+            });
+        });
+
+    $('#newImageFile').on('input', function () {
+        const files = Array.from(this.files);
+        $('#newImageSubmit').prop('disabled', files.length === 0);
+
+        if (files.length > 0) {
+            $('#newImageName').val(files.map((f) => f.name).join(', '));
+            const reader = new FileReader();
+            reader.onload = (e) => $('#newImagePreview').attr('src', e.target.result);
+            reader.readAsDataURL(files[0]);
+        } else {
+            $('#newImageName').val('');
+            $('#newImagePreview').attr('src', '');
+        }
+    });
+
+    $('#createImageForm')
+        .off('submit')
+        .on('submit', function (e) {
+            e.preventDefault();
+            const files = $('#newImageFile')[0].files;
+            if (files.length === 0) return toastMessage('Please select at least one image.', 'warning');
+
+            const formData = new FormData();
+            formData.append('token', localStorage.getItem('JWT') || '');
+            for (const file of files) formData.append('imageFile', file);
+
+            $.ajax({
+                url: `${window.currentAPIurl}/image/upload`,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#newImageModal').modal('hide');
+                    loadImages();
+                    $('#newImageFile').val('');
+                    $('#newImageName').val('');
+                    $('#newImagePreview').attr('src', '');
+                    handleUploadSummary(data);
+                },
+                error: function () {
+                    toastMessage('Failed to upload images.', 'danger');
+                },
+            });
+        });
+    $(document).on('mouseenter', '.hoverPreview', function () {
+        const src = $(this).attr('src');
+        $('#fullscreenImage').attr('src', src);
+        $('#imageFullscreenOverlay').removeClass('hide').addClass('show');
+    });
+
+    $(document).on('mouseleave', '.hoverPreview', function () {
+        $('#imageFullscreenOverlay').addClass('hide').removeClass('show');
+    });
 });
+
+//AUTH Functions
+
+function onTokenResponse(googleUser) {
+    handleCredentialResponse(googleUser);
+}
+
+function onErrorCallback(error) {
+    console.log('Login Error: ', error);
+}
+
+function handleCredentialResponse(response) {
+    $.ajax({
+        type: 'POST',
+        url: `${currentAPIurl}/googleAuth`,
+        data: JSON.stringify({ token: response.credential }),
+        contentType: 'application/json',
+    })
+        .done(function (data) {
+            let flags = null;
+            try {
+                flags = JSON.parse(data).flags;
+            } catch (e) {
+                console.log('Error parsing flags:', e);
+                console.log('Switching to new Handler');
+            }
+            //Remove After Updating the API
+            if (flags == null || flags == undefined || flags == '') {
+                flags = data.result.flags;
+            }
+            console.log('User Access Level: ' + flags);
+            if (parseFloat(flags) >= 2.0) {
+                localStorage.setItem('JWT', response.credential);
+                onLoad();
+            }
+            $('#g_id_signin').hide();
+            return true;
+        })
+        .fail(function (data) {
+            console.log('Error: ' + data);
+            return false;
+        });
+}
+
+function onLoad(force = false) {
+    if (!force && !pageLoaded) {
+        pageLoaded = true;
+        $('#createEventBtn').show();
+        $('.loginRequired').show();
+        loadUsers();
+        loadCssList();
+        loadScriptList();
+        loadImages();
+        loadEvents();
+        loadUserData();
+    }
+}
+
+function sessionLogin() {
+    console.log('Checking for Local Session');
+    if (localStorage.getItem('JWT') != null) {
+        console.log('JWT found');
+        try {
+            localJWTSession = localStorage.getItem('JWT');
+        } catch (e) {
+            console.log(e);
+        }
+        handleCredentialResponse({ credential: localJWTSession });
+        setTimeout(function () {
+            $('#credential_picker_container').hide();
+        }, 1000);
+    } else {
+        console.log('No Session Found, Skipping.');
+    }
+}
+
+//Other Functions
+
+function toastMessage(message, type = 'info') {
+    const toastContainer = $('#toastContainer');
+
+    // Determine icon color based on type
+    let iconColor;
+    let bgClass;
+
+    switch (type) {
+        case 'success':
+            iconColor = '#198754';
+            bgClass = 'bg-success';
+            break;
+        case 'warning':
+            iconColor = '#ffc107';
+            bgClass = 'bg-warning';
+            break;
+        case 'danger':
+            iconColor = '#dc3545';
+            bgClass = 'bg-danger';
+            break;
+        default:
+            iconColor = '#0d6efd';
+            bgClass = 'bg-info';
+            break;
+    }
+
+    // Create Toast DOM structure
+    const toast = $(`
+        <div class="toast  text-white border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 300px;">
+            <div class="toast-header">
+                <i class="fa-solid fa-circle me-2" style="color: ${iconColor};"></i>
+                <strong class="me-auto text-capitalize">${type}</strong>
+                <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `);
+
+    // Append to container
+    toastContainer.append(toast);
+
+    // Show toast using Bootstrap's API
+    const bsToast = new bootstrap.Toast(toast[0], { delay: 5000 });
+    bsToast.show();
+
+    // Remove from DOM after hidden
+    toast.on('hidden.bs.toast', function () {
+        $(this).remove();
+    });
+}
 
 function setAPIurl() {
     window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
-    if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = devAPIurl;
+    if (localStorage.getItem('currentAPIurl') != null) {
+        window.currentAPIurl = localStorage.getItem('currentAPIurl');
     } else {
-        window.currentAPIurl = productionAPIurl;
-    }
-    try {
-        //check if the currentAPIurl is valid by calling the api
-        fetch(`${currentAPIurl}/calendar/getAllEvents`, {
-            method: 'GET',
-            headers: {},
-        })
-            .then((response) => {})
-            .catch((error) => {
-                window.currentAPIurl = window.productionAPIurl;
-            });
-    } catch (error) {
-        window.currentAPIurl = window.productionAPIurl;
-    }
-}
-
-async function asyncSetAPIurl() {
-    window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
-    window.productionAPIurl = 'https://api.pioneerrocketry.com';
-    window.currentAPIurl = null;
-
-    // Set initial API URL based on hostname
-    if (window.location.hostname === 'dev.pioneerrocketry.com') {
-        window.currentAPIurl = window.devAPIurl;
-    } else {
-        window.currentAPIurl = window.productionAPIurl;
-    }
-
-    // Return a promise that resolves with the validated API URL
-    return new Promise(async (resolve, reject) => {
-        try {
-            // Test if the current API URL is valid
-            const response = await fetch(`${window.currentAPIurl}/calendar/getAllEvents`, {
-                method: 'GET',
-            });
-
-            if (response.ok) {
-                resolve(window.currentAPIurl);
-            } else {
-                // If primary URL fails, fallback to testing URL
-                window.currentAPIurl = window.devAPIurl;
-                resolve(window.currentAPIurl);
-            }
-        } catch (error) {
-            // If fetch fails, fallback to testing URL
-            window.currentAPIurl = window.devAPIurl;
-            resolve(window.currentAPIurl);
+        if (window.location.hostname === 'dev.pioneerrocketry.com') {
+            window.currentAPIurl = devAPIurl;
+        } else {
+            window.currentAPIurl = productionAPIurl;
         }
-    });
+    }
+    if (window.location.hostname === 'localhost') {
+        window.currentAPIurl = 'http://localhost:8787';
+        handleCredentialResponse({ credential: 'TestToken' });
+    }
 }
 
 function getAllUsers() {
@@ -166,113 +375,60 @@ async function getHeader() {
 // Fetch and display all images in the table
 function loadImages() {
     $.ajax({
-        url: 'https://api.pioneerrocketry.com/images',
+        url: `${window.currentAPIurl}/images`,
         method: 'GET',
-        headers: {
-            token: window.user.getToken(),
-            name: window.user.getName(),
-            email: window.user.getEmail(),
-            id: window.user.getId(),
-        },
         success: function (data) {
-            const tbody = $('#imageTable tbody');
-            tbody.empty();
-            (data.images || []).forEach(function (img) {
-                const url = `https://api.pioneerrocketry.com/image/${encodeURIComponent(img.key)}`;
+            const tbody = $('#imageTable tbody').empty();
+
+            (data.images || []).forEach(({ image: img }) => {
+                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
+
+                // Trim and truncate long names
+                const trimmedName = img.key.length > 30 ? img.key.slice(0, 27) + '...' : img.key;
+                const trimmedURL = url.length > 40 ? url.slice(0, 37) + '...' : url;
+
                 const row = `
                     <tr>
-                        <td>${img.key}</td>
-                        <td><a href="${url}" target="_blank">${url}</a></td>
-                        <td><img src="${url}" alt="${img.key}" style="max-width:80px;max-height:80px;" class="rounded" /></td>
-                        <td>
-                            <button class="btn btn-sm btn-primary edit-image-btn" data-name="${img.key}">Edit</button>
+                        <td class="align-middle text-truncate" title="${img.key}">${trimmedName}</td>
+                        <td class="align-middle text-truncate" style="max-width: 300px;" title="${url}">
+                            <a href="${url}" target="_blank">${trimmedURL}</a>
+                        </td>
+                        <td class="align-middle">
+                            <img src="${url}" alt="${img.key}" style="max-width:80px; max-height:80px;" class="rounded hoverPreview" />
+                        </td>
+                        <td class="align-middle">
                             <button class="btn btn-sm btn-primary replace-image-btn" data-name="${img.key}">Replace</button>
                             <button class="btn btn-sm btn-primary delete-image-btn" data-name="${img.key}">Delete</button>
                         </td>
                     </tr>
                 `;
+
                 tbody.append(row);
             });
-            $(document).on('click', '.edit-image-btn', function () {
-                const imageId = $(this).data('image-id');
-                const imageUrl = $(this).data('image-url');
-                openReplaceImageModal(imageId, imageUrl);
-            });
-
-            // Replace Image Button Click Handler
-            $(document).on('click', '.replace-image-btn', function () {
-                const imageName = $(this).data('name');
-                const imageUrl = `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`;
-                // Fill modal fields
-                $('#replaceImageId').val(imageName);
-                $('#replaceImagePreview').attr('src', imageUrl);
-                $('#replaceImageModal').modal('show');
-                $('#replaceImageFile').val('');
-            });
-
-            // Delete Image Button Click Handler
-            $(document).on('click', '.delete-image-btn', function () {
-                const imageName = $(this).data('name');
-                // Show confirm modal using Bootstrap
-                const confirmModal = $(`
-                    <div class="modal fade" id="confirmDeleteImageModal" tabindex="-1" aria-labelledby="confirmDeleteImageModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmDeleteImageModalLabel">Confirm Delete</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete "<strong>${imageName}</strong>"?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" id="confirmDeleteImageBtn">Delete</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `);
-
-                // Remove any existing confirm modal to avoid duplicates
-                $('#confirmDeleteImageModal').remove();
-                $('body').append(confirmModal);
-
-                const modalInstance = new bootstrap.Modal(document.getElementById('confirmDeleteImageModal'));
-                modalInstance.show();
-
-                $('#confirmDeleteImageBtn')
-                    .off('click')
-                    .on('click', function () {
-                        $.ajax({
-                            url: `https://api.pioneerrocketry.com/image/${encodeURIComponent(imageName)}`,
-                            type: 'DELETE',
-                            headers: {
-                                token: window.user.getToken && window.user.getToken(),
-                            },
-                            success: function () {
-                                alert('Image deleted successfully.');
-                                loadImages();
-                            },
-                            error: function () {
-                                alert('Failed to delete image.');
-                            },
-                            complete: function () {
-                                modalInstance.hide();
-                            },
-                        });
-                    });
-
-                // Clean up modal from DOM after it's hidden
-                $('#confirmDeleteImageModal').on('hidden.bs.modal', function () {
-                    $(this).remove();
-                });
-            });
         },
-        error: function (err) {
-            alert('Failed to load images.');
+        error: function () {
+            toastMessage('No Images to load.', 'warning');
+            $('#imageTable tbody').empty();
         },
     });
+}
+
+function handleUploadSummary(ajaxData) {
+    let successCount = 0,
+        failureCount = 0;
+    const failedImages = [];
+    (ajaxData.results || []).forEach((result) => {
+        if (result.error) {
+            failureCount++;
+            failedImages.push(result.imageName);
+        } else {
+            successCount++;
+        }
+    });
+
+    if (successCount && !failureCount) toastMessage(`Uploaded ${successCount} images successfully.`, 'success');
+    else if (successCount && failureCount) toastMessage(`Uploaded ${successCount} images with ${failureCount} failures.`, 'warning');
+    else if (failureCount) toastMessage(`All ${failureCount} images failed to upload.`, 'danger');
 }
 
 // Call this function when the user clicks the "Edit" button for an image
@@ -285,28 +441,6 @@ function openReplaceImageModal(imageId, imageUrl) {
 }
 
 // Handle the form submission
-$('#replaceImageForm').on('submit', function (e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-
-    $.ajax({
-        url: '/api/images/replace', // Change to your actual endpoint
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (response) {
-            // Handle success (e.g., close modal, refresh image table)
-            $('#replaceImageModal').modal('hide');
-            // Optionally reload images
-            loadImages();
-        },
-        error: function (xhr) {
-            // Handle error
-            alert('Failed to replace image.');
-        },
-    });
-});
 
 async function getFooter() {
     return new Promise((resolve, reject) => {
@@ -386,7 +520,6 @@ async function loadUsers() {
     }
 }
 async function loadEvents() {
-    await asyncSetAPIurl();
     let data = await fetch(`${currentAPIurl}/calendar/getAllEvents`, {
         method: 'GET',
     });
@@ -612,8 +745,27 @@ function updatePage(pageName, config) {
 }
 
 // Page Editor Functions
-function initializePageEditor() {
-    $(document).ready(function () {});
+function loadPageData(pageName) {
+    $.ajax({
+        type: 'POST',
+        url: `${window.currentAPIurl}/admin/getPage`,
+        data: {
+            page: pageName,
+        },
+        success: function (response) {
+            console.log('Raw response:', response);
+            const parsedResponse = JSON.parse(response);
+            console.log('Parsed response:', parsedResponse);
+            if (parsedResponse.success === false) {
+                alert('Error: ' + parsedResponse.error);
+                return;
+            }
+            displayPageData(parsedResponse);
+        },
+        error: function (error) {
+            console.error('AJAX error:', error);
+        },
+    });
 }
 
 function displayPageData(data) {
@@ -1267,10 +1419,9 @@ function parseSeparateContentInModal(content) {
 }
 
 async function loadCssList() {
-    await asyncSetAPIurl();
     if (localStorage.getItem('JWT')) {
         try {
-            const response = await fetch(`${currentAPIurl}/modules/getCss`, {
+            const response = await fetch(`${currentAPIurl}/module/getCss`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1349,7 +1500,7 @@ $('#cssForm').on('submit', async function (e) {
         UserAccessLevel: $('#cssAccess').val(),
     };
     try {
-        const response = await fetch(`${currentAPIurl}/modules/createCss`, {
+        const response = await fetch(`${currentAPIurl}/module/createCss`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1408,7 +1559,7 @@ $('#scriptForm').on('submit', async function (e) {
         UserAccessLevel: $('#scriptAccess').val(),
     };
     try {
-        const response = await fetch(`${currentAPIurl}/modules/createScript`, {
+        const response = await fetch(`${currentAPIurl}/module/createScript`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

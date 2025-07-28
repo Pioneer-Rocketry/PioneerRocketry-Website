@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<!--
+	Escape Velocity by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+    <head>
+        <title>Event Details</title>
+        <link rel="icon" type="image/png" href="/images/favicon.png" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <!-- Primary Meta Tags -->
+        <meta name="title" content="Pioneer Rocketry Event Details" />
+        <meta name="description" content="{{description}}" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://pioneerrocketry.com/calendar/event/{{id}}" />
+        <meta property="og:title" content="Pioneer Rocketry" />
+        <meta property="og:description" content="{{description}}" />
+        <meta property="og:image" content="https://pioneerrocketry.com/images/favicon1.png" />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://pioneerrocketry.com/calendar/event/{{id}}" />
+        <meta property="twitter:title" content="Pioneer Rocketry" />
+        <meta property="twitter:description" content="Pioneer Rocketry is an organization with a focus on high powered rocketry within the University of Wisconsin Platteville." />
+        <meta property="twitter:image" content="https://pioneerrocketry.com/images/favicon1.png" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="/assets/js/jquery.min.js"></script>
+
+        <link rel="stylesheet" href="/assets/css/main.css" />
+        <link rel="stylesheet" href="/assets/css/custom.css" />
+        <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css" />
+    </head>
+
+    <body class="homepage is-preload">
+        <div id="page-wrapper">
+            <!-- Header -->
+            <section id="header" class="wrapper smaller">
+                <!-- Nav -->
+                <nav id="nav">
+                    <ul>
+                        <li><a href="/index">Home</a></li>
+                        <li><a href="/calendar">Schedule</a></li>
+                    </ul>
+                </nav>
+            </section>
+
+            <!-- Event -->
+            <!-- Important Event Data -->
+            <section class="wrapper style2 moduleSafe">
+                <div class="title">Event Details</div>
+                <div class="container moduleSafe">
+                    <div class="row aln-center">
+                        <div class="col-12 col-md-8 card-like" style="display: flex; flex-direction: column; justify-content: space-between">
+                            <section class="highlight">
+                                <div style="display: flex; flex-direction: column; align-items: flex-start">
+                                    <h2 class="lead mb-3 fs-2">Event: {{title}}</h2>
+                                    <p class="mb-4 fs-3">Description: {{description}}</p>
+
+                                    <div class="card-like w-100 mb-4 shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title fs-4">Event Timing</h5>
+                                            <div class="row mb-2">
+                                                <div class="col-sm-4 text-muted fs-4">Start:</div>
+                                                <div id="start" class="col-sm-8 fs-4"></div>
+                                                <script>
+                                                    let humanStartDate = new Date(`{{start}}`);
+
+                                                    let startOptions = {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        timeZoneName: 'long',
+                                                    };
+                                                    $('#start').text(humanDate.toLocaleString('en-US', startOptions));
+                                                </script>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-sm-4 text-muted fs-4">End:</div>
+                                                <div class="col-sm-8 fs-4"></div>
+                                                <script>
+                                                    let humanEndDate = new Date(`{{end}}`);
+                                                    let endOptions = {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        timeZoneName: 'long',
+                                                    };
+                                                    $('#end').text(humanEndDate.toLocaleString('en-US', endOptions));
+                                                </script>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-sm-4 text-muted fs-4">All Day:</div>
+
+                                                <div id="allDay" class="col-sm-8 fs-4"></div>
+                                                <script>
+                                                    if (`{{allDay}}` == `0`) {
+                                                        $('#allDay').text('No');
+                                                    } else {
+                                                        $('#allDay').text('Yes');
+                                                    }
+                                                </script>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-4 text-muted fs-4">Repeats:</div>
+
+                                                <div id="repeat" class="col-sm-8 fs-4"></div>
+                                                <script>
+                                                    if (`{{daysOfWeek}}` !== ``) {
+                                                        //days of week will be an array of numbers
+                                                        let daysOfWeek = `{{daysOfWeek}}`.replace('[', '').replace(']', '').split(',');
+                                                        let daysOfWeekNames = daysOfWeek.map((day) => {
+                                                            switch (day) {
+                                                                case '0':
+                                                                    return 'Sunday';
+                                                                case '1':
+                                                                    return 'Monday';
+                                                                case '2':
+                                                                    return 'Tuesday';
+                                                                case '3':
+                                                                    return 'Wednesday';
+                                                                case '4':
+                                                                    return 'Thursday';
+                                                                case '5':
+                                                                    return 'Friday';
+                                                                case '6':
+                                                                    return 'Saturday';
+                                                                default:
+                                                                    return '';
+                                                            }
+                                                        });
+
+                                                        $('#repeat').text(daysOfWeekNames.join(', '));
+                                                    } else {
+                                                        $('#repeat').text('None');
+                                                    }
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <ul class="actions">
+                                        <li>
+                                            <a href="{{url}}" class="button style1" target="_blank">Event Link</a>
+                                        </li>
+                                        <li>
+                                            <a id="download-ics" class="btn btn-primary" download="event.ics">Add to Your Calendar</a>
+                                        </li>
+                                    </ul>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const title = `{{title}}`;
+                                            const description = `{{description}}`;
+                                            const start = new Date(`{{start}}`);
+                                            const end = new Date(`{{end}}`);
+
+                                            function toICSDate(date) {
+                                                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                                            }
+
+                                            const icsContent = `
+                                                BEGIN:VCALENDAR
+                                                VERSION:2.0
+                                                PRODID:-//Pioneer Rocketry//Event Calendar//EN
+                                                CALSCALE:GREGORIAN
+                                                BEGIN:VEVENT
+                                                UID:${`{{id}}`}@pioneerrocketry.com
+                                                DTSTAMP:${toICSDate(new Date())}
+                                                DTSTART:${toICSDate(start)}
+                                                DTEND:${toICSDate(end)}
+                                                SUMMARY:${title}
+                                                DESCRIPTION:${description}
+                                                LOCATION:Pioneer Rocketry
+                                                STATUS:CONFIRMED
+                                                END:VEVENT
+                                                END:VCALENDAR`.trim();
+
+                                            const blob = new Blob([icsContent], {
+                                                type: 'text/calendar',
+                                            });
+                                            const url = URL.createObjectURL(blob);
+                                            document.getElementById('download-ics').href = url;
+                                        });
+                                    </script>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Other Event Data -->
+            <section class="wrapper style3">
+                <div class="title">
+                    Other Event Details
+                    <a class="text-decoration-none text-primary rounded" data-bs-toggle="collapse" href="#otherDetails">Toggle</a>
+                </div>
+                <div id="otherDetails" class="container collapse">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <th>ID</th>
+                                <td>{{id}}</td>
+                            </tr>
+                            <tr>
+                                <th>Group ID</th>
+                                <td>{{groupId}}</td>
+                            </tr>
+                            <tr>
+                                <th>Days of Week</th>
+                                <td>{{daysOfWeek}}</td>
+                            </tr>
+                            <tr>
+                                <th>Start Time</th>
+                                <td>{{startTime}}</td>
+                            </tr>
+                            <tr>
+                                <th>End Time</th>
+                                <td>{{endTime}}</td>
+                            </tr>
+                            <tr>
+                                <th>Start Recur</th>
+                                <td>{{startRecur}}</td>
+                            </tr>
+                            <tr>
+                                <th>End Recur</th>
+                                <td>{{endRecur}}</td>
+                            </tr>
+                            <tr>
+                                <th>Interactive</th>
+                                <td>{{interactive}}</td>
+                            </tr>
+                            <tr>
+                                <th>Class Name</th>
+                                <td>{{className}}</td>
+                            </tr>
+                            <tr>
+                                <th>Class Names</th>
+                                <td>{{classNames}}</td>
+                            </tr>
+                            <tr>
+                                <th>Editable</th>
+                                <td>{{editable}}</td>
+                            </tr>
+                            <tr>
+                                <th>Start Editable</th>
+                                <td>{{startEditable}}</td>
+                            </tr>
+                            <tr>
+                                <th>Duration Editable</th>
+                                <td>{{durationEditable}}</td>
+                            </tr>
+                            <tr>
+                                <th>Resource Editable</th>
+                                <td>{{resourceEditable}}</td>
+                            </tr>
+                            <tr>
+                                <th>Resource ID</th>
+                                <td>{{resourceId}}</td>
+                            </tr>
+                            <tr>
+                                <th>Resource IDs</th>
+                                <td>{{resourceIds}}</td>
+                            </tr>
+                            <tr>
+                                <th>Display</th>
+                                <td>{{display}}</td>
+                            </tr>
+                            <tr>
+                                <th>Overlap</th>
+                                <td>{{overlap}}</td>
+                            </tr>
+                            <tr>
+                                <th>Constraint</th>
+                                <td>{{constraint}}</td>
+                            </tr>
+                            <tr>
+                                <th>RRULE</th>
+                                <td>{{rrule}}</td>
+                            </tr>
+                            <tr>
+                                <th>Duration</th>
+                                <td>{{duration}}</td>
+                            </tr>
+                            <tr>
+                                <th>Color</th>
+                                <td>
+                                    <span class="badge" style="background:{{color}};color:#fff;">{{color}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Background Color</th>
+                                <td>
+                                    <span class="badge" style="background:{{backgroundColor}};color:#fff;">{{backgroundColor}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Border Color</th>
+                                <td>
+                                    <span class="badge" style="background:{{borderColor}};color:#fff;">{{borderColor}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Text Color</th>
+                                <td>
+                                    <span class="badge" style="background:{{textColor}};color:#fff;">{{textColor}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    let currentUrl = window.location.href;
+                    if (currentUrl.indexOf('localhost') !== -1) {
+                        templateUrl = 'http://localhost:8787';
+                    } else {
+                        templateUrl = 'https://pioneerrocketry.com';
+                    }
+                    fetch(`${templateUrl}/template.html`)
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then((data) => {
+                            $('body').append(data.split('<!-- Footer -->')[1].split('<!-- Footer -->')[0]);
+                        })
+                        .catch((error) => {
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                });
+            </script>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+
+        <script src="/assets/js/jquery.dropotron.min.js"></script>
+        <script src="/assets/js/browser.min.js"></script>
+        <script src="/assets/js/breakpoints.min.js"></script>
+        <script src="/assets/js/util.js"></script>
+        <script src="/assets/js/main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,62 @@
+name: Deploy Cloudflare Worker on Push and Pull Request
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the current repo (source of static files)
+      - uses: actions/checkout@v4
+
+      # Set up SSH using the deploy key
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.WORKER_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      # Clone the worker repo using SSH
+      - name: Clone worker repo
+        run: git clone git@github.com:Pioneer-Rocketry/Dev-Website-API.git worker-repo
+
+      # Clear the old static directory (optional)
+      - name: Clear static folder
+        run: |
+          rm -rf worker-repo/static/*
+          mkdir -p worker-repo/static
+
+      # Copy new static files into the worker repo
+      - name: Copy static files
+        run: |
+          rsync -av \
+          --exclude=worker-repo \
+          --exclude=worker \
+          --exclude=.git \
+          --exclude=.github \
+          --exclude=node_modules \
+          --exclude=package-lock.json \
+          --exclude=package.json \
+          --exclude=wrangler.toml \
+          --exclude=wrangler.jsonc \
+          --exclude=README.md \
+          --exclude=.gitignore \
+          --exclude=CNAME \
+          ./ worker-repo/static/
+
+
+
+      - name: Install dependencies
+        working-directory: worker-repo
+        run: npm install 
+
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: "worker-repo"
