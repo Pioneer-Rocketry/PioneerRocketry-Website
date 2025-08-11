@@ -65,7 +65,7 @@ export function onReady() {
 
     $(document).on('click', '.replace-image-btn', function () {
         const imageName = $(this).data('name');
-        const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        const imageUrl = `${currentAPIurl}/images/${encodeURIComponent(imageName)}`;
         $('#replaceImageName').val(imageName);
         $('#replaceImagePreview').attr('src', imageUrl);
         $('#replaceImageModal').modal('show');
@@ -74,7 +74,7 @@ export function onReady() {
 
     $(document).on('click', '.delete-image-btn', function () {
         const imageName = $(this).data('name');
-        const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        const imageURL = `${currentAPIurl}/images/${encodeURIComponent(imageName)}`;
         $('#deleteImageName').text(imageName);
         $('#deleteImage').attr('src', imageURL).attr('alt', imageName);
         $('#confirmDeleteImageModal').modal('show');
@@ -86,7 +86,7 @@ export function onReady() {
             e.preventDefault();
             const imageName = $('#deleteImageName').text();
             $.ajax({
-                url: `${currentAPIurl}/image/delete`,
+                url: `${currentAPIurl}/images/delete`,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ token: localStorage.getItem('JWT') || '', imageName }),
@@ -128,7 +128,7 @@ export function onReady() {
             formData.append('token', localStorage.getItem('JWT') || '');
 
             $.ajax({
-                url: `${currentAPIurl}/image/replace`,
+                url: `${currentAPIurl}/images/replace`,
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -170,7 +170,7 @@ export function onReady() {
             for (const file of files) formData.append('imageFile', file);
 
             $.ajax({
-                url: `${window.currentAPIurl}/image/upload`,
+                url: `${window.currentAPIurl}/images/upload`,
                 method: 'POST',
                 data: formData,
                 processData: false,

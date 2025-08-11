@@ -1,7 +1,9 @@
+import { apiUrls } from "../../json/api-urls";
+
 export function getAllUsers() {
     $.ajax({
-        type: 'GET',
-        url: `${currentAPIurl}/users`,
+        type: apiUrls.methods.admin.users.getAll,
+        url: apiUrls.url.admin.users.getAll,
         success: function (data) {
             console.log(data);
             return data;
@@ -13,13 +15,13 @@ export async function loadUsers() {
     // ensure the currentAPIurl is set
     if (localStorage.getItem('JWT') != null) {
         const settings = {
-            method: 'POST',
+            method: apiUrls.methods.admin.users.getAll,
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ token: localStorage.getItem('JWT') || '' }),
         };
-        let response = await fetch(`${currentAPIurl}/admin/getAllUsers`, settings);
+        let response = await fetch(apiUrls.url.admin.users.getAll, settings);
         if (response.ok) {
             createUserTable(await response.json());
         }
@@ -27,12 +29,12 @@ export async function loadUsers() {
 }
 
 export function createUserTable(response) {
-    const viewerFlag = 0.0;
-    const helperFlag = 5.0;
-    const managerFlag = 10.0;
-    const manageUsersFlag = 15.0;
-    const adminFlag = 20.0;
-    const superAdminFlag = 25.0;
+    const viewerFlag = 0;
+    const helperFlag = 5;
+    const managerFlag = 10;
+    const manageUsersFlag = 15;
+    const adminFlag = 20;
+    const superAdminFlag = 25;
 
     // Create the table structure
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
@@ -43,6 +45,7 @@ export function createUserTable(response) {
         let cellName = $('<td>').text(user.name);
         let cellEmail = $('<td>').text(user.email);
         let cellId = $('<td>').text(user.id);
+        let strippedFlag = JSON.stringify(user.flags, (_, v) => Math.trunc(v));
         row.append(cellName, cellEmail, cellId);
 
         // Create the dropdown for flags
@@ -56,8 +59,8 @@ export function createUserTable(response) {
         let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag)
         
         flagSelect.append(viewer, member, helper , manageUsers, admin, superAdmin);
-        flagSelect.attr('data-flags', user.flags);
-        flagSelect.find(`option[value="${user.flags}"]`).prop('selected', true);
+        flagSelect.attr('data-flags', strippedFlag);
+        flagSelect.find(`option[value="${strippedFlag}"]`).prop('selected', true);
         let cellFlags = $('<td>').append(flagSelect);
         row.append(cellFlags);
         
@@ -90,8 +93,8 @@ export function createUserTable(response) {
 
 export async function changeUser(id, flags, name, email) {
     try {
-        const response = await fetch(`${currentAPIurl}/admin/changeUser`, {
-            method: 'POST',
+        const response = await fetch(currentAPIurl + apiUrls.url.admin.users.update, {
+            method: apiUrls.methods.admin.users.update,
             headers: {
                 'Content-Type': 'application/json',
             },

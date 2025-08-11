@@ -1,9 +1,10 @@
+import { apiUrls } from "../../json/api-urls.js";
 import { toastMessage } from "../ui/toasts.js";
 
 export function loadCssList() {
     $.ajax({
-        url: `${currentAPIurl}/css`,
-        method: 'GET',
+        url: apiUrls.url.admin.modules.css.getAll,
+        method: apiUrls.methods.admin.modules.css.getAll,
         headers: {
             'Content-Type': 'application/json'
         },

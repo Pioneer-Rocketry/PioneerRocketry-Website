@@ -54,7 +54,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.replace-image-btn', function () {
         const imageName = $(this).data('name');
-        const imageUrl = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        const imageUrl = `${currentAPIurl}/images/${encodeURIComponent(imageName)}`;
         $('#replaceImageName').val(imageName);
         $('#replaceImagePreview').attr('src', imageUrl);
         $('#replaceImageModal').modal('show');
@@ -63,7 +63,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.delete-image-btn', function () {
         const imageName = $(this).data('name');
-        const imageURL = `${currentAPIurl}/image/${encodeURIComponent(imageName)}`;
+        const imageURL = `${currentAPIurl}/images/${encodeURIComponent(imageName)}`;
         $('#deleteImageName').text(imageName);
         $('#deleteImage').attr('src', imageURL).attr('alt', imageName);
         $('#confirmDeleteImageModal').modal('show');
@@ -75,7 +75,7 @@ $(document).ready(function () {
             e.preventDefault();
             const imageName = $('#deleteImageName').text();
             $.ajax({
-                url: `${currentAPIurl}/image/delete`,
+                url: `${currentAPIurl}/images/delete`,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ token: localStorage.getItem('JWT') || '', imageName }),
@@ -117,7 +117,7 @@ $(document).ready(function () {
             formData.append('token', localStorage.getItem('JWT') || '');
 
             $.ajax({
-                url: `${currentAPIurl}/image/replace`,
+                url: `${currentAPIurl}/images/replace`,
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -159,7 +159,7 @@ $(document).ready(function () {
             for (const file of files) formData.append('imageFile', file);
 
             $.ajax({
-                url: `${window.currentAPIurl}/image/upload`,
+                url: `${window.currentAPIurl}/images/upload`,
                 method: 'POST',
                 data: formData,
                 processData: false,
@@ -381,7 +381,7 @@ function loadImages() {
             const tbody = $('#imageTable tbody').empty();
 
             (data.images || []).forEach(({ image: img }) => {
-                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key)}`;
+                const url = `${window.currentAPIurl}/images/${encodeURIComponent(img.key)}`;
 
                 // Trim and truncate long names
                 const trimmedName = img.key.length > 30 ? img.key.slice(0, 27) + '...' : img.key;

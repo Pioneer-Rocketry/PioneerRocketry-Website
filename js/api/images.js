@@ -1,15 +1,16 @@
 // Fetch and display all images in the table
+import { apiUrls } from "../../json/api-urls.js";
 import { toastMessage } from "../ui/toasts.js";
 
 export function loadImages() {
     $.ajax({
-        url: `${window.currentAPIurl}/images`,
-        method: 'GET',
+        url: apiUrls.url.images.getAll,
+        method: apiUrls.methods.images.getAll,
         success: function (data) {
             const tbody = $('#imageTable tbody').empty();
 
             (data.images || []).forEach(({ image: img }) => {
-                const url = `${window.currentAPIurl}/image/${encodeURIComponent(img.key.replace("images/", ""))}`;
+                const url = `${currentAPIurl}${apiUrls.url.images.get}${encodeURIComponent(img.key.replace("images/", ""))}`;
 
                 // Trim and truncate long names
                 const trimmedName = img.key.replace("images/", "").length > 30 ? img.key.replace("images/", "").slice(0, 27) + '...' : img.key.replace("images/", "");

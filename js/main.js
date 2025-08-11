@@ -1,4 +1,8 @@
 import { handleCredentialResponse } from './api/auth.js';
+import { apiUrls } from '../json/api-urls.js';
+
+window.apiUrls = apiUrls;
+
 export function setAPIurl() {
     window.productionAPIurl = 'https://pioneerrocketry.com';
     window.currentAPIurl = null;

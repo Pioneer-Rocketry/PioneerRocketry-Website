@@ -1,5 +1,6 @@
+import { apiUrls } from '../../json/api-urls.js';
 import { toastMessage } from '../ui/toasts.js';
-import { formatForDatetimeLocal } from '../utils/time.js';
+import { formatDateForInput } from '../utils/time.js';
 
 export function submitEventForm(form, onSuccess, onError) {
     const eventObj = getEventFormData(form);
@@ -12,8 +13,8 @@ export function submitEventForm(form, onSuccess, onError) {
         return;
     }
     $.ajax({
-        url: `${window.currentAPIurl}/calendar/createEvent`,
-        method: 'POST',
+        url: currentAPIurl + apiUrls.url.admin.events.create,
+        method: apiUrls.methods.admin.events.create,
         contentType: 'application/json',
         data: JSON.stringify(payload),
         dataType: 'json',
@@ -41,9 +42,15 @@ export function getEventFormData(form) {
     }
 
     // Parse booleans
-    ['allDay', 'interactive', 'editable', 'startEditable', 'durationEditable', 'resourceEditable', 'overlap'].forEach((k) => {
+    ['allDay'].forEach((k) => {
         if (k in eventObj && eventObj[k] !== '') {
-            eventObj[k] = eventObj[k] === 'true';
+            if (eventObj[k] === true) {
+                eventObj[k] = 1;
+            } else if (eventObj[k] === false) {
+                eventObj[k] = 0;
+            } else {
+                delete eventObj[k];
+            }
         } else if (eventObj[k] === '') {
             delete eventObj[k];
         }
@@ -99,23 +106,25 @@ export function getEventFormData(form) {
         if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k];
     });
 
-    // Format date fields
-    ['start', 'end', 'startRecur', 'endRecur'].forEach((k) => {
+    // Format date fields to iso strings
+    ['startRecur', 'endRecur'].forEach((k) => {
         if (eventObj[k]) {
             const date = new Date(eventObj[k]);
-            if (!isNaN(date)) {
+            if (!isNaN(date.getTime())) {
                 eventObj[k] = date.toISOString();
+            } else {
+                console.warn(`Invalid date for ${k}: ${eventObj[k]}`);
+                delete eventObj[k];
             }
         }
     });
-
     return eventObj;
 }
 
 export function loadEvents() {
     $.ajax({
-        url: `${currentAPIurl}/calendar/getAllEvents`,
-        method: 'GET',
+        url: apiUrls.url.events.getAll,
+        method: apiUrls.methods.events.getAll,
         dataType: 'json',
         success: function (data) {
             if (data.success == false) {
@@ -167,7 +176,7 @@ export function createEventTable(response) {
         .off('click', '#confirmDeleteEventBtn')
         .on('click', '#confirmDeleteEventBtn', function () {
             const eventId = $('#deleteEventModal').data('eventId');
-            fetch(`${currentAPIurl}/calendar/removeEvent`, {
+            fetch(currentAPIurl + apiUrls.url.admin.events.remove, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
@@ -194,21 +203,26 @@ export function createEventTable(response) {
 
 export function editEvent(event) {
     const form = $('#createEventForm')[0];
-    const datetimeKeys = new Set(['start', 'end', 'startTime', 'endTime', 'startRecur', 'endRecur']);
-    const booleanKeys = new Set(['allDay', 'interactive', 'editable', 'startEditable', 'durationEditable', 'resourceEditable', 'overlap']);
+    const dateKeys = new Set(['startRecur', 'endRecur', 'start', 'end']);
+    //const datetimeKeys = new Set(['start', 'end', 'startRecur', 'endRecur']);
+    const booleanKeys = new Set(['allDay']);
     const arrayKeys = new Set(['daysOfWeek']);
+
+    //change the name of the button to Update Event
+    $('#createEventSubmit').text('Update Event');
+    // change the text of the title to Edit Event
+    $('#createEventModalLabel').text('Edit Event');
 
     for (const key in event) {
         if (event[key] === null) continue;
         if (!form.elements[key]) continue;
-        if (datetimeKeys.has(key)) {
+        if (dateKeys.has(key)) {
             console.log(`Setting ${key} to ${event[key]}`);
-
-            form.elements[key].value = formatForDatetimeLocal(event[key]);
+            form.elements[key].value = formatDateForInput(event[key]); // YYYY-MM-DD format
         } else if (booleanKeys.has(key)) {
             if (event[key] === '0' || event[key] === 0) {
-                form.elements[key].value = 'false';
-            } else if (event[key] === '1' || event[key] === 1) form.elements[key].value = 'true';
+                form.elements[key].checked = false;
+            } else if (event[key] === '1' || event[key] === 1) form.elements[key].checked = true;
             else {
                 continue;
             }

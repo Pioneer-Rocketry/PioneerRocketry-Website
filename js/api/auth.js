@@ -1,3 +1,4 @@
+import { apiUrls } from "../../json/api-urls.js";
 import { onLoad } from "../ui/onReady.js";
 
 export function onTokenResponse(googleUser) {
@@ -10,8 +11,8 @@ export function onErrorCallback(error) {
 
 export function handleCredentialResponse(response) {
     $.ajax({
-        type: 'POST',
-        url: `${currentAPIurl}/googleAuth`,
+        type: apiUrls.methods.auth.googleLogin,
+        url: apiUrls.url.auth.googleLogin,
         data: JSON.stringify({ token: response.credential }),
         contentType: 'application/json',
     })
