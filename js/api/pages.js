@@ -1,4 +1,4 @@
-import { apiUrls } from "../../json/api-urls";
+import { apiUrls } from "../../json/api-urls.js";
 
 export async function getHeader() {
     return new Promise((resolve, reject) => {

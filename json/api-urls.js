@@ -7,41 +7,42 @@ export const apiUrls = {
         admin: {
             users: {
                 getAll: '/admin/users',
-                update: '/admin/users/',
+                update: '/admin/users',
             },
             events: {
-                create: '/admin/events',
+                create: '/admin/events/',
                 update: '/admin/events/',
                 remove: '/admin/events/',
             },
             images: {
-                create: '/admin/images',
+                getAll: '/admin/images',
+                create: '/admin/images/',
                 remove: '/admin/images/',
                 replace: '/admin/images/',
             },
             modules: {
                 get: '/admin/modules/',
                 getAll: '/admin/modules',
-                create: '/admin/modules',
+                create: '/admin/modules/',
                 update: '/admin/modules/',
                 remove: '/admin/modules/',
                 css: {
                     get: '/admin/css/',
                     getAll: '/admin/css',
-                    create: '/admin/css',
+                    create: '/admin/css/',
                     update: '/admin/css/',
                     remove: '/admin/css/',
                 },
                 scripts: {
                     get: '/admin/scripts/',
                     getAll: '/admin/scripts',
-                    create: '/admin/scripts',
+                    create: '/admin/scripts/',
                     update: '/admin/scripts/',
                     remove: '/admin/scripts/',
                 },
             },
             pages: {
-                create: '/admin/pages',
+                create: '/admin/pages/',
                 update: '/admin/pages/',
             },
             rockets: {
@@ -50,13 +51,12 @@ export const apiUrls = {
             },
         },
         events: {
-            getAll: '/calendar/events',
-            get: '/calendar/events/',
-            serve: '/calendar/events//page',
+            getAll: '/events',
+            get: '/events/',
+            serve: '/events/',
         },
         images: {
             get: '/images/',
-            getAll: '/images',
         },
         pages: {
             serve: '/pages/',
@@ -80,6 +80,7 @@ export const apiUrls = {
                 remove: 'DELETE',
             },
             images: {
+                getAll: "GET",
                 create: 'POST',
                 remove: 'DELETE',
                 replace: 'PUT',
@@ -121,7 +122,6 @@ export const apiUrls = {
         },
         images: {
             get: 'GET',
-            getAll: 'GET',
         },
         pages: {
             serve: 'GET',

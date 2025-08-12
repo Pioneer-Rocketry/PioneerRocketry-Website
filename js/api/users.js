@@ -1,15 +1,5 @@
-import { apiUrls } from "../../json/api-urls";
-
-export function getAllUsers() {
-    $.ajax({
-        type: apiUrls.methods.admin.users.getAll,
-        url: apiUrls.url.admin.users.getAll,
-        success: function (data) {
-            console.log(data);
-            return data;
-        },
-    });
-}
+import { apiUrls } from '../../json/api-urls.js';
+import { toastMessage } from '../ui/toasts.js';
 
 export async function loadUsers() {
     // ensure the currentAPIurl is set
@@ -18,8 +8,8 @@ export async function loadUsers() {
             method: apiUrls.methods.admin.users.getAll,
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('JWT') || ''}`,
             },
-            body: JSON.stringify({ token: localStorage.getItem('JWT') || '' }),
         };
         let response = await fetch(apiUrls.url.admin.users.getAll, settings);
         if (response.ok) {
@@ -39,7 +29,7 @@ export function createUserTable(response) {
     // Create the table structure
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
 
-    for (const user of response.users.results) {
+    for (const user of response.result.results) {
         console.log(user);
         let row = $('<tr>').appendTo(table);
         let cellName = $('<td>').text(user.name);
@@ -49,21 +39,21 @@ export function createUserTable(response) {
         row.append(cellName, cellEmail, cellId);
 
         // Create the dropdown for flags
-        let flagSelect = $('<select>').attr('id', `${user.id}flag`).addClass('form-select')
-        
-        let viewer = $('<option>').text('Viewer').val(viewerFlag)
-        let member = $('<option>').text('Member').val(helperFlag)
-        let helper = $('<option>').text('Helper').val(managerFlag)
-        let manageUsers = $('<option>').text('Manage Users').val(manageUsersFlag)
-        let admin = $('<option>').text('Admin').val(adminFlag)
-        let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag)
-        
-        flagSelect.append(viewer, member, helper , manageUsers, admin, superAdmin);
+        let flagSelect = $('<select>').attr('id', `${user.id}flag`).addClass('form-select');
+
+        let viewer = $('<option>').text('Viewer').val(viewerFlag);
+        let member = $('<option>').text('Member').val(helperFlag);
+        let helper = $('<option>').text('Helper').val(managerFlag);
+        let manageUsers = $('<option>').text('Manage Users').val(manageUsersFlag);
+        let admin = $('<option>').text('Admin').val(adminFlag);
+        let superAdmin = $('<option>').text('Super Admin').val(superAdminFlag);
+
+        flagSelect.append(viewer, member, helper, manageUsers, admin, superAdmin);
         flagSelect.attr('data-flags', strippedFlag);
         flagSelect.find(`option[value="${strippedFlag}"]`).prop('selected', true);
         let cellFlags = $('<td>').append(flagSelect);
         row.append(cellFlags);
-        
+
         // Create the Change User button
         let changeButton = $('<button>')
             .attr('id', `${user.id}button`)
@@ -83,7 +73,7 @@ export function createUserTable(response) {
 
         // Handle the Change User button click
         changeButton.click(function () {
-            changeUser(user.id, flagSelect.val(), user.name, user.email);
+            changeUser(user.id, flagSelect.val());
         });
     }
 
@@ -91,27 +81,25 @@ export function createUserTable(response) {
     $('#users').empty().append(table);
 }
 
-export async function changeUser(id, flags, name, email) {
+export async function changeUser(id, newFlag) {
     try {
-        const response = await fetch(currentAPIurl + apiUrls.url.admin.users.update, {
+        const url = `${currentAPIurl}${apiUrls.url.admin.users.update}`;
+
+        const response = await fetch(url, {
             method: apiUrls.methods.admin.users.update,
             headers: {
                 'Content-Type': 'application/json',
+                "Authorization": `Bearer ${localStorage.getItem('JWT') || ''}`,
             },
             body: JSON.stringify({
-                ChangeUser: {
-                    id: id,
-                    flags: flags,
-                    name: name,
-                    email: email,
-                },
-                token: localStorage.getItem('JWT') || '',
+                flag: newFlag,
+                id: id,
             }),
         });
 
         const data = await response.json();
-        createUserTable(data);
-        console.log(data);
+        loadUsers();
+        toastMessage("User Updated Successfully", "success")
     } catch (error) {
         console.log(error);
     }

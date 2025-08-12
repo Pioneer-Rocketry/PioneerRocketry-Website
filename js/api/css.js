@@ -1,12 +1,13 @@
-import { apiUrls } from "../../json/api-urls.js";
-import { toastMessage } from "../ui/toasts.js";
+import { apiUrls } from '../../json/api-urls.js';
+import { toastMessage } from '../ui/toasts.js';
 
 export function loadCssList() {
     $.ajax({
         url: apiUrls.url.admin.modules.css.getAll,
         method: apiUrls.methods.admin.modules.css.getAll,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('JWT') || ''}`,
         },
         success: function (response) {
             $('#cssTable tbody').empty();
@@ -14,11 +15,11 @@ export function loadCssList() {
             const cssList = response.result?.css || [];
 
             if (cssList.length === 0) {
-                toastMessage("No CSS Files Found.", "warning");
+                toastMessage('No CSS Files Found.', 'warning');
                 return;
             }
 
-            cssList.forEach(css => {
+            cssList.forEach((css) => {
                 const row = $('<tr>');
                 row.append(
                     $('<td>').text(css.ID),
@@ -44,8 +45,8 @@ export function loadCssList() {
         },
         error: function (xhr, status, error) {
             $('#cssTable tbody').html('<tr><td colspan="4" class="text-danger">Error loading CSS list</td></tr>');
-            toastMessage("Error Loading CSS files: "+ error, "warning");
-        }
+            toastMessage('Error Loading CSS files: ' + error, 'warning');
+        },
     });
 }
 
@@ -66,6 +67,6 @@ export function openCssModal(css) {
     $('#createCssModal').modal('show');
 }
 
-export function deleteCss(id){
+export function deleteCss(id) {
     //TODO: fill this in
 }
