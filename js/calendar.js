@@ -1,9 +1,5 @@
-import { apiUrls } from '../json/api-urls.js';
-import { toastMessage } from './ui/toasts.js';
-import { Calendar } from "https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js";
 
-
-export function setAPIurl() {
+function setAPIurl() {
     window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
     window.productionAPIurl = 'https://api.pioneerrocketry.com';
     window.currentAPIurl = null;
@@ -20,30 +16,26 @@ export function setAPIurl() {
         window.currentAPIurl = 'http://localhost:8787';
     }
 }
-
-
-
-export async function initCalendar() {
+let calendar;
+async function initCalendar() {
     setAPIurl();
     try {
         const response = await fetch(`${window.currentAPIurl}${apiUrls.url.events.getAll}`, {
             method: apiUrls.methods.events.getAll,
         });
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
+
         const data = await response.json();
         let eventsPre;
-        try {
-            eventsPre = data.result.events;
-        } catch (e) {
-            toastMessage('No events found, rendering empty calendar', "warning");
+        if (data && data.result == "Empty"){
+            toastMessage('No events found, rendering empty calendar', 'warning');
             throw new Error('No events found');
+        }else{
+            eventsPre = data.result.events;
+            console.log(eventsPre);
         }
 
         const calendarEl = document.getElementById('calendar');
-        window.calendar = new Calendar(calendarEl, {
-            plugins: [dayGridPlugin, bootstrap5Plugin],
+        calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             timeZone: 'local',
             themeSystem: 'bootstrap5',
@@ -58,17 +50,17 @@ export async function initCalendar() {
         });
 
         for (let i = 0; i < eventsPre.length; i++) {
-            eventsPre[i].url = `${window.currentAPIurl}/calendar/event/${eventsPre[i].id}`;
+            eventsPre[i].url = `${window.currentAPIurl}${window.apiUrls.url.events.serve}${eventsPre[i].id}`;
+            console.log(eventsPre[i]);
             calendar.addEvent(eventsPre[i]);
         }
 
         calendar.render();
     } catch (error) {
         console.error('Error:', error);
-        toastMessage('Rendering Empty Calendar',"danger");
+        toastMessage('Rendering Empty Calendar', 'danger');
         const calendarEl = document.getElementById('calendar');
-        calendar = new Calendar(calendarEl, {
-            plugins: [dayGridPlugin, bootstrap5Plugin],
+        calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             timeZone: 'local',
             events: [],
@@ -80,10 +72,3 @@ export async function initCalendar() {
         calendar.render();
     }
 }
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initCalendar());
-} else {
-    initCalendar()
-}
-

@@ -30,7 +30,6 @@ export function createUserTable(response) {
     let table = $('<table>').addClass('table table-hover placeholder-glow placeholder-sm');
 
     for (const user of response.result.results) {
-        console.log(user);
         let row = $('<tr>').appendTo(table);
         let cellName = $('<td>').text(user.name);
         let cellEmail = $('<td>').text(user.email);
@@ -98,8 +97,18 @@ export async function changeUser(id, newFlag) {
         });
 
         const data = await response.json();
-        loadUsers();
-        toastMessage("User Updated Successfully", "success")
+        if(data.success == true){
+            toastMessage("User Updated Successfully", "success")
+            loadUsers();
+        }else if(data.success==false){
+            toastMessage("User Update Incomplete", "danger")
+            loadUsers();
+        }else{
+            toastMessage("User Update Incomplete", "danger")
+            loadUsers();
+        }
+        
+        
     } catch (error) {
         console.log(error);
     }

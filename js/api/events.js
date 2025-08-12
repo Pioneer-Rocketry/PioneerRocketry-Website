@@ -5,18 +5,15 @@ import { formatDateForInput } from '../utils/time.js';
 export function submitEventForm(form, onSuccess, onError) {
     const eventObj = getEventFormData(form);
     const payload = { event: eventObj };
-    if (localStorage.getItem('JWT')) {
-        payload.token = localStorage.getItem('JWT');
-    } else {
-        console.error('No JWT found in localStorage');
-        if (typeof onError === 'function') onError(new Error('No JWT found'));
-        return;
-    }
     $.ajax({
         url: currentAPIurl + apiUrls.url.admin.events.create,
         method: apiUrls.methods.admin.events.create,
         contentType: 'application/json',
         data: JSON.stringify(payload),
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('JWT') || ''}`,
+        },
+
         dataType: 'json',
         success: function (result, textStatus, jqXHR) {
             if (jqXHR.status === 200 && result.success) {
@@ -56,49 +53,13 @@ export function getEventFormData(form) {
         }
     });
 
-    // Parse classNames (space-separated or JSON array)
-    if (eventObj.classNames) {
-        try {
-            const parsed = JSON.parse(eventObj.classNames);
-            if (Array.isArray(parsed)) {
-                eventObj.classNames = JSON.stringify(parsed.map(String).filter(Boolean));
-            } else {
-                throw new Error();
-            }
-        } catch {
-            const array = eventObj.classNames
-                .split(/\s+/)
-                .map((s) => s.trim())
-                .filter(Boolean);
-            eventObj.classNames = JSON.stringify(array);
-        }
-    }
-
-    // Parse resourceIds (comma-separated or JSON array)
-    if (eventObj.resourceIds) {
-        try {
-            const parsed = JSON.parse(eventObj.resourceIds);
-            if (Array.isArray(parsed)) {
-                eventObj.resourceIds = JSON.stringify(parsed.map(String).filter(Boolean));
-            } else {
-                throw new Error();
-            }
-        } catch {
-            const array = eventObj.resourceIds
-                .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean);
-            eventObj.resourceIds = JSON.stringify(array);
-        }
-    }
-
     // Parse daysOfWeek as array of numbers
     if (eventObj.daysOfWeek) {
         const numbers = eventObj.daysOfWeek
             .split(',')
             .map(Number)
             .filter((n) => !isNaN(n));
-        eventObj.daysOfWeek = JSON.stringify(numbers);
+        eventObj.daysOfWeek = numbers;
     }
 
     // Remove empty optional fields
@@ -127,8 +88,11 @@ export function loadEvents() {
         method: apiUrls.methods.events.getAll,
         dataType: 'json',
         success: function (data) {
-            if (data.success == false) {
+            if (data.result == 'Empty') {
                 toastMessage('No Events Found', 'warning');
+                $('#events').empty();
+            } else if (data.success == false) {
+                toastMessage('Error Loading Events', 'danger');
                 $('#events').empty();
             } else {
                 createEventTable(data);
@@ -177,9 +141,12 @@ export function createEventTable(response) {
         .on('click', '#confirmDeleteEventBtn', function () {
             const eventId = $('#deleteEventModal').data('eventId');
             fetch(currentAPIurl + apiUrls.url.admin.events.remove, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: eventId, token: localStorage.getItem('JWT') || '' }),
+                method: apiUrls.methods.admin.events.remove,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: localStorage.getItem('JWT') || '',
+                },
+                body: JSON.stringify({ id: eventId }),
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -203,8 +170,7 @@ export function createEventTable(response) {
 
 export function editEvent(event) {
     const form = $('#createEventForm')[0];
-    const dateKeys = new Set(['startRecur', 'endRecur', 'start', 'end']);
-    //const datetimeKeys = new Set(['start', 'end', 'startRecur', 'endRecur']);
+    const dateKeys = new Set(['startRecur', 'endRecur','start', 'end']);
     const booleanKeys = new Set(['allDay']);
     const arrayKeys = new Set(['daysOfWeek']);
 
@@ -217,8 +183,15 @@ export function editEvent(event) {
         if (event[key] === null) continue;
         if (!form.elements[key]) continue;
         if (dateKeys.has(key)) {
+            //if the event[key] has no time then we need to set the form element to date
+            if (event[key].indexOf('T') === -1) {
+                form.elements[key].type = 'date';
+            }else{
+                form.elements[key].type = 'datetime-local';
+            }
             console.log(`Setting ${key} to ${event[key]}`);
-            form.elements[key].value = formatDateForInput(event[key]); // YYYY-MM-DD format
+            form.elements[key].value = event[key];
+
         } else if (booleanKeys.has(key)) {
             if (event[key] === '0' || event[key] === 0) {
                 form.elements[key].checked = false;
@@ -229,10 +202,7 @@ export function editEvent(event) {
         } else if (arrayKeys.has(key)) {
             let daysOfWeek = event[key];
             if (typeof daysOfWeek === 'string') {
-                daysOfWeek = daysOfWeek
-                    .split(',')
-                    .map(Number)
-                    .filter((n) => !isNaN(n));
+                daysOfWeek = JSON.parse(daysOfWeek);
             }
             if (Array.isArray(daysOfWeek)) {
                 //for some reason the days are numbers 0-6, so we need to map them to the checkboxes
@@ -263,10 +233,14 @@ export function editEvent(event) {
                             break;
                         default:
                             console.warn(`Unknown day of week: ${day}`);
-                            continue; // Skip unknown days
+                            continue; // Skip unknown days, (if this ever happens the world is gone)
                     }
                     $(`#eventDaysOfWeek${day}`).prop('checked', true);
                 }
+                $('#eventStartRecur').prop('required', daysOfWeek.length !== 0);
+                $('#eventEndRecur').prop('required', daysOfWeek.length !== 0);
+                $('label[for=eventStartRecur]').html(`Recurrence Start Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
+                $('label[for=eventEndRecur]').html(`Recurrence End Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
             }
         } else {
             form.elements[key].value = event[key];
@@ -277,4 +251,44 @@ export function editEvent(event) {
     form.dataset.eventId = event.id;
     $('#createEventSubmit').text('Update Event');
     $('#createEventModal').modal('show');
+}
+
+export function eventsOnReady() {
+    $('#eventAllDay').on('input', () => {
+        $('#eventStart').attr('type', $('#eventAllDay').prop('checked') ? 'date' : 'datetime-local');
+        $('label[for=eventStart]').html(`Start Date ${$('#eventAllDay').prop('checked')? "" : "and Time "}<span class='text-danger'>*</span>`);
+        $('label[for=eventEnd]').html(`End Date and Time ${$('#eventAllDay').prop('checked')? "" : "<span class='text-danger'>*</span>"}`);
+        $('#eventEnd').prop('disabled', $('#eventAllDay').prop('checked'));
+    });
+    // Days of week checkboxes to hidden input
+    $('#daysOfWeekButtons input[type="checkbox"]').on('change', function () {
+        const selected = $('#daysOfWeekButtons input[type="checkbox"]:checked')
+            .map(function () {
+                return this.value;
+            })
+            .get();
+        $('#eventDaysOfWeek').val(selected.join(','));
+        $('#eventStartRecur').prop('required', selected.length !== 0);
+        $('#eventEndRecur').prop('required', selected.length !== 0);
+        $('label[for=eventStartRecur]').html(`Recurrence Start Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
+        $('label[for=eventEndRecur]').html(`Recurrence End Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
+    });
+
+    $('#createEventForm').on('submit', async function (event) {
+        event.preventDefault();
+        const form = event.target;
+        submitEventForm(
+            form,
+            function (result) {
+                if (typeof loadEvents === 'function') loadEvents();
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
+                modal.hide();
+                form.reset();
+            },
+            function (error) {
+                console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
+            }
+        );
+        $('#createEventSubmit').text('Create Event');
+    });
 }

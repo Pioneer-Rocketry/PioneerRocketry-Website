@@ -11,7 +11,10 @@ export function loadImages() {
         method: apiUrls.methods.admin.images.getAll,
         success: function (data) {
             const tbody = $('#imageTable tbody').empty();
-
+            if (data.result == 'Empty') {
+                toastMessage('No Images Found', 'warning');
+                return;
+            }
             (data.result || []).forEach(({ image: img }) => {
                 const url = `${currentAPIurl}${apiUrls.url.images.get}${encodeURIComponent(img.key.replace('images/', ''))}`;
 
@@ -39,7 +42,7 @@ export function loadImages() {
             });
         },
         error: function () {
-            toastMessage('No Images to load.', 'warning');
+            toastMessage('Error Loading Images.', 'Error');
             $('#imageTable tbody').empty();
         },
     });

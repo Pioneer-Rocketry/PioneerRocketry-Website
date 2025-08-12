@@ -10,15 +10,15 @@ export const apiUrls = {
                 update: '/admin/users',
             },
             events: {
-                create: '/admin/events/',
-                update: '/admin/events/',
-                remove: '/admin/events/',
+                create: '/admin/events',
+                update: '/admin/events',
+                remove: '/admin/events',
             },
             images: {
                 getAll: '/admin/images',
-                create: '/admin/images/',
-                remove: '/admin/images/',
-                replace: '/admin/images/',
+                create: '/admin/images',
+                remove: '/admin/images',
+                replace: '/admin/images',
             },
             modules: {
                 get: '/admin/modules/',

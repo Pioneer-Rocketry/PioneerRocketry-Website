@@ -70,3 +70,45 @@ export function openCssModal(css) {
 export function deleteCss(id) {
     //TODO: fill this in
 }
+
+export function cssOnReady(){
+        $('#cssForm').on('submit', async function (e) {
+        e.preventDefault();
+        const cssFileInput = document.getElementById('cssFile');
+        let cssContent = '';
+        if (cssFileInput.files && cssFileInput.files[0]) {
+            cssContent = await cssFileInput.files[0].text();
+        } else {
+            alert('Please select a CSS file.');
+            return;
+        }
+        const cssData = {
+            ID: $('#cssId').val(),
+            Name: $('#cssName').val(),
+            Content: cssContent,
+            UserAccessLevel: $('#cssAccess').val(),
+        };
+        try {
+            const response = await fetch(currentAPIurl+apiUrls.url.admin.modules.css.create, {
+                method: apiUrls.methods.admin.modules.css.create,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    css: cssData,
+                    token: localStorage.getItem('JWT') || '',
+                }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                $('#createCssModal').modal('hide');
+                loadCssList(); // Refresh the CSS list
+            } else {
+                alert('Error updating CSS: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error saving CSS:', error);
+            alert('Error saving CSS: ' + error.message);
+        }
+    });
+}
