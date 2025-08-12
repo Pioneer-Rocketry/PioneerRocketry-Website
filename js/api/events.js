@@ -33,25 +33,18 @@ export function getEventFormData(form) {
 
     // Gather basic form data
     for (const el of form.elements) {
+        console.log(`Processing element: ${el.name} (${el.type})`);
         if (!el.name) continue;
         if (el.type === 'checkbox' || el.type === 'radio') continue;
         eventObj[el.name] = el.value;
     }
 
     // Parse booleans
-    ['allDay'].forEach((k) => {
-        if (k in eventObj && eventObj[k] !== '') {
-            if (eventObj[k] === true) {
-                eventObj[k] = 1;
-            } else if (eventObj[k] === false) {
-                eventObj[k] = 0;
-            } else {
-                delete eventObj[k];
-            }
-        } else if (eventObj[k] === '') {
-            delete eventObj[k];
-        }
-    });
+    // Parse the 'allDay' checkbox as boolean/number
+    const allDayCheckbox = form.elements['allDay'] || form.elements['eventAllDay'];
+    if (allDayCheckbox && allDayCheckbox.type === 'checkbox') {
+        eventObj.allDay = allDayCheckbox.checked ? 1 : 0;
+    }
 
     // Parse daysOfWeek as array of numbers
     if (eventObj.daysOfWeek) {
@@ -114,7 +107,14 @@ export function createEventTable(response) {
     for (const event of response.result.events) {
         const row = $('<tr>').appendTo(table);
         const titleCell = $('<td>').text(event.title);
-        const startCell = $('<td>').text(new Date(event.start).toLocaleString());
+        let startDate = event.start;
+        // If the start date has a time, show date and time; otherwise, show only the date.
+        if (typeof startDate === 'string' && startDate.indexOf('T') !== -1) {
+            startDate = new Date(event.start).toLocaleString();
+        } else {
+            startDate = new Date(event.start).toLocaleDateString();
+        }
+        const startCell = $('<td>').text(startDate);
         const endCell = $('<td>').text(event.end ? new Date(event.end).toLocaleString() : 'N/A');
         const buttonCell = $('<td>');
         row.append(titleCell, startCell, endCell, buttonCell);
@@ -169,6 +169,7 @@ export function createEventTable(response) {
 }
 
 export function editEvent(event) {
+    $('#createEventSubmit').text('Edit Event');
     const form = $('#createEventForm')[0];
     const dateKeys = new Set(['startRecur', 'endRecur','start', 'end']);
     const booleanKeys = new Set(['allDay']);
@@ -289,6 +290,14 @@ export function eventsOnReady() {
                 console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
             }
         );
+        //reset the form
+        $('#eventStartRecur').prop('required', false);
+        $('#eventEndRecur').prop('required', false);
+        $('label[for=eventStartRecur]').html(`Recurrence Start Date <span class='text-danger'>*</span>`);
+        $('label[for=eventEndRecur]').html(`Recurrence End Date <span class='text-danger'>*</span>`);
         $('#createEventSubmit').text('Create Event');
     });
+    $('#createEventModal').on('hide.bs.modal', function () {
+        $('#createEventSubmit').text('Create Event');
+    })
 }
