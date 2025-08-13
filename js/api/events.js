@@ -1,29 +1,56 @@
 import { apiUrls } from '../../json/api-urls.js';
 import { toastMessage } from '../ui/toasts.js';
-import { formatDateForInput } from '../utils/time.js';
 
-export function submitEventForm(form, onSuccess, onError) {
+async function submitEvent(event, mode = 'create') {
+    event.preventDefault();
+    const form = event.target;
+    $('#advancedSettingsCollapse').collapse('show');
+
     const eventObj = getEventFormData(form);
     const payload = { event: eventObj };
+
+    const url =
+        mode === 'edit'
+            ? currentAPIurl + apiUrls.url.admin.events.update
+            : currentAPIurl + apiUrls.url.admin.events.create;
+    const method =
+        mode === 'edit'
+            ? apiUrls.methods.admin.events.update
+            : apiUrls.methods.admin.events.create;
+
     $.ajax({
-        url: currentAPIurl + apiUrls.url.admin.events.create,
-        method: apiUrls.methods.admin.events.create,
+        url,
+        method,
         contentType: 'application/json',
         data: JSON.stringify(payload),
         headers: {
             Authorization: `Bearer ${localStorage.getItem('JWT') || ''}`,
         },
-
         dataType: 'json',
-        success: function (result, textStatus, jqXHR) {
+        success(result, textStatus, jqXHR) {
             if (jqXHR.status === 200 && result.success) {
-                if (typeof onSuccess === 'function') onSuccess(result);
+                if (typeof loadEvents === 'function') loadEvents();
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
+                modal.hide();
+                form.reset();
+                toastMessage(
+                    mode === 'edit' ? 'Event updated successfully!' : 'Event created successfully!',
+                    'success'
+                );
             } else {
-                if (typeof onError === 'function') onError(result);
+                toastMessage(
+                    `Error ${mode === 'edit' ? 'updating' : 'creating'} event: ` +
+                        (result.error || result.errorMessage || 'Unknown error'),
+                    'danger'
+                );
             }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
-            if (typeof onError === 'function') onError(new Error(textStatus + ': ' + errorThrown));
+        error(jqXHR, textStatus, errorThrown) {
+            toastMessage(
+                `Error ${mode === 'edit' ? 'updating' : 'creating'} event: ` +
+                    (jqXHR.responseJSON?.error || textStatus + ': ' + errorThrown),
+                'danger'
+            );
         },
     });
 }
@@ -39,7 +66,6 @@ export function getEventFormData(form) {
         eventObj[el.name] = el.value;
     }
 
-    // Parse booleans
     // Parse the 'allDay' checkbox as boolean/number
     const allDayCheckbox = form.elements['allDay'] || form.elements['eventAllDay'];
     if (allDayCheckbox && allDayCheckbox.type === 'checkbox') {
@@ -60,18 +86,6 @@ export function getEventFormData(form) {
         if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k];
     });
 
-    // Format date fields to iso strings
-    ['startRecur', 'endRecur'].forEach((k) => {
-        if (eventObj[k]) {
-            const date = new Date(eventObj[k]);
-            if (!isNaN(date.getTime())) {
-                eventObj[k] = date.toISOString();
-            } else {
-                console.warn(`Invalid date for ${k}: ${eventObj[k]}`);
-                delete eventObj[k];
-            }
-        }
-    });
     return eventObj;
 }
 
@@ -122,7 +136,7 @@ export function createEventTable(response) {
         const editEventButton = $('<button>').attr('id', `${event.id}editButton`).addClass('btn btn-primary').text('Edit Event').appendTo(buttonCell);
 
         editEventButton.off('click').on('click', function () {
-            editEvent(event);
+            editEventModal(event);
         });
 
         // Delete button
@@ -168,10 +182,16 @@ export function createEventTable(response) {
     $('#events').empty().append(table);
 }
 
-export function editEvent(event) {
+export function editEventModal(event) {
     $('#createEventSubmit').text('Edit Event');
+    $('#createEventForm')
+        .off()
+        .on('submit', async function (event) {
+            event.preventDefault();
+            submitEvent(event, 'edit');
+        });
     const form = $('#createEventForm')[0];
-    const dateKeys = new Set(['startRecur', 'endRecur','start', 'end']);
+    const dateKeys = new Set(['startRecur', 'endRecur', 'start', 'end']);
     const booleanKeys = new Set(['allDay']);
     const arrayKeys = new Set(['daysOfWeek']);
 
@@ -187,17 +207,22 @@ export function editEvent(event) {
             //if the event[key] has no time then we need to set the form element to date
             if (event[key].indexOf('T') === -1) {
                 form.elements[key].type = 'date';
-            }else{
+            } else {
                 form.elements[key].type = 'datetime-local';
             }
             console.log(`Setting ${key} to ${event[key]}`);
             form.elements[key].value = event[key];
-
         } else if (booleanKeys.has(key)) {
             if (event[key] === '0' || event[key] === 0) {
                 form.elements[key].checked = false;
-            } else if (event[key] === '1' || event[key] === 1) form.elements[key].checked = true;
-            else {
+            } else if (event[key] === '1' || event[key] === 1) {
+                form.elements[key].checked = true;
+                if (key === 'allDay') {
+                    $('#eventStart').attr('type', 'date');
+                    $('label[for=eventStart]').html(`Start Date <span class='text-danger'>*</span>`);
+                    $('#eventEnd').prop('disabled', true);
+                }
+            } else {
                 continue;
             }
         } else if (arrayKeys.has(key)) {
@@ -240,8 +265,8 @@ export function editEvent(event) {
                 }
                 $('#eventStartRecur').prop('required', daysOfWeek.length !== 0);
                 $('#eventEndRecur').prop('required', daysOfWeek.length !== 0);
-                $('label[for=eventStartRecur]').html(`Recurrence Start Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
-                $('label[for=eventEndRecur]').html(`Recurrence End Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
+                $('label[for=eventStartRecur]').html(`Recurrence Start Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ''}`);
+                $('label[for=eventEndRecur]').html(`Recurrence End Date${daysOfWeek.length !== 0 ? " <span class='text-danger'>*</span>" : ''}`);
             }
         } else {
             form.elements[key].value = event[key];
@@ -257,8 +282,8 @@ export function editEvent(event) {
 export function eventsOnReady() {
     $('#eventAllDay').on('input', () => {
         $('#eventStart').attr('type', $('#eventAllDay').prop('checked') ? 'date' : 'datetime-local');
-        $('label[for=eventStart]').html(`Start Date ${$('#eventAllDay').prop('checked')? "" : "and Time "}<span class='text-danger'>*</span>`);
-        $('label[for=eventEnd]').html(`End Date and Time ${$('#eventAllDay').prop('checked')? "" : "<span class='text-danger'>*</span>"}`);
+        $('label[for=eventStart]').html(`Start Date ${$('#eventAllDay').prop('checked') ? '' : 'and Time '}<span class='text-danger'>*</span>`);
+        $('label[for=eventEnd]').html(`End Date and Time ${$('#eventAllDay').prop('checked') ? '' : "<span class='text-danger'>*</span>"}`);
         $('#eventEnd').prop('disabled', $('#eventAllDay').prop('checked'));
     });
     // Days of week checkboxes to hidden input
@@ -271,33 +296,31 @@ export function eventsOnReady() {
         $('#eventDaysOfWeek').val(selected.join(','));
         $('#eventStartRecur').prop('required', selected.length !== 0);
         $('#eventEndRecur').prop('required', selected.length !== 0);
-        $('label[for=eventStartRecur]').html(`Recurrence Start Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
-        $('label[for=eventEndRecur]').html(`Recurrence End Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ""}`);
+        $('label[for=eventStartRecur]').html(`Recurrence Start Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ''}`);
+        $('label[for=eventEndRecur]').html(`Recurrence End Date${selected.length !== 0 ? " <span class='text-danger'>*</span>" : ''}`);
     });
 
     $('#createEventForm').on('submit', async function (event) {
         event.preventDefault();
-        const form = event.target;
-        submitEventForm(
-            form,
-            function (result) {
-                if (typeof loadEvents === 'function') loadEvents();
-                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createEventModal'));
-                modal.hide();
-                form.reset();
-            },
-            function (error) {
-                console.log('Error: ' + (error.error || error.errorMessage || 'Unknown error'));
-            }
-        );
-        //reset the form
-        $('#eventStartRecur').prop('required', false);
-        $('#eventEndRecur').prop('required', false);
-        $('label[for=eventStartRecur]').html(`Recurrence Start Date <span class='text-danger'>*</span>`);
-        $('label[for=eventEndRecur]').html(`Recurrence End Date <span class='text-danger'>*</span>`);
-        $('#createEventSubmit').text('Create Event');
+        submitEvent(event, 'create');
     });
     $('#createEventModal').on('hide.bs.modal', function () {
+        $('#createEventForm')
+            .off()
+            .on('submit', async function (event) {
+                event.preventDefault();
+                submitEvent(event, 'create');
+            });
+        
         $('#createEventSubmit').text('Create Event');
-    })
+        $('#eventStartRecur').prop('required', false);
+        $('#eventEndRecur').prop('required', false);
+        $('label[for=eventStartRecur]').html(`Recurrence Start Date`);
+        $('label[for=eventEndRecur]').html(`Recurrence End Date`);
+        $('#advancedSettingsCollapse').collapse('hide');
+        $('#eventStart').attr('type', 'datetime-local');
+        $('label[for=eventStart]').html(`Start Date and Time <span class='text-danger'>*</span>`);
+        $('label[for=eventEnd]').html(`End Date and Time <span class='text-danger'>*</span>`);
+        $('#eventEnd').prop('disabled', false);
+    });
 }

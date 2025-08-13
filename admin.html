@@ -64,7 +64,7 @@
                 <h1 class="card-title loginRequired">User Management</h1>
             </div>
             <div class="card-body overflow-auto">
-                <div class="" id="users"></div>
+                <div class="" id="users" style="max-height: 40vh"></div>
             </div>
         </div>
 
@@ -78,7 +78,7 @@
                 </button>
             </div>
             <div class="card-body overflow-auto">
-                <div class="loginRequired" id="events"></div>
+                <div class="loginRequired" id="events" style="max-height: 40vh"></div>
             </div>
         </div>
 
@@ -93,9 +93,9 @@
             </div>
             <div class="card-body overflow-auto">
                 <div class="container-fluid mt-3">
-                    <div class="table-responsive" style="max-height: 80vh; overflow-y: auto">
-                        <table class="table table-bordered table-hover align-middle" id="imageTable">
-                            <thead class="table-light">
+                    <div class="table-responsive" style="max-height: 40vh; overflow-y: auto">
+                        <table class="table table-hover align-middle" id="imageTable">
+                            <thead class="table-dark">
                                 <tr>
                                     <th style="max-width: 250px">Image Name</th>
                                     <th style="max-width: 300px">URL</th>
@@ -218,7 +218,7 @@
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventAllDay">All Day</label>
-                                <input type="checkbox" class="form-check-input" id="eventAllDay" name="allDay" oninput="">
+                                <input type="checkbox" class="form-check-input" id="eventAllDay" name="allDay" oninput="" />
                             </div>
                             <div class="form-group mb-2">
                                 <label for="eventStart">
@@ -278,7 +278,7 @@
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventEndRecur">Recurrence End Date</label>
-                                        <input type="date" class="form-control" id="eventEndTime" name="endTime" />
+                                        <input type="date" class="form-control" id="eventEndRecur" name="endRecur" />
                                     </div>
                                     <div class="form-group mb-2">
                                         <label for="eventBackgroundColor">Background Color</label>
