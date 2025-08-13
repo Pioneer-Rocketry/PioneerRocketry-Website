@@ -5,6 +5,7 @@ import { imagesOnReady, loadImages } from '../api/images.js';
 import { loadUsers } from '../api/users.js';
 import { cssOnReady, loadCssList } from '../api/css.js';
 import { loadScriptList, scriptOnReady } from '../api/scripts.js';
+import { sessionLogin } from '../api/auth.js';
 
 
 export function onReady() {
@@ -17,6 +18,7 @@ export function onReady() {
 
     setAPIurl();
     $('.loginRequired').hide();
+    sessionLogin();
 
     if (location.host.match(/^[0-9.:]+$/)) {
         //set the user to a test user that only works on localhost
@@ -51,5 +53,6 @@ export function onLoad(force = false) {
         loadScriptList();
         loadImages();
         loadEvents();
+        sessionLogin();
     }
 }
