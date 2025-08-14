@@ -101,14 +101,16 @@ export function imagesOnReady() {
             $.ajax({
                 url: currentAPIurl + apiUrls.url.admin.images.remove,
                 type: apiUrls.methods.admin.images.remove,
+                headers: { Authorization: `Bearer ${localStorage.getItem('JWT') || ''}` },
                 contentType: 'application/json',
-                data: JSON.stringify({ token: localStorage.getItem('JWT') || '', imageName }),
+                data: JSON.stringify({ imageName }),
                 success: function () {
                     toastMessage('Image deleted successfully.', 'success');
-                    setTimeout(loadImages, 5000);
+                    setTimeout(loadImages, 1000);
                 },
                 error: function () {
                     toastMessage('Failed to delete image.', 'danger');
+                    setTimeout(loadImages, 1000);
                 },
             });
         });
@@ -143,15 +145,21 @@ export function imagesOnReady() {
             $.ajax({
                 url: currentAPIurl + apiUrls.url.admin.images.replace,
                 type: apiUrls.methods.admin.images.replace,
+                headers: { Authorization: `Bearer ${localStorage.getItem('JWT') || ''}` },
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function () {
                     $('#replaceImageModal').modal('hide');
-                    setTimeout(loadImages, 500);
+                    setTimeout(loadImages, 1000);
+                    $('#replaceImageFile').val('');
+                    $('#replaceImagePreview').attr('src', '');
+                    $('#replaceImageNewPreview').attr('src', '');
+                    toastMessage('Image replaced successfully.', 'success');
                 },
                 error: function () {
                     toastMessage('Failed to replace image.', 'danger');
+                    setTimeout(loadImages, 1000);
                 },
             });
         });
@@ -179,18 +187,18 @@ export function imagesOnReady() {
             if (files.length === 0) return toastMessage('Please select at least one image.', 'warning');
 
             const formData = new FormData();
-            formData.append('token', localStorage.getItem('JWT') || '');
             for (const file of files) formData.append('imageFile', file);
 
             $.ajax({
                 url: currentAPIurl + apiUrls.url.admin.images.create,
                 method: apiUrls.methods.admin.images.create,
+                headers: { Authorization: `Bearer ${localStorage.getItem('JWT') || ''}` },
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function (data) {
                     $('#newImageModal').modal('hide');
-                    loadImages();
+                    setTimeout(loadImages, 1000);
                     $('#newImageFile').val('');
                     $('#newImageName').val('');
                     $('#newImagePreview').attr('src', '');
@@ -198,6 +206,7 @@ export function imagesOnReady() {
                 },
                 error: function () {
                     toastMessage('Failed to upload images.', 'danger');
+                    setTimeout(loadImages, 1000);
                 },
             });
         });

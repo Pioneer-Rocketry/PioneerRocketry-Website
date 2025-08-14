@@ -337,28 +337,32 @@
         </div>
 
         <!-- Image Replace Modal -->
-        <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel">
+        <div class="modal fade" id="replaceImageModal" tabindex="-1" aria-labelledby="replaceImageModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form id="replaceImageForm" enctype="multipart/form-data">
                         <div class="modal-header">
                             <h5 class="modal-title" id="replaceImageModalLabel">Replace Image</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="replaceImageName" class="form-label">Image Name</label>
-                                <input type="text" class="form-control" id="replaceImageName" name="imageName" required disabled />
+                                <input type="text" class="form-control" id="replaceImageName" name="imageName" value="" required disabled />
                             </div>
                             <div class="mb-3">
                                 <label for="replaceImageFile" class="form-label">New Image File</label>
                                 <input type="file" class="form-control" id="replaceImageFile" name="imageFile" accept="image/*" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Current Image Preview</label>
-                                <div>
-                                    <img id="replaceImagePreview" src="#" alt="Current Image" style="max-width: 100%; height: auto" />
-                                    <img id="replaceImageNewPreview" src="#" alt="New Image" style="max-width: 100%; height: auto" />
+                                <label class="form-label">Image Comparison</label>
+                                <div class="d-flex align-items-center justify-content-center gap-3">
+                                    <!-- Old Image -->
+                                    <img id="replaceImagePreview" src="https://placehold.co/600x400/EEE/31343C?font=source-sans-pro&text=Current%20Image" alt="Current Image" class="img-fluid border rounded" style="max-width: 200px; object-fit: contain; height: auto"/>
+                                    <!-- Arrow Icon -->
+                                    <i class="fas fa-arrow-right fa-2x text-secondary"></i>
+                                    <!-- New Image -->
+                                    <img id="replaceImageNewPreview" src="https://placehold.co/600x400/EEE/31343C?font=source-sans-pro&text=New%20Image" alt="New Image" class="img-fluid border rounded" style="max-width: 200px; object-fit: contain; height: auto"/>
                                 </div>
                             </div>
                         </div>
@@ -525,7 +529,7 @@
             </div>
         </div>
 
-        <!-- Fullscreen Image Overlay -->
+        <!-- Fullscreen Image Modal -->
         <div id="imageFullscreenOverlay" class="hide position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center p-5 fade" style="z-index: 99999; pointer-events: none">
             <div class="w-100 h-100 d-flex justify-content-center align-items-center" style="padding: 10%; box-sizing: border-box">
                 <img id="fullscreenImage" src="" class="rounded shadow" style="max-width: 100%; max-height: 100%; object-fit: contain; height: 100%" />
