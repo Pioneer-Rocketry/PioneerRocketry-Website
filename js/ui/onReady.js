@@ -24,9 +24,6 @@ export function onReady() {
         //set the user to a test user that only works on localhost
         localStorage.setItem('JWT', 'TestToken');
     }
-    $('#reRunOnload').on('click', function () {
-        onLoad(true);
-    });
 
     $('#loadPageBtn').on('click', function () {
         const pageName = document.getElementById('pageName').value;
