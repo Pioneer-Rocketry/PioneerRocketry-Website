@@ -79,7 +79,7 @@
                                                         minute: '2-digit',
                                                         timeZoneName: 'long',
                                                     };
-                                                    $('#start').text(humanDate.toLocaleString('en-US', startOptions));
+                                                    $('#start').text(humanStartDate.toLocaleString('en-US', startOptions));
                                                 </script>
                                             </div>
                                             <div class="row mb-2">
@@ -164,7 +164,7 @@
                                             const end = new Date(`{{end}}`);
 
                                             function toICSDate(date) {
-                                                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                                                return date.toLocaleString();
                                             }
 
                                             const icsContent = `

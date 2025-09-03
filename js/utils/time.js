@@ -1,12 +1,11 @@
-export function formatForDatetimeLocal(dateStr) {
-    try{
-        const date = new Date(dateStr);
-        const offset = date.getTimezoneOffset();
-        const localDate = new Date(date.getTime() - offset * 60000);
-        return localDate.toISOString().slice(0, 16); // format: YYYY-MM-DDTHH:mm
-    }catch(e){
-        console.error('Error formatting date for datetime-local:', e);
-        return '';
-    }
-    
+export function formatDateForInput(isoDateStr) {
+    //time format: yyyy-mm-ddThh:mm
+    if (!isoDateStr) return '';
+    const date = new Date(isoDateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }

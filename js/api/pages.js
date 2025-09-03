@@ -1,3 +1,5 @@
+import { apiUrls } from "../../json/api-urls.js";
+
 export async function getHeader() {
     return new Promise((resolve, reject) => {
         fetch('./template.html')
@@ -58,8 +60,8 @@ export function updatePage(pageName, config) {
     }
 
     // Make API call to update the page
-    return fetch(`${currentAPIurl}/admin/updatePage`, {
-        method: 'POST',
+    return fetch(apiUrls.url.admin.pages.update, {
+        method: apiUrls.methods.admin.pages.update,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -93,8 +95,8 @@ export function updatePage(pageName, config) {
 
 export function loadPageData(pageName) {
     $.ajax({
-        type: 'POST',
-        url: `${window.currentAPIurl}/admin/getPage`,
+        type: apiUrls.methods.pages.serve,
+        url: apiUrls.url.pages.serve,
         data: {
             page: pageName,
         },
@@ -400,8 +402,8 @@ export function createPageDataRow(item) {
                     }
 
                     // Fetch module data
-                    fetch(`${currentAPIurl}/admin/getModule`, {
-                        method: 'POST',
+                    fetch(currentAPIurl+apiUrls.url.admin.modules.getAll, {
+                        method: apiUrls.methods.admin.modules.getAll,
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -465,8 +467,8 @@ export function createPageDataRow(item) {
                                                                 UserAccessLevel: $('#editModuleAccessLevel').val(),
                                                             };
                                                             // Call API to update module
-                                                            fetch(`${currentAPIurl}/admin/updateModule`, {
-                                                                method: 'POST',
+                                                            fetch(currentAPIurl + apiUrls.url.admin.modules.update, {
+                                                                method: apiUrls.method.admin.modules.update,
                                                                 headers: {
                                                                     'Content-Type': 'application/json',
                                                                 },
