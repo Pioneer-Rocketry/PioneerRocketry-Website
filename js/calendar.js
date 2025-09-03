@@ -1,19 +1,10 @@
-
 function setAPIurl() {
-    window.devAPIurl = 'https://dev-api.pioneerrocketry.com';
-    window.productionAPIurl = 'https://api.pioneerrocketry.com';
+    window.productionAPIurl = 'https://pioneerrocketry.com';
     window.currentAPIurl = null;
-    if (localStorage.getItem('currentAPIurl') != null) {
-        window.currentAPIurl = localStorage.getItem('currentAPIurl');
-    } else {
-        if (window.location.hostname === 'dev.pioneerrocketry.com') {
-            window.currentAPIurl = window.devAPIurl;
-        } else {
-            window.currentAPIurl = window.productionAPIurl;
-        }
-    }
     if (window.location.hostname === 'localhost') {
         window.currentAPIurl = 'http://localhost:8787';
+    } else {
+        window.currentAPIurl = productionAPIurl;
     }
 }
 let calendar;
@@ -26,10 +17,10 @@ async function initCalendar() {
 
         const data = await response.json();
         let eventsPre;
-        if (data && data.result == "Empty"){
+        if (data && data.result == 'Empty') {
             toastMessage('No events found, rendering empty calendar', 'warning');
             throw new Error('No events found');
-        }else{
+        } else {
             eventsPre = data.result.events;
             console.log(eventsPre);
         }
