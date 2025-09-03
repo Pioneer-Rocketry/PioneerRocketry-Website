@@ -42,6 +42,14 @@ async function initCalendar() {
 
         for (let i = 0; i < eventsPre.length; i++) {
             eventsPre[i].url = `${window.currentAPIurl}${window.apiUrls.url.events.serve}${eventsPre[i].id}`;
+            if(eventsPre[i].startTime == null&&eventsPre[i].start != null){
+                console.log(eventsPre[i].start.split("T")[1])
+                eventsPre[i].startTime = eventsPre[i].start.split("T")[1]
+            }
+            if(eventsPre[i].endTime == null&&eventsPre[i].end != null){
+                console.log(eventsPre[i].end.split("T")[1])
+                eventsPre[i].endTime = eventsPre[i].end.split("T")[1]
+            }
             console.log(eventsPre[i]);
             calendar.addEvent(eventsPre[i]);
         }

@@ -81,6 +81,8 @@ export function getEventFormData(form) {
         eventObj.daysOfWeek = numbers;
     }
 
+    //if the event has a repeat add the start time
+
     // Remove empty optional fields
     Object.keys(eventObj).forEach((k) => {
         if (eventObj[k] === '' || eventObj[k] == null) delete eventObj[k];
