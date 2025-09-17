@@ -66,6 +66,9 @@ export function getEventFormData(form) {
         eventObj[el.name] = el.value;
     }
 
+    if(!eventObj.startTime) eventObj.startTime = eventObj.start.split("T")[1];
+    if(!eventObj.endTime) eventObj.endTime = eventObj.end.split("T")[1]
+
     // Parse the 'allDay' checkbox as boolean/number
     const allDayCheckbox = form.elements['allDay'] || form.elements['eventAllDay'];
     if (allDayCheckbox && allDayCheckbox.type === 'checkbox') {
@@ -81,7 +84,9 @@ export function getEventFormData(form) {
         eventObj.daysOfWeek = numbers;
     }
 
-    //if the event has a repeat add the start time
+    //if the event has no repeat then add the start time and the end time to the repeating time
+    if(!eventObj.startRecur) eventObj.startRecur = eventObj.start;
+    if(!eventObj.endRecur) eventObj.endRecur = eventObj.end;
 
     // Remove empty optional fields
     Object.keys(eventObj).forEach((k) => {
