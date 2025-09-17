@@ -47,7 +47,7 @@ export function sessionLogin() {
     if (localStorage.getItem('JWT') != null) {
         console.log('JWT found');
         try {
-            localJWTSession = localStorage.getItem('JWT');
+            window.localJWTSession = localStorage.getItem('JWT');
         } catch (e) {
             console.log(e);
         }
