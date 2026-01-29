@@ -5,17 +5,24 @@ const Header = () => {
     const location = useLocation();
 
     return (
-        <section id="header" className="wrapper">
-            {/* Logo */}
-            <div id="logo">
-                <h1><Link to="/">Pioneer Rocketry</Link></h1>
-                <p>Meets Tuesday at 5:33 pm, in Busby Room 230</p>
-                <br />
-                <div>
-                    <img src="/images/home1.jpg" className="d-block img-fluid rounded mx-auto cimg" alt="TREX 2023" />
+        <section id="header" className="wrapper" style={location.pathname === '/calendar' ? { height: '15em' } : {}}>
+            {/* Logo, conditionally rendered */}
+            {/* Logo, conditionally rendered */}
+            {location.pathname === '/calendar' ? (
+                // Calendar Page Header
+                <h1>Meetings are Held Every Tuesday at 5:33PM</h1>
+            ) : (
+                // Default Header
+                <div id="logo">
+                    <h1><Link to="/">Pioneer Rocketry</Link></h1>
+                    <p>Meets Tuesday at 5:33 pm, in Busby Room 230</p>
+                    <br />
+                    <div>
+                        <img src="/images/home1.jpg" className="d-block img-fluid rounded mx-auto cimg" alt="TREX 2023" />
+                    </div>
+                    <br />
                 </div>
-                <br />
-            </div>
+            )}
 
             {/* Nav */}
             <nav id="nav">

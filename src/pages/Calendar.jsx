@@ -60,27 +60,72 @@ const Calendar = () => {
     };
 
     return (
-        <section className="wrapper">
-            <h1 className="text-center" style={{ marginTop: '2rem' }}>Meetings are Held Every Tuesday at 5:33PM</h1>
-            <div id="calendar-container" style={{ margin: '5vh 5vw 10vh 5vw' }}>
-                <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
-                    timeZone="local"
-                    themeSystem="bootstrap5"
-                    height="auto"
-                    contentHeight="auto"
-                    expandRows={true}
-                    headerToolbar={{
-                        left: 'title',
-                        center: 'prev next today',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    }}
-                    events={events}
-                    eventClick={handleEventClick}
-                />
-            </div>
-        </section>
+        <>
+            <style>{`
+                #calendar tbody tr[role='row'] {
+                    height: 150px;
+                }
+
+                #calendar h2 {
+                    color: black !important;
+                }
+                
+                /* Override FullCalendar title color if needed via theme or specific selector */
+                .fc-toolbar-title {
+                    color: black !important;
+                }
+
+                #calendar-container {
+                    margin-left: 5vw;
+                    margin-right: 5vw;
+                    margin-top: 5vh;
+                    margin-bottom: 10vh;
+                }
+
+                /* Day numbers on the left side */
+                .fc .fc-daygrid-day-number {
+                    float: left;
+                    margin-left: 5px;
+                    font-weight: bold;
+                    color: #333; /* Ensuring visibility */
+                }
+
+                .fc .fc-daygrid-day-top {
+                    display: flex;
+                    flex-direction: row-reverse;
+                    justify-content: flex-end !important;
+                }
+                
+                /* Ensure text in calendar is visible */
+                .fc {
+                    color: #333;
+                }
+                
+                .fc-col-header-cell-cushion {
+                    color: #333;
+                }
+            `}</style>
+            <section>
+                <div id="calendar-container" style={{ margin: '5vh 5vw 10vh 5vw' }}>
+                    <FullCalendar
+                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        timeZone="local"
+                        themeSystem="bootstrap5"
+                        height="auto"
+                        contentHeight="auto"
+                        expandRows={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: 'prev next today',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        }}
+                        events={events}
+                        eventClick={handleEventClick}
+                    />
+                </div>
+            </section>
+        </>
     );
 };
 
