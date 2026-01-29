@@ -1,23 +1,16 @@
-# Link: [Production](https://pioneerrocketry.com)
-## Pioneer-Rocketry-Webpage
- This Repo is to house the new webpage for the pioneer rocketry club. (2024)
-Admin Page is Designed to allow the webpage to be updated without any code knowlege.
-this uses a seperate api to do so.
+# React + Vite
 
-## How This All Works
-I have realized that i may not be able to maintain this github forever, so i will list out how the entire workflow works.
-When any change is mafe to the webpage itself, the worker is cloned to a temp dir within the workflow, the static webpage files, a.k.a all files within this repo, are coppied into the static folder within the worker. this allows the worker to serve the static pages and the api shares the same url as the webpage. 
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## ToDo
-[ ] - Move Page get to This worker
-[ ] - Finish module updater
-[ ] - Finish page updater
-[ ] - add module selector for pages
-[ ] - add module verification to pages after they are added
-[ ] - Remove Excess code in auth.js and possibly move it to tools.js
-[ ] - Redo all calendar.js code and move it to tools.js
+Currently, two official plugins are available:
 
-## Page Layout Credits
-Escape Velocity by HTML5 UP
-html5up.net | @ajlkn
-Free for personal and commercial use under the CCA 3.0 [license](html5up.net/license)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
