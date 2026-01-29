@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { apiUrls } from '../config/api-urls';
 import { useNavigate } from 'react-router-dom';
 
+const localizer = momentLocalizer(moment);
+
 const Calendar = () => {
     const [events, setEvents] = useState([]);
+    const [view, setView] = useState('month');
+    const [date, setDate] = useState(new Date());
     const navigate = useNavigate();
+
+    const onNavigate = (newDate) => {
+        setDate(newDate);
+    };
+
+    const onView = (newView) => {
+        setView(newView);
+    };
 
     // Determine API URL
     const getApiUrl = () => {
@@ -31,17 +42,17 @@ const Calendar = () => {
                     setEvents([]);
                 } else if (data && data.result && data.result.events) {
                     const formattedEvents = data.result.events.map(event => {
-                        // Ensure start/end times are parsed correctly if separate fields exist
-                        // The original code handled startTime/endTime splitting
-                        let start = event.start;
-                        let end = event.end;
+                        // Use moment for robust parsing
+                        const start = moment(event.start).toDate();
+                        // Default end to start + 1 hour if missing
+                        const end = event.end ? moment(event.end).toDate() : moment(start).add(1, 'hours').toDate();
 
                         return {
-                            ...event,
+                            ...event, // Spread original properties
+                            title: event.title || 'Untitled Event', // Ensure title exists
                             start: start,
                             end: end,
-                            // We don't set 'url' property here to avoid FullCalendar default navigation
-                            // We handle click via eventClick
+                            resourceId: event.id
                         };
                     });
                     setEvents(formattedEvents);
@@ -54,74 +65,101 @@ const Calendar = () => {
         fetchEvents();
     }, [currentAPIurl]);
 
-    const handleEventClick = (info) => {
-        info.jsEvent.preventDefault(); // Prevent default browser navigation if 'url' was set
-        navigate(`/calendar/event/${info.event.id}`);
+    const handleEventClick = (event) => {
+        navigate(`/calendar/event/${event.id}`);
     };
 
     return (
         <>
             <style>{`
-                #calendar tbody tr[role='row'] {
-                    height: 150px;
-                }
-
-                #calendar h2 {
-                    color: black !important;
+                /* Customize React Big Calendar to match previous look */
+                .rbc-calendar {
+                    height: 800px;
+                    color: #333;
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    font-family: Arial, sans-serif; /* Reset font to be safe */
                 }
                 
-                /* Override FullCalendar title color if needed via theme or specific selector */
-                .fc-toolbar-title {
-                    color: black !important;
+                .rbc-toolbar-label {
+                    color: black;
+                    font-size: 1.5em;
+                    font-weight: bold;
                 }
 
+                /* Force Toolbar to be Flex Row */
+                .rbc-toolbar {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    flex-wrap: nowrap !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                }
+
+                .rbc-btn-group {
+                    display: flex !important;
+                    flex-direction: row !important;
+                }
+                
+                /* RESET Global Button Styles for Calendar */
+                .rbc-calendar button {
+                    min-width: unset !important;
+                    height: unset !important;
+                    line-height: unset !important;
+                    padding: 0.375rem 0.75rem !important;
+                    font-size: 1rem !important;
+                    font-weight: normal !important;
+                    letter-spacing: normal !important;
+                    text-transform: none !important;
+                    margin: 0 !important;
+                    border-radius: 4px !important;
+                    background: none;
+                    border: 1px solid #ccc;
+                    cursor: pointer;
+                }
+                
+                .rbc-calendar button:hover {
+                    background-color: #e6e6e6 !important;
+                    color: #333 !important;
+                }
+                
+                .rbc-calendar button.rbc-active {
+                    background-color: #337ab7 !important;
+                    color: white !important;
+                    border-color: #2e6da4 !important;
+                }
+                
+                /* Reset global table styles if they leak in */
+                .rbc-calendar table {
+                    background: transparent;
+                }
+                
+                .rbc-event {
+                    background-color: #378006;
+                }
+                
                 #calendar-container {
                     margin-left: 5vw;
                     margin-right: 5vw;
                     margin-top: 5vh;
                     margin-bottom: 10vh;
                 }
-
-                /* Day numbers on the left side */
-                .fc .fc-daygrid-day-number {
-                    float: left;
-                    margin-left: 5px;
-                    font-weight: bold;
-                    color: #333; /* Ensuring visibility */
-                }
-
-                .fc .fc-daygrid-day-top {
-                    display: flex;
-                    flex-direction: row-reverse;
-                    justify-content: flex-end !important;
-                }
-                
-                /* Ensure text in calendar is visible */
-                .fc {
-                    color: #333;
-                }
-                
-                .fc-col-header-cell-cushion {
-                    color: #333;
-                }
             `}</style>
             <section>
-                <div id="calendar-container" style={{ margin: '5vh 5vw 10vh 5vw' }}>
-                    <FullCalendar
-                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        timeZone="local"
-                        themeSystem="bootstrap5"
-                        height="auto"
-                        contentHeight="auto"
-                        expandRows={true}
-                        headerToolbar={{
-                            left: 'title',
-                            center: 'prev next today',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        }}
+                <div id="calendar-container">
+                    <BigCalendar
+                        localizer={localizer}
                         events={events}
-                        eventClick={handleEventClick}
+                        startAccessor="start"
+                        endAccessor="end"
+                        style={{ height: 800 }}
+                        onSelectEvent={handleEventClick}
+                        views={['month', 'week', 'day']}
+                        view={view}
+                        date={date}
+                        onNavigate={onNavigate}
+                        onView={onView}
                     />
                 </div>
             </section>
