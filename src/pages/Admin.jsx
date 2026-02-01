@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { apiUrls } from '../config/api-urls';
+import AdminLayout from '../components/admin/AdminLayout';
+import EventManager from '../components/admin/EventManager';
 
 const clientId = '663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com';
 
@@ -8,7 +10,9 @@ const AdminDashboard = () => {
     const [token, setToken] = useState(localStorage.getItem('JWT'));
     const [users, setUsers] = useState([]);
     const [events, setEvents] = useState([]);
-    // const [images, setImages] = useState([]);
+    const [loadingEvents, setLoadingEvents] = useState(false);
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [userProfile, setUserProfile] = useState(null); // Should decode JWT or fetch profile
 
     // Determine API URL
     const getApiUrl = () => {
@@ -36,7 +40,7 @@ const AdminDashboard = () => {
             if (parseFloat(flags) >= 2.0) {
                 localStorage.setItem('JWT', credentialResponse.credential);
                 setToken(credentialResponse.credential);
-                // Load data
+                // Optionally decode token to get user info if needed
                 loadData();
             } else {
                 alert('Insufficient permissions (Flags: ' + flags + ')');
@@ -52,7 +56,7 @@ const AdminDashboard = () => {
     };
 
     const loadData = async () => {
-        // Load events as an example
+        setLoadingEvents(true);
         try {
             const response = await fetch(`${currentAPIurl}${apiUrls.url.events.getAll}`);
             const data = await response.json();
@@ -61,6 +65,36 @@ const AdminDashboard = () => {
             }
         } catch (error) {
             console.error('Error loading events:', error);
+        } finally {
+            setLoadingEvents(false);
+        }
+    };
+
+    const handleCreateEvent = async (eventData) => {
+        try {
+            const payload = {
+                ...eventData,
+                token: token
+            };
+
+            const response = await fetch(`${currentAPIurl}${apiUrls.url.admin.events.create}`, {
+                method: apiUrls.methods.admin.events.create,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await response.json();
+
+            if (data.success || data.result?.success) {
+                loadData();
+                alert('Event created successfully!');
+            } else {
+                alert('Failed to create event: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error creating event:', error);
+            alert('Error creating event');
         }
     };
 
@@ -70,6 +104,30 @@ const AdminDashboard = () => {
         }
     }, [token]);
 
+    const handleDeleteEvent = async (eventId) => {
+        if (!window.confirm('Are you sure you want to delete this event?')) return;
+
+        try {
+            const response = await fetch(`${currentAPIurl}${apiUrls.url.admin.events.remove}`, {
+                method: apiUrls.methods.admin.events.remove,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token, id: eventId }),
+            });
+            const data = await response.json();
+
+            if (data.success || data.result?.success) {
+                loadData();
+            } else {
+                alert('Failed to delete event: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            alert('Error deleting event');
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('JWT');
         setToken(null);
@@ -77,57 +135,77 @@ const AdminDashboard = () => {
 
     if (!token) {
         return (
-            <div className="container wrapper" style={{ marginTop: '5rem', textAlign: 'center' }}>
-                <h1>Admin Login</h1>
-                <div style={{ display: 'inline-block', marginTop: '2rem' }}>
-                    <GoogleLogin
-                        onSuccess={handleLoginSuccess}
-                        onError={handleLoginError}
-                        theme="filled_black"
-                        size="large"
-                        shape="rectangular"
-                    />
+            <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-center items-center">
+                <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 w-full max-w-md text-center">
+                    <h1 className="text-3xl font-bold mb-2">Admin Portal</h1>
+                    <p className="text-gray-400 mb-8">Pioneer Rocketry</p>
+
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleLoginSuccess}
+                            onError={handleLoginError}
+                            theme="filled_black"
+                            size="large"
+                            shape="pill"
+                            width="100%"
+                        />
+                    </div>
+                    <p className="mt-6 text-sm text-gray-500">
+                        Authorized personnel only.
+                    </p>
                 </div>
             </div>
         );
     }
 
-    return (
-        <div className="container wrapper" style={{ marginTop: '2rem' }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Admin Dashboard</h1>
-                <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
-            </div>
-
-            <div className="card mb-4">
-                <div className="card-header">
-                    <h2>Event Manager</h2>
-                </div>
-                <div className="card-body">
-                    <p>Manage club events here.</p>
-                    {events.length === 0 ? (
-                        <p>No events found or loading...</p>
-                    ) : (
-                        <div className="list-group">
-                            {events.map((ev) => (
-                                <div key={ev.id} className="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 className="mb-1">{ev.title}</h5>
-                                        <small>{new Date(ev.start).toLocaleDateString()}</small>
-                                    </div>
-                                    <span className="badge bg-primary rounded-pill">ID: {ev.id}</span>
-                                </div>
-                            ))}
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'dashboard':
+                return (
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-6 shadow-lg">
+                                <h3 className="text-lg font-semibold text-white/80">Total Events</h3>
+                                <p className="text-4xl font-bold text-white mt-2">{events.length}</p>
+                            </div>
+                            <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-6 shadow-lg">
+                                <h3 className="text-lg font-semibold text-white/80">System Status</h3>
+                                <p className="text-xl font-bold text-white mt-2 flex items-center">
+                                    <span className="w-3 h-3 bg-green-400 rounded-full mr-2"></span>
+                                    Operational
+                                </p>
+                            </div>
+                            {/* Add more stats here */}
                         </div>
-                    )}
-                </div>
-            </div>
 
-            <div className="alert alert-info">
-                Full admin functionality (User handling, Image uploads, etc.) requires porting the specific JS logic from the legacy <code>js/api/</code> folders.
-                This dashboard demonstrates authentication and event fetching.
-            </div>
-        </div>
+                        <div className="mt-8 bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                            <h2 className="text-xl font-bold mb-4">Welcome back</h2>
+                            <p className="text-gray-400">Select a module from the sidebar to get started.</p>
+                        </div>
+                    </div>
+                );
+            case 'events':
+                return (
+                    <EventManager
+                        events={events}
+                        loading={loadingEvents}
+                        onCreateEvent={handleCreateEvent}
+                        onDeleteEvent={handleDeleteEvent}
+                    />
+                );
+            case 'users':
+                return <div className="p-10 text-center text-gray-500">User Management Module - Coming Soon</div>;
+            case 'images':
+                return <div className="p-10 text-center text-gray-500">Image Manager Module - Coming Soon</div>;
+            default:
+                return <div className="p-10 text-center text-gray-500">Module Under Construction</div>;
+        }
+    };
+
+    return (
+        <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
+            {renderContent()}
+        </AdminLayout>
     );
 };
 

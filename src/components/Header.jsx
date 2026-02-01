@@ -5,12 +5,13 @@ const Header = () => {
     const location = useLocation();
 
     return (
-        <section id="header" className="wrapper" style={location.pathname === '/calendar' ? { height: '15em' } : {}}>
+        <section id="header" className="wrapper" style={['/calendar', '/admin'].includes(location.pathname) ? { height: '15em' } : {}}>
             {/* Logo, conditionally rendered */}
             {/* Logo, conditionally rendered */}
-            {location.pathname === '/calendar' ? (
-                // Calendar Page Header
-                <h1>Meetings are Held Every Tuesday at 5:33PM</h1>
+            {/* Logo, conditionally rendered */}
+            {['/calendar', '/admin'].includes(location.pathname) ? (
+                // Calendar/Admin Page Header
+                location.pathname === '/calendar' ? <h1>Meetings are Held Every Tuesday at 5:33PM</h1> : <h1>Administration</h1>
             ) : (
                 // Default Header
                 <div id="logo">

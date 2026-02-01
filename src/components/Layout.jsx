@@ -36,7 +36,7 @@ const Layout = () => {
             <div id="page-wrapper">
                 <Header />
                 <Outlet />
-                <Footer />
+                {location.pathname !== '/admin' && <Footer />}
             </div>
 
             <div id="navPanel">
