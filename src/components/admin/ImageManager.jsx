@@ -9,6 +9,7 @@ const ImageManager = ({ token }) => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showReplaceModal, setShowReplaceModal] = useState(false);
     const [imageToReplace, setImageToReplace] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
 
     // Form states
     const [uploadFiles, setUploadFiles] = useState(null);
@@ -136,7 +137,7 @@ const ImageManager = ({ token }) => {
     };
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-white">Image Library</h2>
                 <button
@@ -152,12 +153,12 @@ const ImageManager = ({ token }) => {
             ) : (
                 <div className="bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-700">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="w-full text-left whitespace-nowrap">
                             <thead className="bg-gray-700 text-gray-300">
                                 <tr>
                                     <th className="p-4">Preview</th>
                                     <th className="p-4">Name</th>
-                                    <th className="p-4">URL</th>
+                                    <th className="p-4 hidden md:table-cell">URL</th>
                                     <th className="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -170,10 +171,17 @@ const ImageManager = ({ token }) => {
                                     return (
                                         <tr key={index} className="hover:bg-gray-750">
                                             <td className="p-4">
-                                                <img src={url} alt={name} className="h-16 w-16 object-cover rounded bg-gray-900" />
+                                                <img
+                                                    src={url}
+                                                    alt={name}
+                                                    className="h-16 w-16 object-cover rounded bg-gray-900 cursor-pointer hover:opacity-80 transition-opacity"
+                                                    onMouseEnter={() => setPreviewImage(url)}
+                                                    onMouseLeave={() => setPreviewImage(null)}
+                                                    onClick={() => setPreviewImage(url)} // For mobile/touch
+                                                />
                                             </td>
                                             <td className="p-4 font-medium text-white">{name}</td>
-                                            <td className="p-4">
+                                            <td className="p-4 hidden md:table-cell">
                                                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline truncate block max-w-xs">
                                                     {url}
                                                 </a>
@@ -209,85 +217,108 @@ const ImageManager = ({ token }) => {
                         </table>
                     </div>
                 </div>
-            )}
+            )
+            }
+
+            {/* Fullscreen Image Overlay */}
+            {
+                previewImage && (
+                    <div
+                        className="fixed inset-0 z-[60] pointer-events-none flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+                    // On desktop we might want to let clicks pass through if just hovering, but typically an overlay blocks. 
+                    // However, legacy was a hover effect. 
+                    // Let's make it fixed centered on top of everything.
+                    >
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-h-[90vh] max-w-[90vw] shadow-2xl rounded-lg border-2 border-white/20"
+                        />
+                    </div>
+                )
+            }
 
             {/* Upload Modal */}
-            {showUploadModal && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700 shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-4">Upload Images</h3>
-                        <form onSubmit={handleUpload}>
-                            <div className="mb-4">
-                                <label className="block text-gray-400 mb-2">Select Files</label>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={(e) => setUploadFiles(e.target.files)}
-                                    className="w-full bg-gray-900 text-white p-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowUploadModal(false)}
-                                    className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={!uploadFiles}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Upload
-                                </button>
-                            </div>
-                        </form>
+            {
+                showUploadModal && (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                        <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700 shadow-2xl">
+                            <h3 className="text-xl font-bold text-white mb-4">Upload Images</h3>
+                            <form onSubmit={handleUpload}>
+                                <div className="mb-4">
+                                    <label className="block text-gray-400 mb-2">Select Files</label>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={(e) => setUploadFiles(e.target.files)}
+                                        className="w-full bg-gray-900 text-white p-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowUploadModal(false)}
+                                        className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!uploadFiles}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Upload
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Replace Modal */}
-            {showReplaceModal && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700 shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-4">Replace Image</h3>
-                        <p className="text-gray-400 mb-4 text-sm">Replacing: <span className="text-white font-mono">{imageToReplace?.key.replace('images/', '')}</span></p>
-                        <form onSubmit={handleReplace}>
-                            <div className="mb-4">
-                                <label className="block text-gray-400 mb-2">Select New File</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setReplaceFile(e.target.files[0])}
-                                    className="w-full bg-gray-900 text-white p-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowReplaceModal(false);
-                                        setImageToReplace(null);
-                                    }}
-                                    className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={!replaceFile}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Confirm Replace
-                                </button>
-                            </div>
-                        </form>
+            {
+                showReplaceModal && (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                        <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700 shadow-2xl">
+                            <h3 className="text-xl font-bold text-white mb-4">Replace Image</h3>
+                            <p className="text-gray-400 mb-4 text-sm">Replacing: <span className="text-white font-mono">{imageToReplace?.key.replace('images/', '')}</span></p>
+                            <form onSubmit={handleReplace}>
+                                <div className="mb-4">
+                                    <label className="block text-gray-400 mb-2">Select New File</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setReplaceFile(e.target.files[0])}
+                                        className="w-full bg-gray-900 text-white p-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowReplaceModal(false);
+                                            setImageToReplace(null);
+                                        }}
+                                        className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!replaceFile}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Confirm Replace
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

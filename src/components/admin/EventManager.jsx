@@ -13,7 +13,7 @@ const EventManager = ({ events, loading, onCreateEvent, onDeleteEvent }) => {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-white">Upcoming Events</h3>
                 <button
@@ -38,7 +38,7 @@ const EventManager = ({ events, loading, onCreateEvent, onDeleteEvent }) => {
                 </div>
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-gray-300">
+                    <table className="w-full text-left text-gray-300 whitespace-nowrap">
                         <thead className="text-xs uppercase bg-gray-700 text-gray-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3 rounded-tl-lg">Title</th>

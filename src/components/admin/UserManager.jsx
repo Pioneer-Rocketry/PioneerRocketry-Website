@@ -80,7 +80,7 @@ const UserManager = ({ token }) => {
     };
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6">
             <header className="mb-6">
                 <h2 className="text-2xl font-bold text-white">User Management</h2>
                 <p className="text-gray-400">Manage user roles and permissions.</p>
@@ -91,12 +91,12 @@ const UserManager = ({ token }) => {
             ) : (
                 <div className="bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-700">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="w-full text-left whitespace-nowrap">
                             <thead className="bg-gray-700 text-gray-300">
                                 <tr>
-                                    <th className="p-4">Name</th>
+                                    <th className="p-4 hidden sm:table-cell">Name</th>
                                     <th className="p-4">Email</th>
-                                    <th className="p-4">ID</th>
+                                    <th className="p-4 hidden md:table-cell">ID</th>
                                     <th className="p-4">Role</th>
                                     <th className="p-4 text-right">Actions</th>
                                 </tr>
@@ -107,9 +107,9 @@ const UserManager = ({ token }) => {
 
                                     return (
                                         <tr key={user.id} className="hover:bg-gray-750">
-                                            <td className="p-4 font-medium text-white">{user.name}</td>
+                                            <td className="p-4 font-medium text-white hidden sm:table-cell">{user.name}</td>
                                             <td className="p-4 text-gray-300">{user.email}</td>
-                                            <td className="p-4 text-gray-500 font-mono text-xs">{user.id}</td>
+                                            <td className="p-4 text-gray-500 font-mono text-xs hidden md:table-cell">{user.id}</td>
                                             <td className="p-4">
                                                 <select
                                                     defaultValue={currentFlag}
