@@ -33,7 +33,7 @@ const Layout = () => {
                 <span className="title">Pioneer Rocketry</span>
             </div>
 
-            <div id="page-wrapper">
+            <div id="page-wrapper" style={location.pathname === '/admin' ? { width: '100%', maxWidth: '100%', padding: 0 } : {}}>
                 <Header />
                 <Outlet />
                 {location.pathname !== '/admin' && <Footer />}

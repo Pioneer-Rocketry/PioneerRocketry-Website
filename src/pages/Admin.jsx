@@ -3,6 +3,8 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { apiUrls } from '../config/api-urls';
 import AdminLayout from '../components/admin/AdminLayout';
 import EventManager from '../components/admin/EventManager';
+import UserManager from '../components/admin/UserManager';
+import ImageManager from '../components/admin/ImageManager';
 
 const clientId = '663378314498-3g2pd0cjt832jjv09i16k9brf8jb8n0p.apps.googleusercontent.com';
 
@@ -13,6 +15,7 @@ const AdminDashboard = () => {
     const [loadingEvents, setLoadingEvents] = useState(false);
     const [activeTab, setActiveTab] = useState('dashboard');
     const [userProfile, setUserProfile] = useState(null); // Should decode JWT or fetch profile
+    const [islocalhost, setlocalhost] = useState(false);
 
     // Determine API URL
     const getApiUrl = () => {
@@ -102,6 +105,10 @@ const AdminDashboard = () => {
         if (token) {
             loadData();
         }
+        if (location.hostname == "localhost") {
+            setlocalhost(true);
+            loadData();
+        }
     }, [token]);
 
     const handleDeleteEvent = async (eventId) => {
@@ -133,7 +140,7 @@ const AdminDashboard = () => {
         setToken(null);
     };
 
-    if (!token) {
+    if (!token && !islocalhost) {
         return (
             <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-center items-center">
                 <div className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 w-full max-w-md text-center">
@@ -163,8 +170,8 @@ const AdminDashboard = () => {
             case 'dashboard':
                 return (
                     <div className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-6 shadow-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-lg p-10">
                                 <h3 className="text-lg font-semibold text-white/80">Total Events</h3>
                                 <p className="text-4xl font-bold text-white mt-2">{events.length}</p>
                             </div>
@@ -194,9 +201,9 @@ const AdminDashboard = () => {
                     />
                 );
             case 'users':
-                return <div className="p-10 text-center text-gray-500">User Management Module - Coming Soon</div>;
+                return <UserManager token={token} />;
             case 'images':
-                return <div className="p-10 text-center text-gray-500">Image Manager Module - Coming Soon</div>;
+                return <ImageManager token={token} />;
             default:
                 return <div className="p-10 text-center text-gray-500">Module Under Construction</div>;
         }

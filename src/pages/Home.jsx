@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+// Import Legacy Styles Component
+import LegacyStyles from '../components/LegacyStyles';
 
 const Home = () => {
     return (
         <>
+            <LegacyStyles />
             {/* Intro */}
             <section id="intro" className="wrapper style1 moduleSafe">
                 <div className="title">What is Pioneer Rocketry</div>

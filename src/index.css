@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
+  /* Respect legacy font from main.css */
   line-height: 1.5;
   font-weight: 400;
 
@@ -34,18 +35,10 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  /* Note: This might conflict with new layouts, be careful. AdminLayout handles its own structure. */
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-/* Reset body display for Admin pages which manage their own layout */
-#root:has(.min-h-screen) body {
-  display: block;
-  place-items: unset;
-}
 
 h1 {
   font-size: 3.2em;

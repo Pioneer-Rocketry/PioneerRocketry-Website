@@ -7,9 +7,8 @@ import App from './App.jsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Import FontAwesome
 import '@fortawesome/fontawesome-free/css/all.min.css';
-// Import custom styles
-import './assets/css/main.css';
-import './assets/css/custom.css';
+// Import Tailwind
+import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

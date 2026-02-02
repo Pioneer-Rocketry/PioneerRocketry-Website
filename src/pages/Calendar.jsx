@@ -5,6 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { apiUrls } from '../config/api-urls';
 import { useNavigate } from 'react-router-dom';
+import LegacyStyles from '../components/LegacyStyles';
 
 const Calendar = () => {
     const [events, setEvents] = useState([]);
@@ -61,6 +62,7 @@ const Calendar = () => {
 
     return (
         <>
+            <LegacyStyles />
             <style>{`
                 #calendar tbody tr[role='row'] {
                     height: 150px;

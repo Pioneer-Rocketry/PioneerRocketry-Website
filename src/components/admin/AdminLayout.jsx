@@ -8,9 +8,6 @@ const AdminLayout = ({ children, activeTab, setActiveTab, onLogout, userProfile 
         { id: 'users', label: 'User Management', icon: 'fa-users' },
         { id: 'events', label: 'Event Manager', icon: 'fa-calendar-alt' },
         { id: 'images', label: 'Image Manager', icon: 'fa-images' },
-        { id: 'pages', label: 'Page Editor', icon: 'fa-file-alt' },
-        { id: 'css', label: 'CSS Manager', icon: 'fa-palette' },
-        { id: 'scripts', label: 'Script Manager', icon: 'fa-code' },
     ];
 
     return (
@@ -65,8 +62,8 @@ const AdminLayout = ({ children, activeTab, setActiveTab, onLogout, userProfile 
             </aside>
 
             {/* Main Content */}
-            <main className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300 bg-gray-900 p-8`}>
-                <div className="max-w-7xl mx-auto">
+            <main className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300 bg-gray-900 p-8 w-full`}>
+                <div className="w-full">
                     <header className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-3xl font-bold text-white capitalize">{activeTab.replace('-', ' ')}</h1>
